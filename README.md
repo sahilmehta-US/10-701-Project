@@ -3,7 +3,6 @@
 ## Overview
 
 
----
 ## Install
 To install the required dependencies, first make sure python is installed in your preferred environment. Then run the following command in the root directory:
 ```
