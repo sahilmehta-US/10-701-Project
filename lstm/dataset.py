@@ -114,8 +114,9 @@ def make_splits(csv_file, split_json, seq_len=20, target_col=TARGET_COL, feature
 
     # Prepend the last `seq_len` rows of the preceding split so the first
     # window of each subsequent split has a complete history.
-    val_df  = pd.concat([train_df.iloc[-seq_len:], val_df], ignore_index=True)
-    test_df = pd.concat([val_df.iloc[-(seq_len + len(_rows(spec["validation"]["start_date"], spec["validation"]["end_date"]))):].iloc[:seq_len], test_df], ignore_index=True)
+    raw_val_df = val_df
+    val_df  = pd.concat([train_df.iloc[-seq_len:], raw_val_df], ignore_index=True)
+    test_df = pd.concat([raw_val_df.iloc[-seq_len:], test_df], ignore_index=True)
 
     def _write_tmp(dataframe):
         path = csv_file + f".tmp_{id(dataframe)}.csv"
@@ -154,7 +155,7 @@ def make_dataloaders(csv_file, split_json, seq_len=20, batch_size=64, target_col
 
     Returns
     -------
-    train_loader, val_loader, test_loader
+    train_loader, val_loader, test_loader, n_features
     """
     from torch.utils.data import DataLoader
 
@@ -165,4 +166,4 @@ def make_dataloaders(csv_file, split_json, seq_len=20, batch_size=64, target_col
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=False)
     val_loader   = DataLoader(val_ds,   batch_size=batch_size, shuffle=False)
     test_loader  = DataLoader(test_ds,  batch_size=batch_size, shuffle=False)
-    return train_loader, val_loader, test_loader
+    return train_loader, val_loader, test_loader, train_ds.n_features

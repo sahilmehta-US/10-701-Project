@@ -55,13 +55,9 @@ def plot_losses(train_loss_list, val_loss_list, best_epoch):
     plt.savefig('losses.png', dpi=150)
 
 def run(csv_file, split_json, seq_len, batch_size, target_col, epochs, lr, hidden, num_layers, dropout, loss_scale):
-    train_loader, val_loader, test_loader = make_dataloaders(
+    train_loader, val_loader, test_loader, n_features = make_dataloaders(
         csv_file, split_json, seq_len=seq_len, batch_size=batch_size, target_col=target_col
     )
-
-    # n_features is inferred from the first batch
-    sample_X, _ = next(iter(train_loader))
-    n_features = sample_X.shape[2]
 
     model = LSTM(
         input_size=n_features,
