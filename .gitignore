@@ -1,1 +1,8 @@
 *.env
+
+data/pipeline_steps/
+data/results/
+
+# lstm/: ignore all except top-level Python sources (plots, checkpoints, caches, etc.)
+lstm/*
+!lstm/*.py

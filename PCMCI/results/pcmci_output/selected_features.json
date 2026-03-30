@@ -1,14 +1,52 @@
 {
-  "method": "best_lag_only",
-  "p_value_threshold": 0.05,
-  "target": "Gold Futures (COMEX) | target_log_return_t_plus_5",
-  "n_features": 6,
-  "features": [
-    "CBOE Volatility Index | diff_1 | lag_1",
-    "Copper Futures | log_return | lag_5",
-    "Silver Futures | log_return | lag_1",
-    "U.S. Dollar Index | log_return | lag_1",
-    "US 10Y Treasury Yield | log_return | lag_1",
-    "WTI Crude Oil Futures | log_return | lag_1"
-  ]
+  "target": "Gold Futures (COMEX) | log_return",
+  "pcmci_config": {
+    "max_lag": 5,
+    "pc_alpha": 0.05,
+    "mci_alpha": 0.05,
+    "fdr_method": "fdr_bh",
+    "independence_test": "ParCorr (linear)"
+  },
+  "n_exogenous_features": 5,
+  "exogenous_features": [
+    "ICE BofA MOVE Index | diff_1",
+    "U.S. Dollar Index | log_return",
+    "USD / JPY Exchange Rate | log_return",
+    "US 3M Treasury Yield | log_return",
+    "Silver Futures | log_return"
+  ],
+  "has_significant_self_links": false,
+  "all_causal_links": [
+    {
+      "feature": "ICE BofA MOVE Index | diff_1",
+      "lag": 1,
+      "val_mci": 0.04712449387517322,
+      "pval": 0.013966031742860768
+    },
+    {
+      "feature": "U.S. Dollar Index | log_return",
+      "lag": 2,
+      "val_mci": -0.04640101618929314,
+      "pval": 0.015844889855448442
+    },
+    {
+      "feature": "USD / JPY Exchange Rate | log_return",
+      "lag": 5,
+      "val_mci": -0.04350792775235508,
+      "pval": 0.02642350024001327
+    },
+    {
+      "feature": "US 3M Treasury Yield | log_return",
+      "lag": 1,
+      "val_mci": -0.04255417060464162,
+      "pval": 0.03073172593730229
+    },
+    {
+      "feature": "Silver Futures | log_return",
+      "lag": 1,
+      "val_mci": 0.04133487169617822,
+      "pval": 0.03721005177757266
+    }
+  ],
+  "self_links": []
 }
