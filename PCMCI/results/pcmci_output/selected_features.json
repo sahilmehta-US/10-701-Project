@@ -1,0 +1,14 @@
+{
+  "method": "best_lag_only",
+  "p_value_threshold": 0.05,
+  "target": "Gold Futures (COMEX) | target_log_return_t_plus_5",
+  "n_features": 6,
+  "features": [
+    "CBOE Volatility Index | diff_1 | lag_1",
+    "Copper Futures | log_return | lag_5",
+    "Silver Futures | log_return | lag_1",
+    "U.S. Dollar Index | log_return | lag_1",
+    "US 10Y Treasury Yield | log_return | lag_1",
+    "WTI Crude Oil Futures | log_return | lag_1"
+  ]
+}
