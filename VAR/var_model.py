@@ -7,16 +7,28 @@ from statsmodels.tsa.api import VAR
 from dataclasses import dataclass
 
 # Configuration
-DATA_ROOT = "../data/results"
-DATASET_NAME = "gold_base_stationary_dropna.csv"
-SPLIT_FILE = "split_definition.json"
+DATA_ROOT = "../data/pipeline_steps"
+DATASET_NAME = "step_2_merged_unlagged_features_dropna.csv"
+SPLIT_FILE = "../results/split_definition.json"
 TARGET_COL = "Gold Futures (COMEX) | log_return"
 MAXLAGS = None
 IC = "aic"
 TREND = "c"
 HORIZONS = [1,5]
 OUTPUT_DIR = "var_outputs"
-
+USE_COLS = [
+    "Gold Futures (COMEX) | log_return",
+    "U.S. Dollar Index | log_return",
+    "USD / JPY Exchange Rate | log_return",
+    "S&P 500 | log_return",
+    "CBOE Volatility Index | diff_1",
+    "ICE BofA MOVE Index | diff_1",
+    "WTI Crude Oil Futures | log_return",
+    "Silver Futures | log_return",
+    "Copper Futures | log_return",
+    "US 10Y Treasury Yield | diff_1",
+    "US 3M Treasury Yield | diff_1",
+]
 # Data Structures
 @dataclass
 class SplitRange:
@@ -154,6 +166,8 @@ def main():
     csv_path = data_root / DATASET_NAME
     split_path = data_root / SPLIT_FILE
     bundle = load_data(csv_path, TARGET_COL)
+    bundle.frame = bundle.frame[["Date"] + USE_COLS]
+    bundle.columns = USE_COLS
     splits = load_json(split_path)
     
     train_split = make_split_range(splits, "train")

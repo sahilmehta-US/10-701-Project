@@ -532,6 +532,12 @@ def main(run_upstream_first: bool = True) -> None:
     target_df = read_indexed_csv(YF_TARGET_PATH)
 
     merged_unlagged_df = merge_feature_panels(yf_stationary_df, fred_derived_df)
+    merged_unlagged_df = merged_unlagged_df.drop(columns=[
+        "Secured Overnight Financing Rate | level",
+        "Secured Overnight Financing Rate | diff_1",
+    ], errors="ignore")
+    # Drop SOFR (starts 2018-04, truncates training data from 4900 to 1750 rows)
+    # Fed Funds Rate serves as close substitute
     merged_unlagged_dropna_df = merged_unlagged_df.dropna(how="any")
 
     save_json(
