@@ -10,6 +10,10 @@ Runs two experiments:
 Both use the same architecture, hyperparameters, and random seed
 so the only difference is the input feature set.
 
+Additional experiment:
+  3. LSTM-all-reg: trained on ALL features with regularization on
+     features not selected by PCMCI
+
 Usage:
     python train.py
 """
@@ -39,6 +43,9 @@ HIDDEN     = 64
 NUM_LAYERS = 2
 DROPOUT    = 0.2
 LOSS_SCALE = 1e6   # multiply losses to make them readable
+REG_LAMBDA = 1e-4
+L2_ALL_REGULARIZATION = "l2_noncausal"
+L1_ALL_REGULARIZATION = "l1_noncausal"
 
 CAUSAL_FEATURES_JSON = "../PCMCI/results/pcmci_output/selected_features.json"
 # ══════════════════════════════════════════════════════════════════════════
@@ -55,7 +62,21 @@ def set_seed(seed=42):
         torch.cuda.manual_seed_all(seed)
 
 
-def run_epoch(model, optimizer, loss_fn, loader, training):
+def compute_regularization_penalty(model, reg_type, reg_col_idxs):
+    """Regularise the first-layer input weights tied to selected features."""
+    if reg_type is None or not reg_col_idxs:
+        return None
+
+    input_weights = model.lstm.weight_ih_l0[:, reg_col_idxs]
+    if reg_type == "l1":
+        return input_weights.abs().sum()
+    if reg_type == "l2":
+        return input_weights.pow(2).sum()
+    raise ValueError(f"Unsupported regularization type: {reg_type}")
+
+
+def run_epoch(model, optimizer, loss_fn, loader, training,
+              reg_type=None, reg_col_idxs=None, reg_lambda=0.0):
     """Run one epoch of training or evaluation."""
     model.train(training)
     total_loss = 0.0
@@ -63,7 +84,12 @@ def run_epoch(model, optimizer, loss_fn, loader, training):
         for X, y in loader:
             X, y = X.to(device), y.to(device)
             pred = model(X)
-            loss = loss_fn(pred, y)
+            base_loss = loss_fn(pred, y)
+            loss = base_loss
+            if training and reg_type is not None and reg_lambda > 0:
+                penalty = compute_regularization_penalty(model, reg_type, reg_col_idxs)
+                if penalty is not None:
+                    loss = loss + reg_lambda * penalty
             if training:
                 optimizer.zero_grad()
                 loss.backward()
@@ -91,7 +117,9 @@ def plot_losses(train_losses, val_losses, best_epoch, label, filename):
 
 def run(csv_file, split_json, seq_len, batch_size, target_col,
         epochs, lr, hidden, num_layers, dropout, loss_scale,
-        feature_cols=None, label="LSTM"):
+        feature_cols=None, label="LSTM",
+        regularization=None, reg_lambda=REG_LAMBDA,
+        causal_cols=None):
     """
     Train an LSTM, evaluate on test set, return results dict.
 
@@ -101,6 +129,11 @@ def run(csv_file, split_json, seq_len, batch_size, target_col,
         If None, use all columns. If a list, use only those columns.
     label : str
         Name for this experiment (used in prints and filenames).
+    regularization : str or None
+        One of None, "l1_noncausal", or "l2_noncausal".
+    causal_cols : list[str] or None
+        PCMCI-selected columns used to determine which all-feature
+        inputs should be regularised.
     """
     # Reset seed so both experiments start from identical conditions
     set_seed(42)
@@ -114,6 +147,30 @@ def run(csv_file, split_json, seq_len, batch_size, target_col,
           f"Train: {len(train_loader.dataset)}  "
           f"Val: {len(val_loader.dataset)}  "
           f"Test: {len(test_loader.dataset)}")
+
+    if regularization is None:
+        reg_type = None
+        reg_col_idxs = []
+        reg_cols = []
+    else:
+        if regularization not in {"l1_noncausal", "l2_noncausal"}:
+            raise ValueError(
+                "regularization must be one of None, 'l1_noncausal', or 'l2_noncausal'"
+            )
+        if causal_cols is None:
+            raise ValueError("causal_cols must be provided when regularization is enabled")
+        reg_type = regularization.split("_", maxsplit=1)[0]
+        causal_set = set(causal_cols)
+        reg_cols = [col for col in train_loader.dataset.feature_cols if col not in causal_set]
+        reg_col_idxs = [
+            idx for idx, col in enumerate(train_loader.dataset.feature_cols)
+            if col not in causal_set
+        ]
+
+    reg_desc = regularization or "none"
+    print(f"[{label}] Regularization: {reg_desc}")
+    if reg_type is not None:
+        print(f"[{label}] Penalizing {len(reg_cols)} non-PCMCI features with lambda={reg_lambda}")
 
     model = LSTM(
         input_size=n_features,
@@ -133,7 +190,10 @@ def run(csv_file, split_json, seq_len, batch_size, target_col,
     val_loss_list = []
 
     for epoch in range(1, epochs + 1):
-        train_loss = run_epoch(model, optimizer, loss_fn, train_loader, training=True)
+        train_loss = run_epoch(
+            model, optimizer, loss_fn, train_loader, training=True,
+            reg_type=reg_type, reg_col_idxs=reg_col_idxs, reg_lambda=reg_lambda,
+        )
         val_loss = run_epoch(model, optimizer, loss_fn, val_loader, training=False)
 
         if val_loss < best_val_loss:
@@ -159,10 +219,12 @@ def run(csv_file, split_json, seq_len, batch_size, target_col,
     # Evaluate on test set using best checkpoint
     model.load_state_dict(best_state)
     test_loss = run_epoch(model, optimizer, loss_fn, test_loader, training=False)
+    input_weights = model.lstm.weight_ih_l0.detach().cpu().clone()
 
-    print(f"[{label}] Best epoch: {best_epoch}")
+    print(f"[{label}] Best epoch:    {best_epoch}")
     print(f"[{label}] Best val MSE:  {best_val_loss*loss_scale:.2f} (x{1/loss_scale})")
     print(f"[{label}] Test MSE:      {test_loss*loss_scale:.2f} (x{1/loss_scale})")
+    print(f"[{label}] Weights:       {tuple(input_weights.shape)}")
 
     return {
         "label": label,
@@ -170,7 +232,10 @@ def run(csv_file, split_json, seq_len, batch_size, target_col,
         "best_epoch": best_epoch,
         "best_val_mse": best_val_loss,
         "test_mse": test_loss,
-        "feature_cols": feature_cols,
+        "feature_cols": train_loader.dataset.feature_cols,
+        "regularization": reg_desc,
+        "reg_lambda": reg_lambda if reg_type is not None else None,
+        "weights": input_weights,
     }
 
 
@@ -187,7 +252,7 @@ def load_causal_features():
     with open(CAUSAL_FEATURES_JSON) as f:
         info = json.load(f)
 
-    causal_cols = info["exogenous_features"]
+    causal_cols = list(info["exogenous_features"])
     print(f"[INFO] PCMCI selected {len(causal_cols)} exogenous features:")
     for c in causal_cols:
         print(f"       - {c}")
@@ -225,24 +290,93 @@ def main():
         label="LSTM-causal",
     )
 
+    # ── Experiment 3: LSTM-all with regularization L2 ──────────────────
+    print("\n" + "=" * 70)
+    print("EXPERIMENT 3: LSTM-ALL-REG-L2 (all features, regularize non-PCMCI)")
+    print("=" * 70)
+    print(f"[INFO] Regularization: {L2_ALL_REGULARIZATION}; Lambda: {REG_LAMBDA}")
+    result_all_reg_l2 = run(
+        CSV, SPLIT_JSON, SEQ_LEN, BATCH_SIZE, TARGET_COL,
+        EPOCHS, LR, HIDDEN, NUM_LAYERS, DROPOUT, LOSS_SCALE,
+        feature_cols=None,
+        label="LSTM-all-reg-l2",
+        regularization=L2_ALL_REGULARIZATION,
+        reg_lambda=REG_LAMBDA,
+        causal_cols=causal_cols,
+    )
+
+    # ── Experiment 4: LSTM-all with regularization L1 ──────────────────
+    print("\n" + "=" * 70)
+    print("EXPERIMENT 4: LSTM-ALL-REG-L1 (all features, regularize non-PCMCI)")
+    print("=" * 70)
+    print(f"[INFO] Regularization: {L1_ALL_REGULARIZATION}; Lambda: {REG_LAMBDA}")
+    result_all_reg_l1 = run(
+        CSV, SPLIT_JSON, SEQ_LEN, BATCH_SIZE, TARGET_COL,
+        EPOCHS, LR, HIDDEN, NUM_LAYERS, DROPOUT, LOSS_SCALE,
+        feature_cols=None,
+        label="LSTM-all-reg-l1",
+        regularization=L1_ALL_REGULARIZATION,
+        reg_lambda=REG_LAMBDA,
+        causal_cols=causal_cols,
+    )
+
     # ── Summary ─────────────────────────────────────────────────────
     print("\n" + "=" * 70)
     print("SUMMARY")
     print("=" * 70)
-    print(f"{'Model':<16} {'Features':>8} {'Best Epoch':>10} "
+    print(f"{'Model':<16} {'Features':>8} {'Reg':>14} {'Lambda':>10} {'Best Epoch':>10} "
           f"{'Val MSE':>12} {'Test MSE':>12}")
-    print("-" * 60)
-    for r in [result_all, result_causal]:
-        print(f"{r['label']:<16} {r['n_features']:>8} {r['best_epoch']:>10} "
+    print("-" * 88)
+    results = [result_all, result_causal, result_all_reg_l2, result_all_reg_l1]
+    for r in results:
+        lambda_str = f"{r['reg_lambda']:.0e}" if r['reg_lambda'] is not None else "-"
+        print(f"{r['label']:<16} {r['n_features']:>8} {r['regularization']:>14} {lambda_str:>10} {r['best_epoch']:>10} "
               f"{r['best_val_mse']*LOSS_SCALE:>12.2f} {r['test_mse']*LOSS_SCALE:>12.2f}")
 
     # Which model won?
-    if result_causal["test_mse"] < result_all["test_mse"]:
-        pct = (1 - result_causal["test_mse"] / result_all["test_mse"]) * 100
-        print(f"\n>> LSTM-causal wins by {pct:.1f}% on test MSE")
-    else:
-        pct = (1 - result_all["test_mse"] / result_causal["test_mse"]) * 100
-        print(f"\n>> LSTM-all wins by {pct:.1f}% on test MSE")
+    best_result = min(results, key=lambda r: r["test_mse"])
+    print(f"\n>> Best overall: {best_result['label']} "
+          f"with test MSE {best_result['test_mse']*LOSS_SCALE:.2f}")
+
+    print("\nPAIRWISE TEST COMPARISONS")
+    print("-" * 76)
+    comparisons = [
+        (result_all, result_all_reg_l2),
+        (result_all, result_all_reg_l1),
+        (result_all_reg_l2, result_all_reg_l1),
+        (result_all, result_causal),
+        (result_all_reg_l2, result_causal),
+        (result_all_reg_l1, result_causal),
+    ]
+    for result_a, result_b in comparisons:
+        if np.isclose(result_a["test_mse"], result_b["test_mse"]):
+            print(f">> {result_a['label']} ties {result_b['label']} on test MSE")
+            continue
+
+        winner, loser = (result_a, result_b)
+        if result_b["test_mse"] < result_a["test_mse"]:
+            winner, loser = result_b, result_a
+
+        pct = (1 - winner["test_mse"] / loser["test_mse"]) * 100
+        diff = (loser["test_mse"] - winner["test_mse"]) * LOSS_SCALE
+        print(f">> {winner['label']} beats {loser['label']} by {pct:.1f}% "
+              f"on test MSE ({diff:.2f} scaled MSE)")
+
+    print("\nINPUT WEIGHT SUMMARY")
+    print("-" * 76)
+    for r in results:
+        col_norms = r["weights"].norm(dim=0)
+        causal_idxs = [i for i, col in enumerate(r["feature_cols"]) if col in causal_cols]
+        other_idxs = [i for i, col in enumerate(r["feature_cols"]) if col not in causal_cols]
+
+        all_avg = col_norms.mean().item()
+        causal_avg = col_norms[causal_idxs].mean().item() if causal_idxs else 0.0
+        other_avg = col_norms[other_idxs].mean().item() if other_idxs else 0.0
+
+        print(f"{r['label']:<16} avg|w| all={all_avg:.4f}  "
+              f"pcmci={causal_avg:.4f}  other={other_avg:.4f}")
+        print(f"       - weight shape: {tuple(r['weights'].shape)}")
+        print(f"       - feature split: pcmci={len(causal_idxs)}  other={len(other_idxs)}")
 
 
 if __name__ == "__main__":
