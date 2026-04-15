@@ -1,1 +1,16 @@
+#any private information needed to run, such as API_KEYs should be stored in .env files and excluded
 *.env
+
+data/*pipeline_steps/
+data/*results/
+data/__pycache__/
+data/.DS_Store
+
+# lstm/: ignore all except top-level Python sources (plots, checkpoints, caches, etc.)
+lstm/*
+!lstm/*.py
+
+# var/: ignore all except top-level Python sources (plots, checkpoints, caches, etc.)
+VAR/*
+!VAR/*.py
+

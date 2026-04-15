@@ -19,12 +19,16 @@ TICKER_TO_NAME = {
     "SI=F": "Silver Futures",
     "HG=F": "Copper Futures",
     "GLD": "SPDR Gold Shares ETF",
+    "^TNX": "US 10Y Treasury Yield",
+    "^IRX": "US 3M Treasury Yield",
+    "^TYX": "US 30Y Treasury Yield",
 }
 
 DOWNLOAD_TICKERS = [
     "GC=F", "DX-Y.NYB", "EURUSD=X", "JPY=X",
     "^GSPC", "^IXIC", "^VIX", "^MOVE",
     "CL=F", "BZ=F", "SI=F", "HG=F", "GLD",
+    "^TNX", "^IRX", "^TYX",
 ]
 
 NAME_TO_TICKER = {name: ticker for ticker, name in TICKER_TO_NAME.items()}
@@ -95,6 +99,21 @@ FEATURE_DECISIONS = {
         "role": "drop_or_defer",
         "decision_reason": "Drop to avoid redundancy with S&P 500 and keep the causal feature set smaller.",
     },
+    "US 10Y Treasury Yield": {
+        "keep": True,
+        "role": "feature",
+        "decision_reason": "Keep as the primary real interest rate proxy, a direct theoretical driver of gold prices.",
+    },
+    "US 3M Treasury Yield": {
+        "keep": True,
+        "role": "feature",
+        "decision_reason": "Keep to construct yield spread (10Y - 3M) as a recession indicator.",
+    },
+    "US 30Y Treasury Yield": {
+        "keep": False,
+        "role": "drop_or_defer",
+        "decision_reason": "Drop to avoid redundancy with 10Y yield; 10Y is the standard gold benchmark.",
+    },
 }
 
 PRICE_LIKE_SERIES = {
@@ -114,6 +133,9 @@ PRICE_LIKE_SERIES = {
 VOLATILITY_SERIES = {
     "CBOE Volatility Index",
     "ICE BofA MOVE Index",
+    "US 10Y Treasury Yield",
+    "US 3M Treasury Yield",
+    "US 30Y Treasury Yield",
 }
 
 PREDICTOR_LAGS = (1, 5, 10, 20)
