@@ -5,6 +5,7 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
 
 
 TARGET_COL = "Gold Futures (COMEX) | log_return"
@@ -86,18 +87,6 @@ def make_splits(csv_file, split_json, seq_len=20, target_col=TARGET_COL, feature
     The val and test windows each extend back by `seq_len` rows into the
     preceding split so the first LSTM window has a full history, matching
     the same convention used during training.
-
-    Parameters
-    ----------
-    csv_file   : path to the stationary CSV (e.g. gold_base_stationary_dropna.csv)
-    split_json : path to split_definition.json
-    seq_len    : LSTM look-back window length (default 20)
-    target_col : column to predict
-    feature_cols : columns to use as features; defaults to all numeric columns
-
-    Returns
-    -------
-    train_ds, val_ds, test_ds
     """
     with open(split_json) as f:
         spec = json.load(f)
@@ -138,7 +127,9 @@ def make_splits(csv_file, split_json, seq_len=20, target_col=TARGET_COL, feature
     return train_ds, val_ds, test_ds
 
 
-def make_dataloaders(csv_file, split_json, seq_len=20, batch_size=64, target_col=TARGET_COL, feature_cols=None):
+def make_dataloaders(csv_file, split_json, seq_len=20, batch_size=64,
+                     target_col=TARGET_COL, feature_cols=None,
+                     pca_components=None):
     """
     Convenience wrapper around make_splits that returns DataLoaders directly.
 
@@ -152,6 +143,10 @@ def make_dataloaders(csv_file, split_json, seq_len=20, batch_size=64, target_col
     batch_size   : mini-batch size (default 64)
     target_col   : column to predict
     feature_cols : columns to use as features; defaults to all numeric columns
+    pca_components : int or None
+        If set, fit a PCA on the TRAINING features only (after StandardScaler),
+        and transform val/test with the same fitted PCA. This is the
+        leakage-safe protocol: train sees train statistics only.
 
     Returns
     -------
@@ -163,7 +158,35 @@ def make_dataloaders(csv_file, split_json, seq_len=20, batch_size=64, target_col
         csv_file, split_json, seq_len=seq_len,
         target_col=target_col, feature_cols=feature_cols,
     )
+
+    # ── PCA: fit on train only, transform all splits ────────────────
+    if pca_components is not None:
+        pca = PCA(n_components=pca_components)
+
+        # Flatten (N, seq_len, n_features) -> (N*seq_len, n_features) for PCA
+        n, s, f = train_ds.X.shape
+        flat_train = train_ds.X.reshape(-1, f)
+        pca.fit(flat_train)
+
+        train_ds.X = pca.transform(flat_train).reshape(n, s, -1).astype(np.float32)
+
+        for ds in [val_ds, test_ds]:
+            n2, s2, f2 = ds.X.shape
+            ds.X = pca.transform(ds.X.reshape(-1, f2)).reshape(n2, s2, -1).astype(np.float32)
+
+        # Overwrite feature_cols so downstream code doesn't confuse PCA
+        # components with original named features.
+        pc_names = [f"PC{i+1}" for i in range(pca_components)]
+        for ds in [train_ds, val_ds, test_ds]:
+            ds.feature_cols = pc_names
+
+        explained = pca.explained_variance_ratio_.sum() * 100
+        print(f"[PCA] {f} features -> {pca_components} components "
+              f"({explained:.1f}% variance explained)")
+
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=False)
     val_loader   = DataLoader(val_ds,   batch_size=batch_size, shuffle=False)
     test_loader  = DataLoader(test_ds,  batch_size=batch_size, shuffle=False)
-    return train_loader, val_loader, test_loader, train_ds.n_features
+
+    n_features = train_ds.X.shape[2]  # correct whether or not PCA was applied
+    return train_loader, val_loader, test_loader, n_features
