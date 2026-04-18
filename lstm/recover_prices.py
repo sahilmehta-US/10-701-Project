@@ -449,6 +449,55 @@ def plot_combined_returns(results, out_path, plot_start=None, plot_end=None):
     return out_path
 
 
+def compute_persistence_baseline(reference_merged, plot_start=None, plot_end=None):
+    """Synthetic 'predict y_pred = 0' (random-walk) baseline.
+
+    Uses the same dates and true prices as `reference_merged`, so the
+    baseline metrics are directly comparable with any model row in the
+    summary table.  A persistence forecaster says "tomorrow = today",
+    i.e. `P_hat_t = P_{t-1}^true`, which is exactly what `exp(0)` gives.
+
+    Note: rolling under persistence collapses to a constant (P_0 forever),
+    so rolling metrics for this baseline are not informative.
+    """
+    fake = reference_merged.copy()
+    fake["y_pred"] = 0.0
+    fake["price_pred_one_step"] = fake["price_prev_true"]
+    fake["price_pred_rolling"] = fake["price_prev_true"].iloc[0]
+
+    metrics_full = _compute_metrics(fake)
+    metrics_range = None
+    if plot_start is not None or plot_end is not None:
+        metrics_range = _compute_metrics(_slice_range(fake, plot_start, plot_end))
+
+    return {
+        "label": "persistence (y_pred=0)",
+        "out_csv": None,
+        "out_png": None,
+        "out_returns_png": None,
+        "range_png": None,
+        "range_returns_png": None,
+        **{k: metrics_full[k] for k in (
+            "rmse_one_step", "rmse_rolling",
+            "mape_one_step", "mape_rolling",
+            "direction_accuracy", "n_rows",
+        )},
+        "metrics_range": metrics_range,
+        "merged": fake,
+        "is_baseline": True,
+    }
+
+
+def _format_rel(model_val, baseline_val):
+    """Format a signed %-improvement of model vs baseline on the same metric.
+    Negative = model worse than baseline."""
+    if baseline_val == 0 or not np.isfinite(baseline_val):
+        return "    n/a"
+    pct = (1.0 - model_val / baseline_val) * 100.0
+    sign = "+" if pct >= 0 else ""
+    return f"{sign}{pct:5.2f}%"
+
+
 def _validate_date(s, name):
     if s is None:
         return None
@@ -540,34 +589,69 @@ def main():
                 plot_start=plot_start, plot_end=plot_end,
             )
 
-    print("\n" + "=" * 72)
+    # Persistence baseline ("y_pred = 0"): predict tomorrow's price equals
+    # today's price, evaluated on the same dates as the models.  Added to
+    # the tables as a reference row but intentionally excluded from the
+    # combined plots (where it would collapse to the y=0 axis already drawn).
+    baseline = None
+    if summary:
+        baseline = compute_persistence_baseline(
+            summary[0]["merged"],
+            plot_start=plot_start, plot_end=plot_end,
+        )
+
+    print("\n" + "=" * 95)
     print("SUMMARY (full range)")
-    print("=" * 72)
-    print(f"{'Model':<20} {'RMSE(1-step)':>13} {'MAPE(1-step)':>13} "
-          f"{'RMSE(roll)':>12} {'MAPE(roll)':>12} {'DirAcc%':>8}")
-    print("-" * 80)
-    for r in summary:
-        print(f"{r['label']:<20} {r['rmse_one_step']:>13.4f} "
+    print("=" * 95)
+    header = (f"{'Model':<24} {'RMSE(1-step)':>13} {'MAPE(1-step)':>13} "
+              f"{'RMSE(roll)':>12} {'MAPE(roll)':>12} {'DirAcc%':>8} "
+              f"{'vs base':>9}")
+    print(header)
+    print("-" * 95)
+
+    def _print_row(r, base_rmse):
+        rel = _format_rel(r["rmse_one_step"], base_rmse) if base_rmse else "    —"
+        print(f"{r['label']:<24} {r['rmse_one_step']:>13.4f} "
               f"{r['mape_one_step']:>12.3f}% {r['rmse_rolling']:>12.4f} "
-              f"{r['mape_rolling']:>11.3f}% {r['direction_accuracy']:>7.2f}%")
+              f"{r['mape_rolling']:>11.3f}% "
+              f"{r['direction_accuracy']:>7.2f}% {rel:>9}")
+
+    base_rmse_full = baseline["rmse_one_step"] if baseline else None
+    if baseline:
+        _print_row(baseline, base_rmse=None)
+        print("-" * 95)
+    for r in summary:
+        _print_row(r, base_rmse=base_rmse_full)
 
     if range_dir is not None:
-        print("\n" + "=" * 72)
+        print("\n" + "=" * 103)
         print(f"SUMMARY (range {plot_start or 'min'} → {plot_end or 'max'})")
-        print("=" * 72)
-        print(f"{'Model':<20} {'RMSE(1-step)':>13} {'MAPE(1-step)':>13} "
+        print("=" * 103)
+        print(f"{'Model':<24} {'RMSE(1-step)':>13} {'MAPE(1-step)':>13} "
               f"{'RMSE(roll)':>12} {'MAPE(roll)':>12} {'DirAcc%':>8} "
-              f"{'n':>5}")
-        print("-" * 88)
-        for r in summary:
+              f"{'vs base':>9} {'n':>5}")
+        print("-" * 103)
+
+        def _print_row_range(r, base_rmse):
             m = r["metrics_range"] or {}
             if not m or m.get("n_rows", 0) == 0:
-                print(f"{r['label']:<20}  (no rows in range)")
-                continue
-            print(f"{r['label']:<20} {m['rmse_one_step']:>13.4f} "
+                print(f"{r['label']:<24}  (no rows in range)")
+                return
+            rel = _format_rel(m["rmse_one_step"], base_rmse) if base_rmse else "    —"
+            print(f"{r['label']:<24} {m['rmse_one_step']:>13.4f} "
                   f"{m['mape_one_step']:>12.3f}% {m['rmse_rolling']:>12.4f} "
                   f"{m['mape_rolling']:>11.3f}% "
-                  f"{m['direction_accuracy']:>7.2f}% {m['n_rows']:>5d}")
+                  f"{m['direction_accuracy']:>7.2f}% {rel:>9} {m['n_rows']:>5d}")
+
+        base_rmse_range = (
+            baseline["metrics_range"]["rmse_one_step"]
+            if baseline and baseline["metrics_range"] else None
+        )
+        if baseline:
+            _print_row_range(baseline, base_rmse=None)
+            print("-" * 103)
+        for r in summary:
+            _print_row_range(r, base_rmse=base_rmse_range)
 
 
 if __name__ == "__main__":
