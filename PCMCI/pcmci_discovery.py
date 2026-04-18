@@ -34,21 +34,19 @@ import matplotlib.pyplot as plt
 import os
 import pickle
 
-# ── tigramite ──────────────────────────────────────────────────────────────
 from tigramite import data_processing as pp
 from tigramite.pcmci import PCMCI
 from tigramite.independence_tests.parcorr import ParCorr
 
-# ══════════════════════════════════════════════════════════════════════════
 #  CONFIG
-# ══════════════════════════════════════════════════════════════════════════
 DATA_CSV     = "../data/results/gold_base_stationary_dropna.csv"
 TARGET_COL   = "Gold Futures (COMEX) | log_return"
-MAX_LAG      = 5
-PC_ALPHA     = 0.05          # significance for the PC condition-selection step
-MCI_ALPHA    = 0.05          # significance for the MCI test step
-FDR_METHOD   = "fdr_bh"      # Benjamini-Hochberg FDR correction
-OUTPUT_DIR   = "results/pcmci_output"
+MAX_LAG      = 5 # performs better comparing longer lags, appeal to volatility of financial market
+PC_ALPHA     = 0.05 # significance for the PC condition-selection step
+MCI_ALPHA    = 0.05 # significance for the MCI test step
+FDR_METHOD   = "fdr_bh" # Benjamini-Hochberg FDR correction
+OUTPUT_DIR   = "results/pcmci_output/ontrain"
+SPLIT_FILE = "../data/results/split_definition.json"
 
 # NOTE on target alignment:
 # PCMCI discovers the causal structure of the system: X_j(t-tau) -> Gold(t).
@@ -56,7 +54,7 @@ OUTPUT_DIR   = "results/pcmci_output"
 # because causal parents of gold returns are the same variables regardless
 # of prediction horizon — only lag importance shifts. We select features
 # across all lags 1..MAX_LAG to cover both short and medium-term effects.
-# ══════════════════════════════════════════════════════════════════════════
+
 
 
 def load_and_preprocess() -> tuple:
@@ -68,6 +66,16 @@ def load_and_preprocess() -> tuple:
     extracting causal parents later.
     """
     df = pd.read_csv(DATA_CSV, parse_dates=["Date"])
+    with open(SPLIT_FILE, "r") as f:
+        splits = json.load(f)
+    train_start = pd.Timestamp(splits["train"]["start_date"])
+    train_end   = pd.Timestamp(splits["train"]["end_date"])
+
+    before_len = len(df)
+    df = df[(df["Date"] >= train_start) & (df["Date"] <= train_end)].copy()
+    print(f"Restricted to training split: "
+        f"{train_start.date()} → {train_end.date()}")
+    print(f"Rows: {before_len} → {len(df)}")
     df = df.set_index("Date")
 
     if TARGET_COL not in df.columns:
@@ -75,14 +83,14 @@ def load_and_preprocess() -> tuple:
             f"Target column '{TARGET_COL}' not found.\n"
             f"Available columns: {df.columns.tolist()}"
         )
-
+    
     # Move target to index 0
     cols = [TARGET_COL] + [c for c in df.columns if c != TARGET_COL]
     df = df[cols]
 
-    print(f"[INFO] Dataset shape after preprocessing: {df.shape}")
-    print(f"[INFO] Date range: {df.index[0]} → {df.index[-1]}")
-    print(f"[INFO] Variables ({len(cols)}):")
+    print(f"Dataset shape after preprocessing: {df.shape}")
+    print(f"Date range: {df.index[0]} → {df.index[-1]}")
+    print(f"Variables ({len(cols)}):")
     for i, c in enumerate(cols):
         marker = " <- TARGET" if i == 0 else ""
         print(f"       [{i:2d}] {c}{marker}")
@@ -106,37 +114,25 @@ def run_pcmci(data: np.ndarray, var_names: list) -> dict:
 
     cond_ind_test = ParCorr(significance="analytic")
 
-    pcmci = PCMCI(
-        dataframe=dataframe,
-        cond_ind_test=cond_ind_test,
-        verbosity=1,
+    pcmci = PCMCI(dataframe=dataframe,
+        cond_ind_test=cond_ind_test, verbosity=1,
     )
 
-    print(f"[INFO] Running PCMCI (max_lag={MAX_LAG}, "
-          f"pc_alpha={PC_ALPHA}, fdr_method='{FDR_METHOD}') ...")
-
-    results = pcmci.run_pcmci(
-        tau_max=MAX_LAG,
-        pc_alpha=PC_ALPHA,
-        alpha_level=MCI_ALPHA,
-        fdr_method=FDR_METHOD,
+    results = pcmci.run_pcmci(tau_max=MAX_LAG, pc_alpha=PC_ALPHA,
+        alpha_level=MCI_ALPHA,fdr_method=FDR_METHOD,
     )
 
-    print("[INFO] PCMCI finished.\n")
+    print("PCMCI finished\n")
     return results, pcmci, dataframe
 
 
-def extract_causal_features(
-    results: dict,
-    var_names: list,
-    target_idx: int = 0,
+def extract_causal_features(results: dict, var_names: list,target_idx: int = 0,
 ) -> tuple:
     """
     Extract features with a statistically significant causal link
-    to the target variable (gold) at any lag.
+    to the target variable (gold) at any lag
 
-    Returns
-    -------
+    Returns:
     causal_df : DataFrame with columns [feature, lag, val_mci, pval]
         Exogenous features (other variables -> gold). Sorted by pval.
     self_df : DataFrame with same columns
@@ -175,8 +171,8 @@ def extract_causal_features(
     if len(self_df) > 0:
         self_df = self_df.sort_values("pval").reset_index(drop=True)
 
-    print(f"[INFO] Exogenous causal links: {len(causal_df)}")
-    print(f"[INFO] Self-links (AR):        {len(self_df)}")
+    print(f"Exogenous causal links: {len(causal_df)}")
+    print(f"Self-links (AR): {len(self_df)}")
 
     return causal_df, self_df
 
@@ -184,12 +180,12 @@ def extract_causal_features(
 def save_results(results, causal_df, self_df, pcmci, dataframe):
     """
     Save:
-      1. Raw PCMCI results (pickle)
-      2. Causal features CSV (exogenous)
-      3. Self-links CSV (autoregressive)
-      4. selected_features.json — for downstream LSTM pipeline
-      5. p-value heatmap
-      6. Causal graph plot
+        1. Raw PCMCI results (pickle)
+        2. Causal features CSV (exogenous)
+        3. Self-links CSV (autoregressive)
+        4. selected_features.json — for downstream LSTM pipeline
+        5. p-value heatmap
+        6. Causal graph plot
     """
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -197,17 +193,17 @@ def save_results(results, causal_df, self_df, pcmci, dataframe):
     pickle_path = os.path.join(OUTPUT_DIR, "pcmci_results.pkl")
     with open(pickle_path, "wb") as f:
         pickle.dump(results, f)
-    print(f"[SAVED] Raw results       -> {pickle_path}")
+    print(f"Raw results saved at {pickle_path}")
 
     # 2. Causal features CSV (exogenous only)
     csv_path = os.path.join(OUTPUT_DIR, "causal_features.csv")
     causal_df.to_csv(csv_path, index=False)
-    print(f"[SAVED] Causal features   -> {csv_path}")
+    print(f"Causal features saved at {csv_path}")
 
     # 3. Self-links CSV
     self_csv_path = os.path.join(OUTPUT_DIR, "self_links.csv")
     self_df.to_csv(self_csv_path, index=False)
-    print(f"[SAVED] Self-links (AR)   -> {self_csv_path}")
+    print(f"Self-links (AR) saved at {self_csv_path}")
 
     # 4. selected_features.json — the bridge to the LSTM pipeline
     #    Guard .unique() against empty DataFrames
@@ -236,7 +232,7 @@ def save_results(results, causal_df, self_df, pcmci, dataframe):
     json_path = os.path.join(OUTPUT_DIR, "selected_features.json")
     with open(json_path, "w") as f:
         json.dump(feature_info, f, indent=2)
-    print(f"[SAVED] Feature selection -> {json_path}")
+    print(f"[SAVED] Feature selection saved at {json_path}")
 
     # Print summary table
     print("\n-- Exogenous causal features for gold --")
@@ -274,7 +270,7 @@ def _plot_pvalue_heatmap(results, dataframe):
     path = os.path.join(OUTPUT_DIR, "pvalue_heatmap.png")
     fig.savefig(path, dpi=150)
     plt.close(fig)
-    print(f"[SAVED] p-value heatmap   -> {path}")
+    print(f"[SAVED] p-value heatmap   saved at {path}")
 
 
 def _plot_significant_links(results, dataframe):
@@ -293,30 +289,27 @@ def _plot_significant_links(results, dataframe):
         path = os.path.join(OUTPUT_DIR, "causal_graph.png")
         plt.savefig(path, dpi=150, bbox_inches="tight")
         plt.close()
-        print(f"[SAVED] Causal graph      -> {path}")
+        print(f"Causal graph saved at {path}")
     except Exception as e:
-        print(f"[WARN] Could not plot causal graph: {e}")
+        print(f"Could not plot causal graph: {e}")
 
 
-# ══════════════════════════════════════════════════════════════════════════
+
 #  MAIN
-# ══════════════════════════════════════════════════════════════════════════
 def main():
-    # Step 1: Load & preprocess
+    # Load & preprocess
     data, var_names = load_and_preprocess()
 
-    # Step 2: Run PCMCI with FDR correction
+    # Run PCMCI with FDR correction
     results, pcmci, dataframe = run_pcmci(data, var_names)
 
-    # Step 3: Extract significant causal features (exogenous + self-links)
+    # Extract significant causal features (exogenous + self-links)
     target_idx = var_names.index(TARGET_COL)
     causal_df, self_df = extract_causal_features(results, var_names, target_idx)
 
-    # Step 4: Save everything
     save_results(results, causal_df, self_df, pcmci, dataframe)
 
-    print("\nDone! Check the results/pcmci_output/ folder.")
-    print("  -> Use selected_features.json to feed into dataset.py / train.py")
+    print("\nCheck the results/pcmci_output_ontrain/ folder.")
     return causal_df, self_df
 
 
