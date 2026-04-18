@@ -42,6 +42,9 @@ LR         = 5e-4
 HIDDEN     = 64
 NUM_LAYERS = 2
 DROPOUT    = 0.2
+USE_ATTENTION_GATE = True
+ATTENTION_HIDDEN = None   # defaults to HIDDEN when None
+ATTENTION_DROPOUT = 0.1
 LOSS_SCALE = 1e6   # multiply losses to make them readable
 REG_LAMBDA = 1e-4
 L2_ALL_REGULARIZATION = "l2_noncausal"
@@ -116,9 +119,9 @@ def plot_losses(train_losses, val_losses, best_epoch, label, filename):
 
 
 def run(csv_file, split_json, seq_len, batch_size, target_col,
-        epochs, lr, hidden, num_layers, dropout, loss_scale,
-        feature_cols=None, label="LSTM",
-        regularization=None, reg_lambda=REG_LAMBDA,
+        epochs, lr, hidden, num_layers, dropout, use_attn_gate,
+        attn_hidden, attn_dropout, loss_scale, feature_cols=None, 
+        label="LSTM", regularization=None, reg_lambda=REG_LAMBDA,
         causal_cols=None):
     """
     Train an LSTM, evaluate on test set, return results dict.
@@ -178,6 +181,9 @@ def run(csv_file, split_json, seq_len, batch_size, target_col,
         output_size=1,
         num_layers=num_layers,
         dropout=dropout,
+        use_attn_gate=use_attn_gate,
+        attn_hidden_size=attn_hidden,
+        attn_dropout=attn_dropout,
     ).to(device)
 
     optimizer = optim.Adam(model.parameters(), lr=lr)
@@ -236,6 +242,7 @@ def run(csv_file, split_json, seq_len, batch_size, target_col,
         "regularization": reg_desc,
         "reg_lambda": reg_lambda if reg_type is not None else None,
         "weights": input_weights,
+        "uses_attention_gate": model.attn_gate is not None,
     }
 
 
@@ -273,7 +280,8 @@ def main():
     print("=" * 70)
     result_all = run(
         CSV, SPLIT_JSON, SEQ_LEN, BATCH_SIZE, TARGET_COL,
-        EPOCHS, LR, HIDDEN, NUM_LAYERS, DROPOUT, LOSS_SCALE,
+        EPOCHS, LR, HIDDEN, NUM_LAYERS, DROPOUT, USE_ATTENTION_GATE,
+        ATTENTION_HIDDEN, ATTENTION_DROPOUT, LOSS_SCALE,
         feature_cols=None,
         label="LSTM-all",
     )
@@ -285,7 +293,8 @@ def main():
     causal_cols = load_causal_features()
     result_causal = run(
         CSV, SPLIT_JSON, SEQ_LEN, BATCH_SIZE, TARGET_COL,
-        EPOCHS, LR, HIDDEN, NUM_LAYERS, DROPOUT, LOSS_SCALE,
+        EPOCHS, LR, HIDDEN, NUM_LAYERS, DROPOUT, USE_ATTENTION_GATE,
+        ATTENTION_HIDDEN, ATTENTION_DROPOUT, LOSS_SCALE,
         feature_cols=causal_cols,
         label="LSTM-causal",
     )
@@ -297,7 +306,8 @@ def main():
     print(f"[INFO] Regularization: {L2_ALL_REGULARIZATION}; Lambda: {REG_LAMBDA}")
     result_all_reg_l2 = run(
         CSV, SPLIT_JSON, SEQ_LEN, BATCH_SIZE, TARGET_COL,
-        EPOCHS, LR, HIDDEN, NUM_LAYERS, DROPOUT, LOSS_SCALE,
+        EPOCHS, LR, HIDDEN, NUM_LAYERS, DROPOUT, USE_ATTENTION_GATE,
+        ATTENTION_HIDDEN, ATTENTION_DROPOUT, LOSS_SCALE,
         feature_cols=None,
         label="LSTM-all-reg-l2",
         regularization=L2_ALL_REGULARIZATION,
@@ -312,7 +322,8 @@ def main():
     print(f"[INFO] Regularization: {L1_ALL_REGULARIZATION}; Lambda: {REG_LAMBDA}")
     result_all_reg_l1 = run(
         CSV, SPLIT_JSON, SEQ_LEN, BATCH_SIZE, TARGET_COL,
-        EPOCHS, LR, HIDDEN, NUM_LAYERS, DROPOUT, LOSS_SCALE,
+        EPOCHS, LR, HIDDEN, NUM_LAYERS, DROPOUT, USE_ATTENTION_GATE,
+        ATTENTION_HIDDEN, ATTENTION_DROPOUT, LOSS_SCALE,
         feature_cols=None,
         label="LSTM-all-reg-l1",
         regularization=L1_ALL_REGULARIZATION,
