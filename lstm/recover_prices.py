@@ -17,11 +17,15 @@ Input:  lstm/predictions/<label>_returns.csv  (from predict.py)
 Output (always):
     lstm/predictions/<label>_prices.csv
     lstm/predictions/<label>_prices.png
+    lstm/predictions/<label>_returns_plot.png
     lstm/predictions/_all_models_one_step.png     (when multiple models)
+    lstm/predictions/_all_models_returns.png      (when multiple models)
 
 Output (when --plot-start / --plot-end given):
     lstm/predictions/<start>_<end>/<label>_prices.png
+    lstm/predictions/<start>_<end>/<label>_returns_plot.png
     lstm/predictions/<start>_<end>/_all_models_one_step.png
+    lstm/predictions/<start>_<end>/_all_models_returns.png
 
 Metrics in the range plots are recomputed over the visible window.
 
@@ -121,6 +125,95 @@ def _plot_model(merged, label, out_path, metrics, range_suffix=""):
     return out_path
 
 
+def _return_diagnostics(merged):
+    """Correlation and shrinkage stats for predicted vs true log-returns."""
+    if len(merged) < 2:
+        return {"corr": float("nan"), "shrinkage": float("nan"),
+                "std_true": float("nan"), "std_pred": float("nan"),
+                "mean_true": float("nan"), "mean_pred": float("nan")}
+    yt = merged["y_true"].to_numpy()
+    yp = merged["y_pred"].to_numpy()
+    std_t, std_p = float(yt.std(ddof=0)), float(yp.std(ddof=0))
+    corr = float(np.corrcoef(yt, yp)[0, 1]) if std_t > 0 and std_p > 0 else float("nan")
+    return {
+        "corr": corr,
+        "shrinkage": (std_p / std_t) if std_t > 0 else float("nan"),
+        "std_true": std_t, "std_pred": std_p,
+        "mean_true": float(yt.mean()), "mean_pred": float(yp.mean()),
+    }
+
+
+def _plot_model_returns(merged, label, out_path, metrics, range_suffix=""):
+    """Plot predicted vs true log-returns: time series + scatter.
+
+    Makes the shrinkage-toward-zero behavior of MSE-optimal forecasts
+    on low-SNR targets visually obvious.
+    """
+    if len(merged) == 0:
+        print(f"[{label}] no rows in range — skipping {out_path}")
+        return None
+
+    diag = _return_diagnostics(merged)
+
+    fig, (ax_ts, ax_sc) = plt.subplots(
+        1, 2, figsize=(14, 5), gridspec_kw={"width_ratios": [2.2, 1]}
+    )
+
+    # Time series
+    ax_ts.axhline(0.0, color="gray", linewidth=0.7, alpha=0.6)
+    ax_ts.plot(merged["Date"], merged["y_true"], color="black",
+               linewidth=0.9, alpha=0.85, label="Actual return")
+    ax_ts.plot(merged["Date"], merged["y_pred"], color="tomato",
+               linewidth=0.9, alpha=0.85, label="Predicted return")
+    ax_ts.set_xlabel("Date")
+    ax_ts.set_ylabel("log-return")
+    ax_ts.grid(alpha=0.3)
+    ax_ts.legend(loc="best", fontsize=9)
+    ax_ts.set_title("Return time series")
+
+    # Scatter (y_pred vs y_true) with y=x reference and OLS fit line
+    ax_sc.axhline(0.0, color="gray", linewidth=0.7, alpha=0.6)
+    ax_sc.axvline(0.0, color="gray", linewidth=0.7, alpha=0.6)
+    ax_sc.scatter(merged["y_true"], merged["y_pred"],
+                  s=8, alpha=0.45, color="tomato", edgecolor="none")
+
+    lo = float(min(merged["y_true"].min(), merged["y_pred"].min()))
+    hi = float(max(merged["y_true"].max(), merged["y_pred"].max()))
+    pad = 0.05 * (hi - lo) if hi > lo else 0.01
+    lims = (lo - pad, hi + pad)
+    ax_sc.plot(lims, lims, color="black", linewidth=1.0,
+               linestyle="--", label="y = x (perfect)")
+
+    if np.isfinite(diag["corr"]) and merged["y_true"].std() > 0:
+        # OLS slope y_pred = a + b * y_true; fitted line illustrates shrinkage.
+        b, a = np.polyfit(merged["y_true"], merged["y_pred"], 1)
+        xs = np.array(lims)
+        ax_sc.plot(xs, a + b * xs, color="steelblue", linewidth=1.2,
+                   label=f"OLS fit (slope={b:.2f})")
+
+    ax_sc.set_xlim(lims)
+    ax_sc.set_ylim(lims)
+    ax_sc.set_xlabel("Actual log-return  y_true")
+    ax_sc.set_ylabel("Predicted log-return  y_pred")
+    ax_sc.grid(alpha=0.3)
+    ax_sc.legend(loc="best", fontsize=8)
+    ax_sc.set_title("Predicted vs actual")
+
+    fig.suptitle(
+        f"Return Diagnostics — {label}{range_suffix}    "
+        f"corr={diag['corr']:.3f}  "
+        f"shrinkage σ(pred)/σ(true)={diag['shrinkage']:.2f}  "
+        f"dir-acc={metrics['direction_accuracy']:.1f}%",
+        y=1.02,
+    )
+    fig.tight_layout()
+    os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
+    fig.savefig(out_path, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+    print(f"[{label}] Wrote {out_path}")
+    return out_path
+
+
 def recover_from_predictions(predictions_csv, raw_prices_csv=RAW_PRICES_CSV,
                              price_col=GOLD_PRICE_COL, out_dir=None,
                              label=None, plot_start=None, plot_end=None,
@@ -197,9 +290,12 @@ def recover_from_predictions(predictions_csv, raw_prices_csv=RAW_PRICES_CSV,
 
     out_png = os.path.join(out_dir, f"{label}_prices.png")
     _plot_model(merged, label, out_png, metrics_full)
+    out_returns_png = os.path.join(out_dir, f"{label}_returns_plot.png")
+    _plot_model_returns(merged, label, out_returns_png, metrics_full)
 
-    # Optional range-limited plot.
+    # Optional range-limited plots.
     range_png = None
+    range_returns_png = None
     metrics_range = None
     if (plot_start is not None or plot_end is not None) and range_dir is not None:
         sub = _slice_range(merged, plot_start, plot_end)
@@ -211,6 +307,12 @@ def recover_from_predictions(predictions_csv, raw_prices_csv=RAW_PRICES_CSV,
             metrics_range,
             range_suffix=suffix,
         )
+        range_returns_png = _plot_model_returns(
+            sub, label,
+            os.path.join(range_dir, f"{label}_returns_plot.png"),
+            metrics_range,
+            range_suffix=suffix,
+        )
         if sub.empty:
             print(f"[{label}] range produced 0 rows — plot skipped")
 
@@ -218,7 +320,9 @@ def recover_from_predictions(predictions_csv, raw_prices_csv=RAW_PRICES_CSV,
         "label": label,
         "out_csv": out_csv,
         "out_png": out_png,
+        "out_returns_png": out_returns_png,
         "range_png": range_png,
+        "range_returns_png": range_returns_png,
         **{k: metrics_full[k] for k in (
             "rmse_one_step", "rmse_rolling",
             "mape_one_step", "mape_rolling",
@@ -276,6 +380,65 @@ def plot_combined_one_step(results, out_path, plot_start=None, plot_end=None):
     ax.set_title(title)
     ax.set_xlabel("Date")
     ax.set_ylabel("Gold Futures (COMEX) close")
+    ax.legend(loc="best", fontsize=9)
+    ax.grid(alpha=0.3)
+    fig.tight_layout()
+    os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
+    fig.savefig(out_path, dpi=150)
+    plt.close(fig)
+    print(f"[combined] Wrote {out_path}")
+    return out_path
+
+
+def plot_combined_returns(results, out_path, plot_start=None, plot_end=None):
+    """Overlay all models' predicted log-returns on one time-series chart.
+
+    Exposes shrinkage toward zero side-by-side across models: the tighter
+    a model's predicted-return line hugs zero relative to the actual line,
+    the closer its implied price forecast is to a naive random walk.
+    """
+    if not results:
+        return None
+
+    sliced = []
+    for r in results:
+        sub = _slice_range(r["merged"], plot_start, plot_end)
+        if sub.empty:
+            continue
+        diag = _return_diagnostics(sub)
+        metrics = _compute_metrics(sub)
+        sliced.append({"label": r["label"], "merged": sub,
+                       "diag": diag, "metrics": metrics})
+
+    if not sliced:
+        print(f"[combined] no rows in range — skipping {out_path}")
+        return None
+
+    fig, ax = plt.subplots(figsize=(12, 6))
+    ax.axhline(0.0, color="gray", linewidth=0.7, alpha=0.6)
+
+    truth_ref = max(sliced, key=lambda s: len(s["merged"]))["merged"]
+    ax.plot(truth_ref["Date"], truth_ref["y_true"], color="black",
+            linewidth=1.0, alpha=0.75, label="Actual return", zorder=5)
+
+    cmap = plt.get_cmap("tab10")
+    for i, s in enumerate(sliced):
+        m = s["merged"]
+        ax.plot(
+            m["Date"], m["y_pred"],
+            color=cmap(i % 10), linewidth=0.9, alpha=0.8,
+            label=f"{s['label']}  "
+                  f"(corr={s['diag']['corr']:.2f}, "
+                  f"shrink={s['diag']['shrinkage']:.2f}, "
+                  f"dir={s['metrics']['direction_accuracy']:.1f}%)",
+        )
+
+    title = "Predicted vs Actual Log-Returns (all models)"
+    if plot_start is not None or plot_end is not None:
+        title += f"\n[{plot_start or '…'} → {plot_end or '…'}]"
+    ax.set_title(title)
+    ax.set_xlabel("Date")
+    ax.set_ylabel("log-return")
     ax.legend(loc="best", fontsize=9)
     ax.grid(alpha=0.3)
     fig.tight_layout()
@@ -355,16 +518,25 @@ def main():
         )
 
     if len(summary) > 1:
-        # Always: full-range combined plot in predictions/
+        # Always: full-range combined plots in predictions/
         plot_combined_one_step(
             summary,
             os.path.join(args.predictions_dir, "_all_models_one_step.png"),
         )
-        # Optional: range-limited combined plot in predictions/<range>/
+        plot_combined_returns(
+            summary,
+            os.path.join(args.predictions_dir, "_all_models_returns.png"),
+        )
+        # Optional: range-limited combined plots in predictions/<range>/
         if range_dir is not None:
             plot_combined_one_step(
                 summary,
                 os.path.join(range_dir, "_all_models_one_step.png"),
+                plot_start=plot_start, plot_end=plot_end,
+            )
+            plot_combined_returns(
+                summary,
+                os.path.join(range_dir, "_all_models_returns.png"),
                 plot_start=plot_start, plot_end=plot_end,
             )
 
