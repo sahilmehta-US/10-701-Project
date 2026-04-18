@@ -1,14 +1,20 @@
+"""
+Merge Yahoo Finance stationary features with FRED derived features on Yahoo trading dates.
+
+Reads yfinance_pipeline_steps/step_5_stationary_base_data.csv and
+fred_pipeline_steps/step_5_fred_derived_features.csv, left-joins FRED on the Yahoo index,
+writes pipeline_steps/step_1_merge_inputs_metadata.json and step_2_merged_* CSVs,
+then copies handoff aliases and split metadata into results/.
+"""
 import importlib.util
 import json
 import os
 import shutil
 from pathlib import Path
-from typing import Iterable, Sequence, Tuple
+from typing import Sequence
 
 import pandas as pd
 
-
-PREDICTOR_LAGS: Tuple[int, ...] = (1, 5, 10, 20)
 
 MERGE_STEP_OUTPUT_DIR = "pipeline_steps"
 MERGE_RESULTS_DIR = "results"
@@ -23,21 +29,14 @@ FRED_ARCHIVE_STEP_DIR = Path("fred_pipeline_steps")
 FRED_ARCHIVE_RESULTS_DIR = Path("fred_results")
 
 YF_SHARED_BASE_STATIONARY_PATH = SHARED_STEP_DIR / "step_5_stationary_base_data.csv"
-YF_SHARED_TARGET_PATH = SHARED_STEP_DIR / "step_6_target_data.csv"
 FRED_SHARED_DERIVED_PATH = SHARED_STEP_DIR / "step_5_fred_derived_features.csv"
 
 YF_BASE_STATIONARY_PATH = YF_ARCHIVE_STEP_DIR / "step_5_stationary_base_data.csv"
-YF_TARGET_PATH = YF_ARCHIVE_STEP_DIR / "step_6_target_data.csv"
 FRED_DERIVED_PATH = FRED_ARCHIVE_STEP_DIR / "step_5_fred_derived_features.csv"
 
 FINAL_HANDOFF_FILE_ALIASES = {
-    "step_2_merged_unlagged_features.csv": "gold_base_stationary.csv",
-    "step_2_merged_unlagged_features_dropna.csv": "gold_base_stationary_dropna.csv",
-    "step_3_merged_unified_lagged_features.csv": "lagged_features.csv",
-    "step_3_merged_unified_lagged_features_dropna.csv": "lagged_features_dropna.csv",
-    "step_4_gold_forecast_features.csv": "gold_forecast_features.csv",
-    "step_4_gold_forecast_features_t1.csv": "gold_forecast_features_t1.csv",
-    "step_4_gold_forecast_features_t5.csv": "gold_forecast_features_t5.csv",
+    "step_2_merged_features.csv": "gold_base_stationary.csv",
+    "step_2_merged_features_dropna.csv": "gold_base_stationary_dropna.csv",
 }
 
 DEFAULT_SPLIT_DEFINITION = {
@@ -46,11 +45,6 @@ DEFAULT_SPLIT_DEFINITION = {
     "applies_to": [
         "gold_base_stationary.csv",
         "gold_base_stationary_dropna.csv",
-        "lagged_features.csv",
-        "lagged_features_dropna.csv",
-        "gold_forecast_features.csv",
-        "gold_forecast_features_t1.csv",
-        "gold_forecast_features_t5.csv",
     ],
     "train": {"start_date": "2006-01-03", "end_date": "2018-12-31"},
     "validation": {"start_date": "2019-01-01", "end_date": "2021-12-31"},
@@ -58,13 +52,18 @@ DEFAULT_SPLIT_DEFINITION = {
     "notes": "Use fixed chronological splits for all merged time-series experiments. Do not randomly split observations.",
 }
 
+# After the merge, row-wise ``dropna(how="any")`` requires every column to be
+# non-null. A single late-start or patchy FRED series otherwise deletes almost
+# all pre-2020 Yahoo rows and empty splits (e.g. LSTM train 2006–2018).
+MERGED_COLUMN_MAX_MISSING_FRACTION = 0.05
+
 NO_SCALING_POLICY = {
     "scaling_applied_in_preprocessing_handoff": False,
     "applies_to": list(FINAL_HANDOFF_FILE_ALIASES.values()),
     "reason": [
         "Scaling must be fit on the training split only.",
         "Global standardization before the split would leak information from validation and test periods.",
-        "This merged handoff should be cleaned, merged, and uniformly lagged, but not globally standardized.",
+        "This merged handoff should be cleaned and merged, but not globally standardized.",
     ],
     "instruction_for_downstream_use": "Fit any scaler on the training split only, then apply that fitted scaler to validation and test splits.",
 }
@@ -150,7 +149,7 @@ def build_merge_report(yf_df: pd.DataFrame, fred_df: pd.DataFrame, merged_df: pd
             "columns": int(yf_df.shape[1]),
             "start_date": yf_df.index.min().strftime("%Y-%m-%d") if not yf_df.empty else None,
             "end_date": yf_df.index.max().strftime("%Y-%m-%d") if not yf_df.empty else None,
-            "notes": "Yahoo Finance stationary-style feature panel before merged lagging.",
+            "notes": "Yahoo Finance stationary-style feature panel before merge.",
         },
         {
             "input_panel": "fred_derived_panel",
@@ -158,10 +157,10 @@ def build_merge_report(yf_df: pd.DataFrame, fred_df: pd.DataFrame, merged_df: pd
             "columns": int(fred_df.shape[1]),
             "start_date": fred_df.index.min().strftime("%Y-%m-%d") if not fred_df.empty else None,
             "end_date": fred_df.index.max().strftime("%Y-%m-%d") if not fred_df.empty else None,
-            "notes": "FRED derived macro / rates feature panel before merged lagging.",
+            "notes": "FRED derived macro / rates feature panel before merge.",
         },
         {
-            "input_panel": "merged_unlagged_panel",
+            "input_panel": "merged_panel",
             "rows": int(len(merged_df)),
             "columns": int(merged_df.shape[1]),
             "start_date": merged_df.index.min().strftime("%Y-%m-%d") if not merged_df.empty else None,
@@ -186,60 +185,7 @@ def merge_feature_panels(yf_stationary_df: pd.DataFrame, fred_derived_df: pd.Dat
     return merged_df
 
 
-def build_lagged_feature_dataset(feature_df: pd.DataFrame, lags: Iterable[int] = PREDICTOR_LAGS) -> pd.DataFrame:
-    lagged_data = {}
-    for column in feature_df.columns:
-        for lag in lags:
-            lagged_data[f"{column} | lag_{lag}"] = feature_df[column].shift(lag)
-    lagged_df = pd.DataFrame(lagged_data, index=feature_df.index)
-    lagged_df.index.name = "Date"
-    return lagged_df
-
-
-def build_lagged_feature_report(feature_df: pd.DataFrame, lags: Iterable[int] = PREDICTOR_LAGS) -> pd.DataFrame:
-    rows = {}
-    for column in feature_df.columns:
-        lagged_columns = [f"{column} | lag_{lag}" for lag in lags]
-        rows[column] = {
-            "lagged_columns": "; ".join(lagged_columns),
-            "lagging_reason": (
-                "Apply one uniform lagging policy after Yahoo and FRED features are merged "
-                "so all predictors are aligned consistently."
-            ),
-        }
-    report = pd.DataFrame.from_dict(rows, orient="index")
-    report.index.name = "source_predictor"
-    return report
-
-
-def build_forecast_handoff_dataset(
-    lagged_df: pd.DataFrame,
-    target_df: pd.DataFrame,
-    drop_missing: bool = True,
-) -> pd.DataFrame:
-    handoff_df = lagged_df.join(target_df, how="inner")
-    handoff_df = handoff_df.sort_index()
-    if drop_missing:
-        handoff_df = handoff_df.dropna(how="any")
-    handoff_df.index.name = "Date"
-    return handoff_df
-
-
-def build_single_target_output(forecast_df: pd.DataFrame, target_column: str) -> pd.DataFrame:
-    predictor_columns = [
-        column
-        for column in forecast_df.columns
-        if not column.startswith("Gold Futures (COMEX) | target_log_return_t_plus_")
-    ]
-    return forecast_df[predictor_columns + [target_column]].copy()
-
-
-def build_feature_dictionary(
-    merged_unlagged_df: pd.DataFrame,
-    lagged_df: pd.DataFrame,
-    forecast_t1_df: pd.DataFrame,
-    forecast_t5_df: pd.DataFrame,
-) -> pd.DataFrame:
+def build_feature_dictionary(merged_df: pd.DataFrame) -> pd.DataFrame:
     rows = []
 
     def add_date_row(output_file: str, meaning: str) -> None:
@@ -258,73 +204,19 @@ def build_feature_dictionary(
 
     add_date_row(
         "gold_base_stationary.csv",
-        "Observation date for the merged Yahoo Finance and FRED feature panel before unified lagging.",
+        "Observation date for the merged Yahoo Finance and FRED feature panel.",
     )
-    for column in merged_unlagged_df.columns:
+    for column in merged_df.columns:
         rows.append(
             {
                 "output_file": "gold_base_stationary.csv",
                 "column_name": column,
                 "source_panel": infer_source_panel(column),
                 "source_series": infer_base_series_name(column),
-                "human_readable_meaning": f"Merged unlagged feature for {infer_base_series_name(column)}.",
+                "human_readable_meaning": f"Merged feature for {infer_base_series_name(column)}.",
                 "transform_used": infer_transform_description(column),
                 "units_or_interpretation": infer_units(column),
                 "feature_role": "merged feature",
-            }
-        )
-
-    add_date_row(
-        "lagged_features.csv",
-        "Observation date for the uniformly lagged merged predictor panel.",
-    )
-    for column in lagged_df.columns:
-        rows.append(
-            {
-                "output_file": "lagged_features.csv",
-                "column_name": column,
-                "source_panel": infer_source_panel(column),
-                "source_series": infer_base_series_name(column),
-                "human_readable_meaning": f"Uniformly lagged merged predictor for {infer_base_series_name(column)}.",
-                "transform_used": infer_transform_description(column),
-                "units_or_interpretation": infer_units(column),
-                "feature_role": "lagged predictor",
-            }
-        )
-
-    add_date_row(
-        "gold_forecast_features_t1.csv",
-        "Observation date for the merged lagged predictor panel with the 1-day-ahead gold target.",
-    )
-    for column in forecast_t1_df.columns:
-        rows.append(
-            {
-                "output_file": "gold_forecast_features_t1.csv",
-                "column_name": column,
-                "source_panel": infer_source_panel(column),
-                "source_series": infer_base_series_name(column),
-                "human_readable_meaning": infer_target_or_feature_meaning(column),
-                "transform_used": infer_transform_description(column),
-                "units_or_interpretation": infer_units(column),
-                "feature_role": infer_feature_role(column),
-            }
-        )
-
-    add_date_row(
-        "gold_forecast_features_t5.csv",
-        "Observation date for the merged lagged predictor panel with the 5-day-ahead gold target.",
-    )
-    for column in forecast_t5_df.columns:
-        rows.append(
-            {
-                "output_file": "gold_forecast_features_t5.csv",
-                "column_name": column,
-                "source_panel": infer_source_panel(column),
-                "source_series": infer_base_series_name(column),
-                "human_readable_meaning": infer_target_or_feature_meaning(column),
-                "transform_used": infer_transform_description(column),
-                "units_or_interpretation": infer_units(column),
-                "feature_role": infer_feature_role(column),
             }
         )
 
@@ -332,8 +224,6 @@ def build_feature_dictionary(
 
 
 def infer_source_panel(column_name: str) -> str:
-    if column_name.startswith("Gold Futures (COMEX) | target_log_return_t_plus_"):
-        return "yfinance_target"
     if column_name.startswith("FRED::"):
         return "fred"
 
@@ -366,26 +256,14 @@ def infer_source_panel(column_name: str) -> str:
 def infer_base_series_name(column_name: str) -> str:
     if column_name.startswith("FRED::"):
         column_name = column_name.removeprefix("FRED::")
-    if " | lag_" in column_name:
-        column_name = column_name.rsplit(" | lag_", 1)[0]
-    if " | target_log_return_t_plus_" in column_name:
-        return column_name.split(" | target_log_return_t_plus_", 1)[0]
     return column_name.split(" | ", 1)[0]
 
 
 def infer_transform_description(column_name: str) -> str:
-    if " | target_log_return_t_plus_" in column_name:
-        horizon = column_name.rsplit("_", 1)[1]
-        return f"Future log return over {horizon} trading day(s)"
-
     working = column_name.removeprefix("FRED::")
-    lag_text = ""
-    if " | lag_" in working:
-        working, lag_part = working.rsplit(" | lag_", 1)
-        lag_text = f"; then lagged by {lag_part} trading day(s)"
 
     if " | " not in working:
-        return f"Level{lag_text}"
+        return "Level"
 
     transform = working.split(" | ", 1)[1]
     mapping = {
@@ -397,12 +275,10 @@ def infer_transform_description(column_name: str) -> str:
         "rolling_volatility_20": "20-day rolling volatility",
         "moving_average_ratio_20": "20-day moving-average ratio",
     }
-    return f"{mapping.get(transform, transform)}{lag_text}"
+    return mapping.get(transform, transform)
 
 
 def infer_units(column_name: str) -> str:
-    if " | target_log_return_t_plus_" in column_name:
-        return "Forward log return in decimal units"
     if "log_return" in column_name or "momentum_" in column_name or "moving_average_ratio_" in column_name:
         return "Decimal return-style quantity"
     if "rolling_volatility_" in column_name:
@@ -412,25 +288,6 @@ def infer_units(column_name: str) -> str:
     if "level" in column_name or "Treasury" in column_name or "Federal Funds" in column_name or "OAS" in column_name:
         return "Level of the underlying series"
     return "See source series definition"
-
-
-def infer_target_or_feature_meaning(column_name: str) -> str:
-    if " | target_log_return_t_plus_" in column_name:
-        horizon = column_name.rsplit("_", 1)[1]
-        return f"{horizon}-day-ahead gold log return target measured from day t to day t+{horizon}."
-    if " | lag_" in column_name:
-        base = infer_base_series_name(column_name)
-        lag = column_name.rsplit(" | lag_", 1)[1]
-        return f"{lag}-day lag of the merged feature for {base}."
-    return f"Merged feature for {infer_base_series_name(column_name)}."
-
-
-def infer_feature_role(column_name: str) -> str:
-    if " | target_log_return_t_plus_" in column_name:
-        return "target"
-    if " | lag_" in column_name:
-        return "lagged predictor"
-    return "merged feature"
 
 
 def export_final_handoff_aliases() -> None:
@@ -474,7 +331,7 @@ def run_and_archive_yfinance(yfinance_script: Path) -> None:
     clear_directory_contents(SHARED_RESULTS_DIR)
     run_upstream_pipeline_if_needed(
         yfinance_script,
-        sentinel_paths=[YF_SHARED_BASE_STATIONARY_PATH, YF_SHARED_TARGET_PATH],
+        sentinel_paths=[YF_SHARED_BASE_STATIONARY_PATH],
         module_name="yfinance_data_for_merge",
     )
     archive_shared_outputs(YF_ARCHIVE_STEP_DIR, YF_ARCHIVE_RESULTS_DIR)
@@ -496,7 +353,7 @@ def run_and_archive_fred(fred_script: Path) -> None:
 
 
 def ensure_archived_upstream_outputs(yfinance_script: Path, fred_script: Path, rerun_upstream: bool) -> None:
-    yf_missing = not (YF_BASE_STATIONARY_PATH.exists() and YF_TARGET_PATH.exists())
+    yf_missing = not YF_BASE_STATIONARY_PATH.exists()
     fred_missing = not FRED_DERIVED_PATH.exists()
 
     if rerun_upstream or yf_missing:
@@ -507,6 +364,7 @@ def ensure_archived_upstream_outputs(yfinance_script: Path, fred_script: Path, r
 
 
 def main(run_upstream_first: bool = True) -> None:
+    """Run upstream Yahoo/FRED pipelines if needed, merge panels, write step_1–2 artifacts and results handoff."""
     script_dir = Path(__file__).resolve().parent
     os.chdir(script_dir)
 
@@ -529,71 +387,54 @@ def main(run_upstream_first: bool = True) -> None:
 
     yf_stationary_df = read_indexed_csv(YF_BASE_STATIONARY_PATH)
     fred_derived_df = read_indexed_csv(FRED_DERIVED_PATH)
-    target_df = read_indexed_csv(YF_TARGET_PATH)
 
-    merged_unlagged_df = merge_feature_panels(yf_stationary_df, fred_derived_df)
-    merged_unlagged_df = merged_unlagged_df.drop(columns=[
+    merged_df = merge_feature_panels(yf_stationary_df, fred_derived_df)
+    merged_df = merged_df.drop(columns=[
         "Secured Overnight Financing Rate | level",
         "Secured Overnight Financing Rate | diff_1",
     ], errors="ignore")
     # Drop SOFR (starts 2018-04, truncates training data from 4900 to 1750 rows)
     # Fed Funds Rate serves as close substitute
-    merged_unlagged_dropna_df = merged_unlagged_df.dropna(how="any")
+
+    missing_frac = merged_df.isna().mean()
+    sparse_mask = missing_frac > MERGED_COLUMN_MAX_MISSING_FRACTION
+    dropped_sparse_columns = sorted(sparse_mask[sparse_mask].index.astype(str).tolist())
+    merged_df = merged_df.drop(columns=dropped_sparse_columns, errors="ignore")
+
+    merged_dropna_df = merged_df.dropna(how="any")
 
     save_json(
         {
             "yfinance_stationary_input": str(YF_BASE_STATIONARY_PATH),
-            "yfinance_target_input": str(YF_TARGET_PATH),
             "fred_derived_input": str(FRED_DERIVED_PATH),
             "yfinance_archive_step_dir": str(YF_ARCHIVE_STEP_DIR),
             "yfinance_archive_results_dir": str(YF_ARCHIVE_RESULTS_DIR),
             "fred_archive_step_dir": str(FRED_ARCHIVE_STEP_DIR),
             "fred_archive_results_dir": str(FRED_ARCHIVE_RESULTS_DIR),
-            "lag_policy": list(PREDICTOR_LAGS),
             "merge_alignment": (
-                "Left join on Yahoo Finance trading dates, then apply uniform lagging "
-                "to the merged predictor panel."
+                "Left join on Yahoo Finance trading dates for the merged predictor panel."
             ),
             "upstream_output_behavior": (
                 "Yahoo and FRED each run into the shared pipeline_steps/results folders, "
                 "are archived into source-specific folders, and then merged outputs are "
                 "written back into the shared pipeline_steps/results folders."
             ),
+            "merged_column_max_missing_fraction": MERGED_COLUMN_MAX_MISSING_FRACTION,
+            "dropped_sparse_columns": dropped_sparse_columns,
+            "dropped_sparse_columns_note": (
+                "Removed before row-wise complete-case filtering so one patchy FRED column "
+                "does not erase most of the Yahoo calendar."
+            ),
         },
         step_file("step_1_merge_inputs_metadata.json"),
     )
 
-    merge_report = build_merge_report(yf_stationary_df, fred_derived_df, merged_unlagged_df)
+    merge_report = build_merge_report(yf_stationary_df, fred_derived_df, merged_df)
     save_data(merge_report, step_file("step_2_merge_report.csv"))
-    save_data(merged_unlagged_df, step_file("step_2_merged_unlagged_features.csv"))
-    save_data(merged_unlagged_dropna_df, step_file("step_2_merged_unlagged_features_dropna.csv"))
+    save_data(merged_df, step_file("step_2_merged_features.csv"))
+    save_data(merged_dropna_df, step_file("step_2_merged_features_dropna.csv"))
 
-    lagged_feature_report = build_lagged_feature_report(merged_unlagged_df, lags=PREDICTOR_LAGS)
-    lagged_feature_df = build_lagged_feature_dataset(merged_unlagged_df, lags=PREDICTOR_LAGS)
-    lagged_feature_dropna_df = lagged_feature_df.dropna(how="any")
-    save_data(lagged_feature_report, step_file("step_3_merged_unified_lagged_feature_report.csv"))
-    save_data(lagged_feature_df, step_file("step_3_merged_unified_lagged_features.csv"))
-    save_data(lagged_feature_dropna_df, step_file("step_3_merged_unified_lagged_features_dropna.csv"))
-
-    forecast_df = build_forecast_handoff_dataset(lagged_feature_df, target_df, drop_missing=True)
-    forecast_t1_df = build_single_target_output(
-        forecast_df,
-        "Gold Futures (COMEX) | target_log_return_t_plus_1",
-    )
-    forecast_t5_df = build_single_target_output(
-        forecast_df,
-        "Gold Futures (COMEX) | target_log_return_t_plus_5",
-    )
-    save_data(forecast_df, step_file("step_4_gold_forecast_features.csv"))
-    save_data(forecast_t1_df, step_file("step_4_gold_forecast_features_t1.csv"))
-    save_data(forecast_t5_df, step_file("step_4_gold_forecast_features_t5.csv"))
-
-    feature_dictionary = build_feature_dictionary(
-        merged_unlagged_df,
-        lagged_feature_df,
-        forecast_t1_df,
-        forecast_t5_df,
-    )
+    feature_dictionary = build_feature_dictionary(merged_df)
     feature_dictionary.to_csv(result_file("feature_dictionary.csv"), index=False)
     save_json(maybe_get_split_definition(yfinance_script), result_file("split_definition.json"))
     save_json(NO_SCALING_POLICY, result_file("no_scaling_policy.json"))

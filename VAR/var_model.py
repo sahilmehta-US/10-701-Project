@@ -8,7 +8,7 @@ from dataclasses import dataclass
 
 # Configuration
 DATA_ROOT = "../data/pipeline_steps"
-DATASET_NAME = "step_2_merged_unlagged_features_dropna.csv"
+DATASET_NAME = "step_2_merged_features_dropna.csv"
 SPLIT_FILE = "../results/split_definition.json"
 TARGET_COL = "Gold Futures (COMEX) | log_return"
 MAXLAGS = None

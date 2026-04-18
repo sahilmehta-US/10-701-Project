@@ -1,10 +1,53 @@
-#any private information needed to run, such as API_KEYs should be stored in .env files and excluded
+# Secrets and env files (*.env covers names like prod.env; .env.* covers .env.local, etc.)
 *.env
+.env.*
+!.env.example
 
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Packaging / local build outputs
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Tests / coverage reports
+.coverage
+htmlcov/
+
+# Experiment tracking (optional; harmless if unused)
+wandb/
+mlruns/
+
+# Generated data under data/ (* matches fred_, yfinance_, or empty prefix)
 data/*pipeline_steps/
 data/*results/
-data/__pycache__/
-data/.DS_Store
+
+# PCMCI/results: ignore generated outputs except feature tables used downstream
+PCMCI/results/*
+!PCMCI/results/pcmci_output/
+PCMCI/results/pcmci_output/*
+!PCMCI/results/pcmci_output/selected_features.json
+!PCMCI/results/pcmci_output/causal_features.csv
 
 # lstm/: ignore all except top-level Python sources (plots, checkpoints, caches, etc.)
 lstm/*
@@ -13,4 +56,3 @@ lstm/*
 # var/: ignore all except top-level Python sources (plots, checkpoints, caches, etc.)
 VAR/*
 !VAR/*.py
-
