@@ -52,7 +52,7 @@ PCA_COMPONENTS = 4 # matched to |C| from PCMCI; adjust if PCMCI count changes
 
 SEEDS = [0, 1, 2, 3, 4]   # multi seed experiment, can also change it to other seeds
 
-CAUSAL_FEATURES_JSON = "../PCMCI/results/pcmci_output_ontrain/selected_features.json"
+CAUSAL_FEATURES_JSON = "../PCMCI/results/pcmci_output/ontrain/selected_features.json"
 GRANGER_FEATURES_JSON = "../granger_outputs/granger_selected_features.json"
 
 OUTPUT_DIR = "experiment_outputs"

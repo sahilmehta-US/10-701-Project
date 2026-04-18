@@ -28,7 +28,7 @@ MAX_LAG     = 10
 ALPHA       = 0.05
 OUTPUT_DIR  = "granger_outputs"
 
-PCMCI_JSON  = "PCMCI/results/pcmci_output_ontrain/selected_features.json"
+PCMCI_JSON  = "PCMCI/results/pcmci_output/ontrain/selected_features.json"
 
 
 
