@@ -43,6 +43,7 @@ class GoldBaseStationaryDataset(Dataset):
 
         features = df[feature_cols].values.astype(np.float32)
         targets = df[target_col].values.astype(np.float32)
+        dates = df["Date"].values  # numpy datetime64[ns]
 
         if scaler is None:
             scaler = StandardScaler()
@@ -54,12 +55,15 @@ class GoldBaseStationaryDataset(Dataset):
         # Build (X, y) pairs: X = window [t, t+seq_len), y = target at t+seq_len
         self.X = []
         self.y = []
+        self.dates = []
         for i in range(len(features_scaled) - seq_len):
             self.X.append(features_scaled[i : i + seq_len])
             self.y.append(targets[i + seq_len])
+            self.dates.append(dates[i + seq_len])
 
         self.X = np.array(self.X, dtype=np.float32)  # (N, seq_len, n_features)
         self.y = np.array(self.y, dtype=np.float32)  # (N,)
+        self.dates = np.array(self.dates, dtype="datetime64[ns]")  # (N,)
 
     def __len__(self):
         return len(self.y)

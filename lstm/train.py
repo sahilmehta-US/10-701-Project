@@ -19,6 +19,7 @@ Usage:
 """
 
 import json
+import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -51,6 +52,7 @@ L2_ALL_REGULARIZATION = "l2_noncausal"
 L1_ALL_REGULARIZATION = "l1_noncausal"
 
 CAUSAL_FEATURES_JSON = "../PCMCI/results/pcmci_output/selected_features.json"
+CHECKPOINT_DIR = "checkpoints"
 # ══════════════════════════════════════════════════════════════════════════
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -138,6 +140,11 @@ def run(csv_file, split_json, seq_len, batch_size, target_col,
         PCMCI-selected columns used to determine which all-feature
         inputs should be regularised.
     """
+    # Annotate label with attention-gate status so checkpoints/plots for
+    # different architectures never collide on disk.
+    if use_attn_gate:
+        label = f"{label}-attn"
+
     # Reset seed so both experiments start from identical conditions
     set_seed(42)
 
@@ -232,6 +239,38 @@ def run(csv_file, split_json, seq_len, batch_size, target_col,
     print(f"[{label}] Test MSE:      {test_loss*loss_scale:.2f} (x{1/loss_scale})")
     print(f"[{label}] Weights:       {tuple(input_weights.shape)}")
 
+    # Persist best checkpoint so downstream scripts (predict.py,
+    # recover_prices.py) can run without retraining.
+    os.makedirs(CHECKPOINT_DIR, exist_ok=True)
+    ckpt_path = os.path.join(CHECKPOINT_DIR, f"{label}.pt")
+    torch.save(
+        {
+            "label": label,
+            "state_dict": best_state,
+            "config": {
+                "input_size": n_features,
+                "hidden_size": hidden,
+                "num_layers": num_layers,
+                "dropout": dropout,
+                "use_attn_gate": use_attn_gate,
+                "attn_hidden_size": attn_hidden,
+                "attn_dropout": attn_dropout,
+                "seq_len": seq_len,
+                "target_col": target_col,
+            },
+            "feature_cols": train_loader.dataset.feature_cols,
+            "csv_file": csv_file,
+            "split_json": split_json,
+            "best_epoch": best_epoch,
+            "best_val_mse": best_val_loss,
+            "test_mse": test_loss,
+            "regularization": reg_desc,
+            "reg_lambda": reg_lambda if reg_type is not None else None,
+        },
+        ckpt_path,
+    )
+    print(f"[{label}] Checkpoint:    {ckpt_path}")
+
     return {
         "label": label,
         "n_features": n_features,
@@ -243,6 +282,7 @@ def run(csv_file, split_json, seq_len, batch_size, target_col,
         "reg_lambda": reg_lambda if reg_type is not None else None,
         "weights": input_weights,
         "uses_attention_gate": model.attn_gate is not None,
+        "checkpoint_path": ckpt_path,
     }
 
 
