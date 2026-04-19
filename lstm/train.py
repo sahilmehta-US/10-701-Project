@@ -60,7 +60,7 @@ CHECKPOINT_DIR = paths.CHECKPOINT_DIR
 # Multi-seed training: every experiment is trained once per seed so we
 # can report mean ± std and assess whether model-vs-model gaps exceed
 # seed-to-seed variance.
-SEEDS = [42, 123, 456, 789, 1024]
+SEEDS = [42, 123, 456, 789, 1024, 1234, 5678, 9101, 10086, 10701]
 # ══════════════════════════════════════════════════════════════════════════
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
