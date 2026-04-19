@@ -396,24 +396,55 @@ def _mean_std(stacked):
     return stacked[0], np.zeros_like(stacked[0])
 
 
-def plot_aggregate_prices(results, arch_label, runs_dir=RUNS_DIR):
+def _slice_results(results, plot_start, plot_end):
+    """Return a shallow copy of each result dict with `merged` clipped to
+    [plot_start, plot_end]. Runs that become empty are dropped."""
+    sliced = []
+    for r in results:
+        sub = _slice_range(r["merged"], plot_start, plot_end)
+        if sub.empty:
+            continue
+        sliced.append({**r, "merged": sub})
+    return sliced
+
+
+def _aggregate_out_path(arch_label, filename, runs_dir, range_name):
+    """Aggregate output path, nested under `<range_name>/` when given."""
+    base = paths.aggregate_dir(arch_label, root=runs_dir)
+    if range_name is not None:
+        base = os.path.join(base, range_name)
+    return os.path.join(base, filename)
+
+
+def plot_aggregate_prices(results, arch_label, runs_dir=RUNS_DIR,
+                          plot_start=None, plot_end=None):
     """Mean ± std of price predictions across seeds, for one architecture.
 
     Per-seed prices.png files in each run folder stay untouched; this
     plot is the one that survives into the report, where seed noise
     should be a band rather than N overlapping lines.
+
+    If plot_start / plot_end are given, each seed's frame is clipped to
+    the window before stacking and the output is nested under
+    ``_aggregate/<start>_<end>/`` so full-range and range-clipped views
+    can coexist without overwriting each other.
     """
     if not results:
         return None
-    dates, one_step = _stack_across_seeds(results, "price_pred_one_step")
-    _, rolling = _stack_across_seeds(results, "price_pred_rolling")
+    working = _slice_results(results, plot_start, plot_end)
+    if not working:
+        print(f"[{arch_label}] aggregate prices: no rows in range, skipped")
+        return None
+
+    dates, one_step = _stack_across_seeds(working, "price_pred_one_step")
+    _, rolling = _stack_across_seeds(working, "price_pred_rolling")
     if dates is None or one_step is None or len(dates) == 0:
         print(f"[{arch_label}] aggregate prices: no overlapping dates, skipped")
         return None
 
     # `price_true` is seed-independent — take from first run, aligned to
     # the shared dates from the stack.
-    truth = (results[0]["merged"][["Date", "price_true"]]
+    truth = (working[0]["merged"][["Date", "price_true"]]
              .merge(pd.DataFrame({"Date": dates}), on="Date", how="inner")
              .sort_values("Date").reset_index(drop=True))
 
@@ -424,23 +455,27 @@ def plot_aggregate_prices(results, arch_label, runs_dir=RUNS_DIR):
     ax.plot(truth["Date"], truth["price_true"], color="black",
             linewidth=1.2, label="Actual", zorder=5)
     ax.plot(dates, one_mean, color="tomato", linewidth=1.0,
-            label=f"One-step (mean, N={len(results)})")
+            label=f"One-step (mean, N={len(working)})")
     ax.fill_between(dates, one_mean - one_std, one_mean + one_std,
                     color="tomato", alpha=0.25, label="One-step ±1σ")
     ax.plot(dates, roll_mean, color="steelblue", linewidth=1.0, alpha=0.8,
-            label=f"Rolling (mean, N={len(results)})")
+            label=f"Rolling (mean, N={len(working)})")
     ax.fill_between(dates, roll_mean - roll_std, roll_mean + roll_std,
                     color="steelblue", alpha=0.20, label="Rolling ±1σ")
-    ax.set_title(f"Gold Price Recovery — {arch_label} "
-                 f"(aggregated over {len(results)} seeds)")
+    title = (f"Gold Price Recovery — {arch_label} "
+             f"(aggregated over {len(working)} seeds)")
+    if plot_start is not None or plot_end is not None:
+        title += f"\n[{plot_start or '…'} → {plot_end or '…'}]"
+    ax.set_title(title)
     ax.set_xlabel("Date")
     ax.set_ylabel("Gold Futures (COMEX) close")
     ax.legend(loc="best", fontsize=9)
     ax.grid(alpha=0.3)
     fig.tight_layout()
 
-    out_path = os.path.join(paths.aggregate_dir(arch_label, root=runs_dir),
-                            paths.PRICES_PLOT_FILENAME)
+    rname = paths.range_name(plot_start, plot_end)
+    out_path = _aggregate_out_path(arch_label, paths.PRICES_PLOT_FILENAME,
+                                   runs_dir, rname)
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     fig.savefig(out_path, dpi=150)
     plt.close(fig)
@@ -448,16 +483,27 @@ def plot_aggregate_prices(results, arch_label, runs_dir=RUNS_DIR):
     return out_path
 
 
-def plot_aggregate_returns(results, arch_label, runs_dir=RUNS_DIR):
-    """Mean ± std of predicted log-returns across seeds, for one architecture."""
+def plot_aggregate_returns(results, arch_label, runs_dir=RUNS_DIR,
+                           plot_start=None, plot_end=None):
+    """Mean ± std of predicted log-returns across seeds, for one architecture.
+
+    Range clipping mirrors `plot_aggregate_prices`: when a window is
+    given, each seed's frame is sliced before stacking and the output
+    lands in ``_aggregate/<start>_<end>/``.
+    """
     if not results:
         return None
-    dates, y_pred = _stack_across_seeds(results, "y_pred")
+    working = _slice_results(results, plot_start, plot_end)
+    if not working:
+        print(f"[{arch_label}] aggregate returns: no rows in range, skipped")
+        return None
+
+    dates, y_pred = _stack_across_seeds(working, "y_pred")
     if dates is None or y_pred is None or len(dates) == 0:
         print(f"[{arch_label}] aggregate returns: no overlapping dates, skipped")
         return None
 
-    truth = (results[0]["merged"][["Date", "y_true"]]
+    truth = (working[0]["merged"][["Date", "y_true"]]
              .merge(pd.DataFrame({"Date": dates}), on="Date", how="inner")
              .sort_values("Date").reset_index(drop=True))
     mean_p, std_p = _mean_std(y_pred)
@@ -474,23 +520,25 @@ def plot_aggregate_returns(results, arch_label, runs_dir=RUNS_DIR):
     ax.plot(truth["Date"], truth["y_true"], color="black",
             linewidth=0.9, alpha=0.85, label="Actual return", zorder=5)
     ax.plot(dates, mean_p, color="tomato", linewidth=0.9,
-            label=f"Predicted (mean, N={len(results)})")
+            label=f"Predicted (mean, N={len(working)})")
     ax.fill_between(dates, mean_p - std_p, mean_p + std_p,
                     color="tomato", alpha=0.25, label="Predicted ±1σ")
-    ax.set_title(
-        f"Predicted vs Actual Log-Returns — {arch_label} "
-        f"(aggregated over {len(results)} seeds)    "
-        f"corr(mean, truth)={corr:.3f}  "
-        f"shrinkage σ(mean)/σ(true)={shrink:.2f}"
-    )
+    title = (f"Predicted vs Actual Log-Returns — {arch_label} "
+             f"(aggregated over {len(working)} seeds)    "
+             f"corr(mean, truth)={corr:.3f}  "
+             f"shrinkage σ(mean)/σ(true)={shrink:.2f}")
+    if plot_start is not None or plot_end is not None:
+        title += f"\n[{plot_start or '…'} → {plot_end or '…'}]"
+    ax.set_title(title)
     ax.set_xlabel("Date")
     ax.set_ylabel("log-return")
     ax.legend(loc="best", fontsize=9)
     ax.grid(alpha=0.3)
     fig.tight_layout()
 
-    out_path = os.path.join(paths.aggregate_dir(arch_label, root=runs_dir),
-                            paths.RETURNS_PLOT_FILENAME)
+    rname = paths.range_name(plot_start, plot_end)
+    out_path = _aggregate_out_path(arch_label, paths.RETURNS_PLOT_FILENAME,
+                                   runs_dir, rname)
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     fig.savefig(out_path, dpi=150)
     plt.close(fig)
@@ -732,13 +780,24 @@ def main():
         )
 
     # Per-arch aggregate plots (mean ± std across seeds). Per-seed plots
-    # stay untouched in each run folder for reference.
+    # stay untouched in each run folder for reference. Full-range views
+    # are always emitted; the range-clipped views are nested under
+    # `_aggregate/<start>_<end>/` so the two coexist.
     by_arch = {}
     for r in summary:
         by_arch.setdefault(r["arch_label"], []).append(r)
     for arch_label, runs in by_arch.items():
         plot_aggregate_prices(runs, arch_label, runs_dir=args.runs_dir)
         plot_aggregate_returns(runs, arch_label, runs_dir=args.runs_dir)
+        if rname is not None:
+            plot_aggregate_prices(
+                runs, arch_label, runs_dir=args.runs_dir,
+                plot_start=plot_start, plot_end=plot_end,
+            )
+            plot_aggregate_returns(
+                runs, arch_label, runs_dir=args.runs_dir,
+                plot_start=plot_start, plot_end=plot_end,
+            )
 
     if len(summary) > 1:
         # Always: full-range combined plots in runs/_all_models/
