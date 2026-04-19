@@ -12,20 +12,22 @@ Two modes are computed for each test date:
   * rolling:         uses the PREDICTED previous close P_hat_{t-1}
                      (errors compound multiplicatively)
 
-Input:  lstm/predictions/<label>_returns.csv  (from predict.py)
+Input:  lstm/runs/<arch_label>/seed<N>/returns.csv   (from predict.py)
 
 Output (always):
-    lstm/predictions/<label>_prices.csv
-    lstm/predictions/<label>_prices.png
-    lstm/predictions/<label>_returns_plot.png
-    lstm/predictions/_all_models_one_step.png     (when multiple models)
-    lstm/predictions/_all_models_returns.png      (when multiple models)
+    lstm/runs/<arch_label>/seed<N>/prices.csv
+    lstm/runs/<arch_label>/seed<N>/prices.png
+    lstm/runs/<arch_label>/seed<N>/returns_plot.png
+    lstm/runs/<arch_label>/_aggregate/prices.png        (mean ± std across seeds)
+    lstm/runs/<arch_label>/_aggregate/returns_plot.png  (mean ± std across seeds)
+    lstm/runs/_all_models/one_step.png                  (when multiple models)
+    lstm/runs/_all_models/returns.png                   (when multiple models)
 
 Output (when --plot-start / --plot-end given):
-    lstm/predictions/<start>_<end>/<label>_prices.png
-    lstm/predictions/<start>_<end>/<label>_returns_plot.png
-    lstm/predictions/<start>_<end>/_all_models_one_step.png
-    lstm/predictions/<start>_<end>/_all_models_returns.png
+    lstm/runs/<arch_label>/seed<N>/<start>_<end>/prices.png
+    lstm/runs/<arch_label>/seed<N>/<start>_<end>/returns_plot.png
+    lstm/runs/_all_models/<start>_<end>/one_step.png
+    lstm/runs/_all_models/<start>_<end>/returns.png
 
 Metrics in the range plots are recomputed over the visible window.
 
@@ -43,7 +45,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-PREDICTIONS_DIR = "predictions"
+import paths
+
+RUNS_DIR = paths.RUNS_DIR
 RAW_PRICES_CSV = "../data/pipeline_steps/step_4_cleaned_close_prices.csv"
 GOLD_PRICE_COL = "Gold Futures (COMEX)"
 
@@ -214,21 +218,48 @@ def _plot_model_returns(merged, label, out_path, metrics, range_suffix=""):
     return out_path
 
 
+def _label_from_returns_path(predictions_csv, runs_dir=RUNS_DIR):
+    """Recover (label, arch_label, seed) from a returns.csv path.
+
+    Expected path shape: ``<runs_dir>/<arch_label>/seed<N>/returns.csv``.
+    Falls back to parsing the filename for older/non-standard inputs.
+    """
+    norm_runs = os.path.normpath(runs_dir)
+    rel = os.path.relpath(predictions_csv, norm_runs)
+    parts = rel.split(os.sep)
+    if (len(parts) == 3 and parts[-1] == paths.RETURNS_CSV_FILENAME
+            and parts[1].startswith("seed")):
+        arch_label = parts[0]
+        try:
+            seed = int(parts[1][len("seed"):])
+        except ValueError:
+            seed = None
+        return paths.make_label(arch_label, seed), arch_label, seed
+
+    # Fallback: predictions_csv was passed explicitly and does not live in
+    # the standard tree. Parse the old-style "<label>_returns.csv" name.
+    base = os.path.basename(predictions_csv)
+    label = base.replace("_returns.csv", "").replace(".csv", "")
+    arch_label, seed = paths.parse_label(label)
+    return label, arch_label, seed
+
+
 def recover_from_predictions(predictions_csv, raw_prices_csv=RAW_PRICES_CSV,
-                             price_col=GOLD_PRICE_COL, out_dir=None,
-                             label=None, plot_start=None, plot_end=None,
-                             range_dir=None):
+                             price_col=GOLD_PRICE_COL, runs_dir=RUNS_DIR,
+                             label=None, plot_start=None, plot_end=None):
     """Recover absolute prices from a predictions CSV.
 
-    Always writes the full-range CSV and PNG to `out_dir`.
-    If plot_start/plot_end are given, also writes a range-limited PNG
-    (with metrics recomputed over the visible window) to `range_dir`.
+    Always writes the full-range CSV and PNGs into the run folder
+    (``<runs_dir>/<arch>/seed<N>/``).  If plot_start/plot_end are given,
+    also writes a range-limited copy into a nested subfolder named for
+    the range, with metrics recomputed over the visible window.
     """
-    if out_dir is None:
-        out_dir = os.path.dirname(predictions_csv) or "."
+    parsed_label, arch_label, seed = _label_from_returns_path(
+        predictions_csv, runs_dir=runs_dir
+    )
     if label is None:
-        base = os.path.basename(predictions_csv)
-        label = base.replace("_returns.csv", "")
+        label = parsed_label
+    out_dir = paths.run_dir(arch_label, seed, root=runs_dir)
 
     preds = pd.read_csv(predictions_csv, parse_dates=["Date"])
     preds = preds.sort_values("Date").reset_index(drop=True)
@@ -284,32 +315,35 @@ def recover_from_predictions(predictions_csv, raw_prices_csv=RAW_PRICES_CSV,
           f"{metrics_full['direction_accuracy']:5.2f}%")
 
     os.makedirs(out_dir, exist_ok=True)
-    out_csv = os.path.join(out_dir, f"{label}_prices.csv")
+    out_csv = os.path.join(out_dir, paths.PRICES_CSV_FILENAME)
     merged.to_csv(out_csv, index=False)
     print(f"[{label}] Wrote {out_csv}")
 
-    out_png = os.path.join(out_dir, f"{label}_prices.png")
+    out_png = os.path.join(out_dir, paths.PRICES_PLOT_FILENAME)
     _plot_model(merged, label, out_png, metrics_full)
-    out_returns_png = os.path.join(out_dir, f"{label}_returns_plot.png")
+    out_returns_png = os.path.join(out_dir, paths.RETURNS_PLOT_FILENAME)
     _plot_model_returns(merged, label, out_returns_png, metrics_full)
 
-    # Optional range-limited plots.
+    # Optional range-limited plots — nested one level under the run dir,
+    # so a single arch/seed keeps all its views co-located.
     range_png = None
     range_returns_png = None
     metrics_range = None
-    if (plot_start is not None or plot_end is not None) and range_dir is not None:
+    rname = paths.range_name(plot_start, plot_end)
+    if rname is not None:
         sub = _slice_range(merged, plot_start, plot_end)
         metrics_range = _compute_metrics(sub)
         suffix = f" [{plot_start or '…'} → {plot_end or '…'}]"
+        range_dir = paths.range_subdir(out_dir, rname)
         range_png = _plot_model(
             sub, label,
-            os.path.join(range_dir, f"{label}_prices.png"),
+            os.path.join(range_dir, paths.PRICES_PLOT_FILENAME),
             metrics_range,
             range_suffix=suffix,
         )
         range_returns_png = _plot_model_returns(
             sub, label,
-            os.path.join(range_dir, f"{label}_returns_plot.png"),
+            os.path.join(range_dir, paths.RETURNS_PLOT_FILENAME),
             metrics_range,
             range_suffix=suffix,
         )
@@ -318,6 +352,8 @@ def recover_from_predictions(predictions_csv, raw_prices_csv=RAW_PRICES_CSV,
 
     return {
         "label": label,
+        "arch_label": arch_label,
+        "seed": seed,
         "out_csv": out_csv,
         "out_png": out_png,
         "out_returns_png": out_returns_png,
@@ -331,6 +367,135 @@ def recover_from_predictions(predictions_csv, raw_prices_csv=RAW_PRICES_CSV,
         "metrics_range": metrics_range,
         "merged": merged,
     }
+
+
+def _stack_across_seeds(results, col):
+    """Inner-join per-seed frames on Date and stack `col` into [n_seeds, T].
+
+    Returns (dates, stacked).  Only dates present in every seed's test
+    slice are kept; in practice they're identical because every run sees
+    the same test split, but the merge keeps us honest if a seed ever
+    drops rows upstream.
+    """
+    if not results:
+        return None, None
+    combined = results[0]["merged"][["Date", col]].rename(columns={col: "s0"})
+    for i, r in enumerate(results[1:], start=1):
+        df = r["merged"][["Date", col]].rename(columns={col: f"s{i}"})
+        combined = combined.merge(df, on="Date", how="inner")
+    combined = combined.sort_values("Date").reset_index(drop=True)
+    dates = combined["Date"]
+    stacked = combined.drop(columns="Date").to_numpy().T
+    return dates, stacked
+
+
+def _mean_std(stacked):
+    """Return (mean, std) along axis 0. std=0 if only one row."""
+    if stacked.shape[0] > 1:
+        return stacked.mean(0), stacked.std(0, ddof=1)
+    return stacked[0], np.zeros_like(stacked[0])
+
+
+def plot_aggregate_prices(results, arch_label, runs_dir=RUNS_DIR):
+    """Mean ± std of price predictions across seeds, for one architecture.
+
+    Per-seed prices.png files in each run folder stay untouched; this
+    plot is the one that survives into the report, where seed noise
+    should be a band rather than N overlapping lines.
+    """
+    if not results:
+        return None
+    dates, one_step = _stack_across_seeds(results, "price_pred_one_step")
+    _, rolling = _stack_across_seeds(results, "price_pred_rolling")
+    if dates is None or one_step is None or len(dates) == 0:
+        print(f"[{arch_label}] aggregate prices: no overlapping dates, skipped")
+        return None
+
+    # `price_true` is seed-independent — take from first run, aligned to
+    # the shared dates from the stack.
+    truth = (results[0]["merged"][["Date", "price_true"]]
+             .merge(pd.DataFrame({"Date": dates}), on="Date", how="inner")
+             .sort_values("Date").reset_index(drop=True))
+
+    one_mean, one_std = _mean_std(one_step)
+    roll_mean, roll_std = _mean_std(rolling)
+
+    fig, ax = plt.subplots(figsize=(11, 5))
+    ax.plot(truth["Date"], truth["price_true"], color="black",
+            linewidth=1.2, label="Actual", zorder=5)
+    ax.plot(dates, one_mean, color="tomato", linewidth=1.0,
+            label=f"One-step (mean, N={len(results)})")
+    ax.fill_between(dates, one_mean - one_std, one_mean + one_std,
+                    color="tomato", alpha=0.25, label="One-step ±1σ")
+    ax.plot(dates, roll_mean, color="steelblue", linewidth=1.0, alpha=0.8,
+            label=f"Rolling (mean, N={len(results)})")
+    ax.fill_between(dates, roll_mean - roll_std, roll_mean + roll_std,
+                    color="steelblue", alpha=0.20, label="Rolling ±1σ")
+    ax.set_title(f"Gold Price Recovery — {arch_label} "
+                 f"(aggregated over {len(results)} seeds)")
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Gold Futures (COMEX) close")
+    ax.legend(loc="best", fontsize=9)
+    ax.grid(alpha=0.3)
+    fig.tight_layout()
+
+    out_path = os.path.join(paths.aggregate_dir(arch_label, root=runs_dir),
+                            paths.PRICES_PLOT_FILENAME)
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    fig.savefig(out_path, dpi=150)
+    plt.close(fig)
+    print(f"[{arch_label}] Aggregate price plot -> {out_path}")
+    return out_path
+
+
+def plot_aggregate_returns(results, arch_label, runs_dir=RUNS_DIR):
+    """Mean ± std of predicted log-returns across seeds, for one architecture."""
+    if not results:
+        return None
+    dates, y_pred = _stack_across_seeds(results, "y_pred")
+    if dates is None or y_pred is None or len(dates) == 0:
+        print(f"[{arch_label}] aggregate returns: no overlapping dates, skipped")
+        return None
+
+    truth = (results[0]["merged"][["Date", "y_true"]]
+             .merge(pd.DataFrame({"Date": dates}), on="Date", how="inner")
+             .sort_values("Date").reset_index(drop=True))
+    mean_p, std_p = _mean_std(y_pred)
+
+    # Correlation of the *mean* prediction with truth is a cleaner summary
+    # than averaging per-seed correlations (which would understate it).
+    yt = truth["y_true"].to_numpy()
+    corr = (float(np.corrcoef(yt, mean_p)[0, 1])
+            if yt.std() > 0 and mean_p.std() > 0 else float("nan"))
+    shrink = (float(mean_p.std() / yt.std()) if yt.std() > 0 else float("nan"))
+
+    fig, ax = plt.subplots(figsize=(11, 5))
+    ax.axhline(0.0, color="gray", linewidth=0.7, alpha=0.6)
+    ax.plot(truth["Date"], truth["y_true"], color="black",
+            linewidth=0.9, alpha=0.85, label="Actual return", zorder=5)
+    ax.plot(dates, mean_p, color="tomato", linewidth=0.9,
+            label=f"Predicted (mean, N={len(results)})")
+    ax.fill_between(dates, mean_p - std_p, mean_p + std_p,
+                    color="tomato", alpha=0.25, label="Predicted ±1σ")
+    ax.set_title(
+        f"Predicted vs Actual Log-Returns — {arch_label} "
+        f"(aggregated over {len(results)} seeds)    "
+        f"corr(mean, truth)={corr:.3f}  "
+        f"shrinkage σ(mean)/σ(true)={shrink:.2f}"
+    )
+    ax.set_xlabel("Date")
+    ax.set_ylabel("log-return")
+    ax.legend(loc="best", fontsize=9)
+    ax.grid(alpha=0.3)
+    fig.tight_layout()
+
+    out_path = os.path.join(paths.aggregate_dir(arch_label, root=runs_dir),
+                            paths.RETURNS_PLOT_FILENAME)
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    fig.savefig(out_path, dpi=150)
+    plt.close(fig)
+    print(f"[{arch_label}] Aggregate returns plot -> {out_path}")
+    return out_path
 
 
 def plot_combined_one_step(results, out_path, plot_start=None, plot_end=None):
@@ -510,10 +675,13 @@ def _validate_date(s, name):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--predictions", type=str, default=None,
-                        help="Path to a predictions CSV. Overrides --label.")
+                        help="Path to a returns.csv. Overrides --label.")
     parser.add_argument("--label", type=str, default=None,
-                        help="Load predictions/<label>_returns.csv.")
-    parser.add_argument("--predictions-dir", type=str, default=PREDICTIONS_DIR)
+                        help="Full label (e.g. LSTM-all_seed42). Loads "
+                             "runs/<arch>/seed<N>/returns.csv.")
+    parser.add_argument("--runs-dir", type=str, default=RUNS_DIR,
+                        help="Root folder of per-run output "
+                             "(<runs-dir>/<arch>/seed<N>/returns.csv).")
     parser.add_argument("--raw-prices", type=str, default=RAW_PRICES_CSV)
     parser.add_argument("--price-col", type=str, default=GOLD_PRICE_COL)
     parser.add_argument("--plot-start", type=str, default=None,
@@ -532,24 +700,21 @@ def main():
             f"({plot_end})."
         )
 
-    range_dir = None
-    if plot_start is not None or plot_end is not None:
-        range_name = f"{plot_start or 'min'}_{plot_end or 'max'}"
-        range_dir = os.path.join(args.predictions_dir, range_name)
-        os.makedirs(range_dir, exist_ok=True)
-        print(f"[range] Saving range plots into {range_dir}")
+    rname = paths.range_name(plot_start, plot_end)
 
     if args.predictions is not None:
         files = [args.predictions]
     elif args.label is not None:
-        files = [os.path.join(args.predictions_dir, f"{args.label}_returns.csv")]
+        arch_label, seed = paths.parse_label(args.label)
+        files = [paths.returns_csv(arch_label, seed, root=args.runs_dir)]
     else:
-        files = sorted(
-            glob.glob(os.path.join(args.predictions_dir, "*_returns.csv"))
-        )
+        # New layout: <runs>/<arch>/seed<N>/returns.csv
+        files = sorted(glob.glob(os.path.join(
+            args.runs_dir, "*", "seed*", paths.RETURNS_CSV_FILENAME
+        )))
         if not files:
             raise SystemExit(
-                f"No predictions found in {args.predictions_dir}/. "
+                f"No predictions found under {args.runs_dir}/*/seed*/. "
                 f"Run predict.py first."
             )
 
@@ -560,32 +725,45 @@ def main():
                 f,
                 raw_prices_csv=args.raw_prices,
                 price_col=args.price_col,
+                runs_dir=args.runs_dir,
                 plot_start=plot_start,
                 plot_end=plot_end,
-                range_dir=range_dir,
             )
         )
 
+    # Per-arch aggregate plots (mean ± std across seeds). Per-seed plots
+    # stay untouched in each run folder for reference.
+    by_arch = {}
+    for r in summary:
+        by_arch.setdefault(r["arch_label"], []).append(r)
+    for arch_label, runs in by_arch.items():
+        plot_aggregate_prices(runs, arch_label, runs_dir=args.runs_dir)
+        plot_aggregate_returns(runs, arch_label, runs_dir=args.runs_dir)
+
     if len(summary) > 1:
-        # Always: full-range combined plots in predictions/
+        # Always: full-range combined plots in runs/_all_models/
+        combined_dir = paths.all_models_dir(root=args.runs_dir)
         plot_combined_one_step(
             summary,
-            os.path.join(args.predictions_dir, "_all_models_one_step.png"),
+            os.path.join(combined_dir, paths.COMBINED_ONE_STEP_FILENAME),
         )
         plot_combined_returns(
             summary,
-            os.path.join(args.predictions_dir, "_all_models_returns.png"),
+            os.path.join(combined_dir, paths.COMBINED_RETURNS_FILENAME),
         )
-        # Optional: range-limited combined plots in predictions/<range>/
-        if range_dir is not None:
+        # Optional: range-limited combined plots in runs/_all_models/<range>/
+        if rname is not None:
+            combined_range_dir = paths.all_models_dir(
+                range_name=rname, root=args.runs_dir
+            )
             plot_combined_one_step(
                 summary,
-                os.path.join(range_dir, "_all_models_one_step.png"),
+                os.path.join(combined_range_dir, paths.COMBINED_ONE_STEP_FILENAME),
                 plot_start=plot_start, plot_end=plot_end,
             )
             plot_combined_returns(
                 summary,
-                os.path.join(range_dir, "_all_models_returns.png"),
+                os.path.join(combined_range_dir, paths.COMBINED_RETURNS_FILENAME),
                 plot_start=plot_start, plot_end=plot_end,
             )
 
@@ -623,7 +801,7 @@ def main():
     for r in summary:
         _print_row(r, base_rmse=base_rmse_full)
 
-    if range_dir is not None:
+    if rname is not None:
         print("\n" + "=" * 103)
         print(f"SUMMARY (range {plot_start or 'min'} → {plot_end or 'max'})")
         print("=" * 103)

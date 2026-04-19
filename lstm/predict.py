@@ -4,8 +4,8 @@ predict.py
 Load a trained LSTM checkpoint and dump predicted vs actual gold
 log-returns on the test split.
 
-Output:
-    lstm/predictions/<label>_returns.csv
+Output (per checkpoint):
+    lstm/runs/<arch_label>/seed<N>/returns.csv
     columns: Date, y_true, y_pred
 
 Usage:
@@ -23,11 +23,12 @@ import pandas as pd
 import torch
 from torch.utils.data import DataLoader
 
+import paths
 from dataset import make_splits
 from lstm import LSTM
 
-CHECKPOINT_DIR = "checkpoints"
-PREDICTIONS_DIR = "predictions"
+CHECKPOINT_DIR = paths.CHECKPOINT_DIR
+RUNS_DIR = paths.RUNS_DIR
 BATCH_SIZE = 256
 
 
@@ -45,8 +46,12 @@ def build_model(config):
     )
 
 
-def predict_from_checkpoint(ckpt_path, out_dir=PREDICTIONS_DIR, device=None):
-    """Run inference on the test split and write a (Date, y_true, y_pred) CSV."""
+def predict_from_checkpoint(ckpt_path, runs_dir=RUNS_DIR, device=None):
+    """Run inference on the test split and write a (Date, y_true, y_pred) CSV.
+
+    The CSV is written to `runs_dir/<arch_label>/seed<N>/returns.csv` so
+    the path alone locates the run; the filename stays generic.
+    """
     if device is None:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -54,6 +59,7 @@ def predict_from_checkpoint(ckpt_path, out_dir=PREDICTIONS_DIR, device=None):
     label = ckpt["label"]
     config = ckpt["config"]
     feature_cols = ckpt["feature_cols"]
+    arch_label, seed = paths.parse_label(label)
 
     print(f"[{label}] Loaded {ckpt_path}")
     print(f"[{label}] Best epoch={ckpt['best_epoch']}  "
@@ -94,8 +100,8 @@ def predict_from_checkpoint(ckpt_path, out_dir=PREDICTIONS_DIR, device=None):
         "y_pred": y_pred.astype(np.float64),
     })
 
-    os.makedirs(out_dir, exist_ok=True)
-    out_path = os.path.join(out_dir, f"{label}_returns.csv")
+    out_path = paths.returns_csv(arch_label, seed, root=runs_dir)
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
     df.to_csv(out_path, index=False)
 
     mse = float(((df["y_pred"] - df["y_true"]) ** 2).mean())
@@ -113,23 +119,25 @@ def main():
                         help="Checkpoint label (e.g. LSTM-all). Loads "
                              "checkpoints/<label>.pt.")
     parser.add_argument("--checkpoint-dir", type=str, default=CHECKPOINT_DIR)
-    parser.add_argument("--out-dir", type=str, default=PREDICTIONS_DIR)
+    parser.add_argument("--runs-dir", type=str, default=RUNS_DIR,
+                        help="Root folder for per-run output "
+                             "(writes <runs-dir>/<arch>/seed<N>/returns.csv).")
     args = parser.parse_args()
 
     if args.checkpoint is not None:
-        paths = [args.checkpoint]
+        paths_list = [args.checkpoint]
     elif args.label is not None:
-        paths = [os.path.join(args.checkpoint_dir, f"{args.label}.pt")]
+        paths_list = [os.path.join(args.checkpoint_dir, f"{args.label}.pt")]
     else:
-        paths = sorted(glob.glob(os.path.join(args.checkpoint_dir, "*.pt")))
-        if not paths:
+        paths_list = sorted(glob.glob(os.path.join(args.checkpoint_dir, "*.pt")))
+        if not paths_list:
             raise SystemExit(
                 f"No checkpoints found in {args.checkpoint_dir}/. "
                 f"Run train.py first."
             )
 
-    for p in paths:
-        predict_from_checkpoint(p, out_dir=args.out_dir)
+    for p in paths_list:
+        predict_from_checkpoint(p, runs_dir=args.runs_dir)
 
 
 if __name__ == "__main__":

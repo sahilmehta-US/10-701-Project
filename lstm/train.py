@@ -29,6 +29,7 @@ import matplotlib.pyplot as plt
 import random
 import numpy as np
 
+import paths
 from dataset import make_dataloaders
 from lstm import LSTM
 
@@ -54,7 +55,7 @@ L2_ALL_REGULARIZATION = "l2_noncausal"
 L1_ALL_REGULARIZATION = "l1_noncausal"
 
 CAUSAL_FEATURES_JSON = "../PCMCI/results/pcmci_output/selected_features.json"
-CHECKPOINT_DIR = "checkpoints"
+CHECKPOINT_DIR = paths.CHECKPOINT_DIR
 
 # Multi-seed training: every experiment is trained once per seed so we
 # can report mean ± std and assess whether model-vs-model gaps exceed
@@ -125,6 +126,60 @@ def plot_losses(train_losses, val_losses, best_epoch, label, filename):
     plt.savefig(filename, dpi=150)
     plt.close()
     print(f"[SAVED] Loss plot -> {filename}")
+
+
+def plot_aggregate_losses(results, arch_label):
+    """Mean ± std of train / val loss curves across seeds for one arch.
+
+    Per-seed curves remain available in each seed subfolder; this view
+    is the one that goes in the report, where seed noise should be a
+    band rather than N overlapping lines.
+    """
+    if not results:
+        return None
+    # Safeguard: if seeds disagree on #epochs (e.g. early stop), truncate.
+    min_epochs = min(len(r["train_losses"]) for r in results)
+    train_curves = np.stack([r["train_losses"][:min_epochs] for r in results])
+    val_curves = np.stack([r["val_losses"][:min_epochs] for r in results])
+    epochs = np.arange(1, min_epochs + 1)
+
+    # With only one seed, `.std(ddof=1)` is undefined — fall back to zero.
+    if len(results) > 1:
+        tr_mean, tr_std = train_curves.mean(0), train_curves.std(0, ddof=1)
+        va_mean, va_std = val_curves.mean(0), val_curves.std(0, ddof=1)
+    else:
+        tr_mean, tr_std = train_curves[0], np.zeros_like(train_curves[0])
+        va_mean, va_std = val_curves[0], np.zeros_like(val_curves[0])
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+    # Show individual seeds faintly so outliers are still visible.
+    for r in results:
+        ax.plot(epochs, r["train_losses"][:min_epochs],
+                color="steelblue", alpha=0.15, linewidth=0.8)
+        ax.plot(epochs, r["val_losses"][:min_epochs],
+                color="tomato", alpha=0.15, linewidth=0.8)
+    ax.plot(epochs, tr_mean, color="steelblue", linewidth=1.6,
+            label=f"Train mean (N={len(results)})")
+    ax.fill_between(epochs, tr_mean - tr_std, tr_mean + tr_std,
+                    color="steelblue", alpha=0.25, label="Train ±1σ")
+    ax.plot(epochs, va_mean, color="tomato", linewidth=1.6,
+            label=f"Val mean (N={len(results)})")
+    ax.fill_between(epochs, va_mean - va_std, va_mean + va_std,
+                    color="tomato", alpha=0.25, label="Val ±1σ")
+    ax.set_xlabel("Epoch")
+    ax.set_ylabel("Loss")
+    ax.set_title(f"Train vs Val Loss (aggregated over seeds) — {arch_label}")
+    ax.legend(loc="best", fontsize=9)
+    ax.grid(alpha=0.3)
+    fig.tight_layout()
+
+    out_path = os.path.join(paths.aggregate_dir(arch_label),
+                            paths.LOSSES_FILENAME)
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    fig.savefig(out_path, dpi=150)
+    plt.close(fig)
+    print(f"[{arch_label}] Aggregate loss plot -> {out_path}")
+    return out_path
 
 
 def run(csv_file, split_json, seq_len, batch_size, target_col,
@@ -236,10 +291,12 @@ def run(csv_file, split_json, seq_len, batch_size, target_col,
         train_loss_list.append(train_loss)
         val_loss_list.append(val_loss)
 
-    # Plot training curves
+    # Plot training curves into the per-run folder. The path already
+    # encodes arch + seed, so the filename itself is just "losses.png".
+    losses_png = paths.losses_png(arch_label, seed)
+    os.makedirs(os.path.dirname(losses_png), exist_ok=True)
     plot_losses(train_loss_list, val_loss_list, best_epoch,
-                label=label,
-                filename=f"losses_{label.lower().replace(' ', '_')}.png")
+                label=label, filename=losses_png)
 
     # Evaluate on test set using best checkpoint
     model.load_state_dict(best_state)
@@ -254,7 +311,7 @@ def run(csv_file, split_json, seq_len, batch_size, target_col,
     # Persist best checkpoint so downstream scripts (predict.py,
     # recover_prices.py) can run without retraining.
     os.makedirs(CHECKPOINT_DIR, exist_ok=True)
-    ckpt_path = os.path.join(CHECKPOINT_DIR, f"{label}.pt")
+    ckpt_path = paths.checkpoint_path(label, root=CHECKPOINT_DIR)
     torch.save(
         {
             "label": label,
@@ -298,6 +355,8 @@ def run(csv_file, split_json, seq_len, batch_size, target_col,
         "weights": input_weights,
         "uses_attention_gate": model.attn_gate is not None,
         "checkpoint_path": ckpt_path,
+        "train_losses": np.asarray(train_loss_list, dtype=np.float64),
+        "val_losses": np.asarray(val_loss_list, dtype=np.float64),
     }
 
 
@@ -421,6 +480,15 @@ def main():
                 seed=seed,
             )
             all_results.append(r)
+
+    # ── Aggregate loss plots (mean ± std across seeds, per arch) ──
+    # The per-seed losses.png files in each run folder remain the
+    # ground truth; these aggregate views go in the report.
+    grouped = {}
+    for r in all_results:
+        grouped.setdefault(r["arch_label"], []).append(r)
+    for arch, rs in grouped.items():
+        plot_aggregate_losses(rs, arch)
 
     # ── Per-seed table ─────────────────────────────────────────────
     print("\n" + "=" * 96)
