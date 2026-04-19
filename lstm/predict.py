@@ -21,10 +21,9 @@ import os
 import numpy as np
 import pandas as pd
 import torch
-from torch.utils.data import DataLoader
 
 import paths
-from dataset import make_splits
+from dataset import make_dataloaders
 from lstm import LSTM
 
 CHECKPOINT_DIR = paths.CHECKPOINT_DIR
@@ -68,22 +67,43 @@ def predict_from_checkpoint(ckpt_path, runs_dir=RUNS_DIR, device=None):
 
     # Rebuild the exact test split the model was evaluated on. The scaler
     # is refit on the training slice, matching what happened in train.py.
-    _, _, test_ds = make_splits(
-        ckpt["csv_file"],
-        ckpt["split_json"],
-        seq_len=config["seq_len"],
-        target_col=config["target_col"],
-        feature_cols=feature_cols,
-    )
+    # For LSTM-pca checkpoints we re-derive the PCA pipeline on the fly:
+    # because PCA is fit on the training slice (deterministic given the
+    # same rows + n_components), the components come out identical to the
+    # ones the model was trained on. We pass feature_cols=None in that
+    # case because the stored feature_cols are the post-PCA ["PC1"...]
+    # labels, not columns that exist in the raw CSV.
+    pca_components = ckpt.get("pca_components")
+    if pca_components is not None:
+        print(f"[{label}] Rebuilding PCA pipeline "
+              f"({pca_components} components) on the fly")
+        _, _, test_loader, _ = make_dataloaders(
+            ckpt["csv_file"],
+            ckpt["split_json"],
+            seq_len=config["seq_len"],
+            batch_size=BATCH_SIZE,
+            target_col=config["target_col"],
+            feature_cols=None,
+            pca_components=pca_components,
+        )
+    else:
+        _, _, test_loader, _ = make_dataloaders(
+            ckpt["csv_file"],
+            ckpt["split_json"],
+            seq_len=config["seq_len"],
+            batch_size=BATCH_SIZE,
+            target_col=config["target_col"],
+            feature_cols=feature_cols,
+        )
+    test_ds = test_loader.dataset
 
     model = build_model(config).to(device)
     model.load_state_dict(ckpt["state_dict"])
     model.eval()
 
-    loader = DataLoader(test_ds, batch_size=BATCH_SIZE, shuffle=False)
     preds = []
     with torch.no_grad():
-        for X, _ in loader:
+        for X, _ in test_loader:
             pred = model(X.to(device)).detach().cpu().numpy()
             preds.append(np.atleast_1d(pred))
     y_pred = np.concatenate(preds)

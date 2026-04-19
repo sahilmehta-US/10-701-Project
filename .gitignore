@@ -42,12 +42,11 @@ mlruns/
 data/*pipeline_steps/
 data/*results/
 
-# PCMCI/results: ignore generated outputs except feature tables used downstream
+# PCMCI/results: ignore all
 PCMCI/results/*
-!PCMCI/results/pcmci_output/
-PCMCI/results/pcmci_output/*
-!PCMCI/results/pcmci_output/selected_features.json
-!PCMCI/results/pcmci_output/causal_features.csv
+
+# granger_outputs/: ignore all
+granger_outputs/*
 
 # lstm/: ignore all except top-level Python sources (plots, checkpoints, caches, etc.)
 lstm/*

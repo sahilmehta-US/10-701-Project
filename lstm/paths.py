@@ -39,7 +39,7 @@ COMBINED_RETURNS_FILENAME = "returns.png"
 
 
 def parse_label(label):
-    """Split 'LSTM-all-reg-l1-attn_seed42' -> ('LSTM-all-reg-l1-attn', 42).
+    """Split 'LSTM-reg-l1-attn_seed42' -> ('LSTM-reg-l1-attn', 42).
 
     Returns (arch_label, seed). `seed` is None for legacy labels without a
     `_seed<N>` suffix (older checkpoints trained before the seed sweep).
