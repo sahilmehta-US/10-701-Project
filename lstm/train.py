@@ -1,29 +1,26 @@
 """
-train.py
---------
-Train and evaluate LSTM models for gold price prediction.
+train.py: Train and evaluate LSTM models for gold price prediction.
 
 Six architectures are trained, each over several random seeds:
-  1. LSTM-all:        trained on ALL features (baseline)
-  2. LSTM-causal:     trained on PCMCI-selected features only
-  3. LSTM-granger:    trained on Granger-selected features
-  4. LSTM-pca:        trained on PCA-reduced inputs (dim matched to |C|)
-  5. LSTM-reg-l1:      ALL features, L1 penalty on non-PCMCI input weights
-  6. LSTM-reg-l2:      ALL features, L2 penalty on non-PCMCI input weights
+    1. LSTM-all: trained on ALL features (baseline)
+    2. LSTM-causal: trained on PCMCI-selected features only
+    3. LSTM-granger: trained on Granger-selected features
+    4. LSTM-pca: trained on PCA-reduced inputs (dim matched to number of PCMCI-selected features)
+    5. LSTM-reg-l1: ALL features, L1 penalty on non-PCMCI input weights
+    6. LSTM-reg-l2: ALL features, L2 penalty on non-PCMCI input weights
 
-All six share architecture and hyperparameters; the only differences
-are the input feature set and the regularizer. Each is trained for
-every seed in `SEEDS`; metrics are reported per-seed AND aggregated
-(mean ± std) so model-vs-model comparisons can be judged against
-seed-to-seed noise.
+All six share architecture and hyperparameters for controlled experiment;
+the only differences are the input feature set and the regularizer.
+Each is trained for every seed in SEEDS(loop through every seed);
+metrics are reported per-seed & aggregated (mean +/- std) so model
+comparisons can be judged against noise from different seeds.
 
 Two summary styles can be produced at the end of training (controlled
-by `SUMMARY_STYLE`): a pairwise / weight-norm view and a metrics view
-(MSE/MAE/RMSE/DirAcc with CSV + JSON dumps). See `summarize_pairwise`
-and `summarize_metrics` below.
+by SUMMARY_STYLE): a pairwise / weight-norm view and a metrics view
+(MSE/MAE/RMSE/DirAcc with CSV + JSON dumps). See summarize_pairwise
+and summarize_metrics below.
 
-Usage:
-    python train.py
+usage: python train.py
 """
 
 import itertools
@@ -41,19 +38,18 @@ import paths
 from dataset import make_dataloaders
 from lstm import LSTM
 
-# ══════════════════════════════════════════════════════════════════════════
-#  CONFIG
-# ══════════════════════════════════════════════════════════════════════════
+
+# CONFIG
 CSV        = "../data/results/gold_base_stationary_dropna.csv"
 SPLIT_JSON = "../data/results/split_definition.json"
 TARGET_COL = "Gold Futures (COMEX) | log_return"
 SEQ_LEN    = 20
 BATCH_SIZE = 64
 EPOCHS     = 50
-LR         = 8e-4
-HIDDEN     = 32
-NUM_LAYERS = 2
-DROPOUT    = 0.36
+LR         = 6e-4 # tuned
+HIDDEN     = 16   # tuned
+NUM_LAYERS = 2    # tuned
+DROPOUT    = 0.47 # tuned
 USE_ATTENTION_GATE = False
 ATTENTION_HIDDEN = None   # defaults to HIDDEN when None
 ATTENTION_DROPOUT = 0.1
@@ -65,11 +61,11 @@ L1_ALL_REGULARIZATION = "l1_noncausal"
 PCA_COMPONENTS = 4   # matched to |C| from PCMCI; adjust if PCMCI count changes
 
 # Early stopping: when enabled, stop training a run if val loss has not
-# improved for `EARLY_STOP_PATIENCE` consecutive epochs.
-USE_EARLY_STOP = False
+# improved for EARLY_STOP_PATIENCE consecutive epochs.
+USE_EARLY_STOP = True
 EARLY_STOP_PATIENCE = 10
 
-# Verbose chatter inside `run()` (per-epoch lines, feature counts, etc.).
+# Verbose chatter inside run() (per-epoch lines, feature counts, etc.).
 # End-of-experiment summary tables in main() always print regardless.
 VERBOSE = True
 
@@ -85,16 +81,15 @@ CHECKPOINT_DIR = paths.CHECKPOINT_DIR
 OUTPUT_DIR = "experiment_outputs"   # metrics-style CSV / JSON destination
 
 # Multi-seed training: every experiment is trained once per seed so we
-# can report mean ± std and assess whether model-vs-model gaps exceed
+# can report mean +/- std and assess whether model-vs-model gaps exceed
 # seed-to-seed variance.
 SEEDS = [42, 123, 456, 789, 1024, 1234, 5678, 9101, 10086, 10701]
-# ══════════════════════════════════════════════════════════════════════════
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 def set_seed(seed=42):
-    """Reset all random seeds for reproducibility between runs."""
+    """Reset all random seeds for reproducibility between runs"""
     torch.manual_seed(seed)
     random.seed(seed)
     np.random.seed(seed)
@@ -116,7 +111,7 @@ def compute_regularization_penalty(model, reg_type, reg_col_idxs):
 
 
 def run_epoch(model, optimizer, loss_fn, loader, training,
-              reg_type=None, reg_col_idxs=None, reg_lambda=0.0):
+                reg_type=None, reg_col_idxs=None, reg_lambda=0.0):
     """Run one epoch of training or evaluation."""
     model.train(training)
     total_loss = 0.0
@@ -141,7 +136,7 @@ def run_epoch(model, optimizer, loss_fn, loader, training,
 def compute_metrics(model, loader):
     """Compute MSE, MAE, RMSE, directional accuracy on a dataloader.
 
-    Used by the "metrics" summary style; `run()` calls this at the end
+    Used by the "metrics" summary style; run() calls this at the end
     of training so both summary styles can share the same return dict.
     """
     model.eval()
@@ -170,7 +165,7 @@ def plot_losses(train_losses, val_losses, best_epoch, label, filename,
                 verbose=True):
     """Plot training curves and save to file.
 
-    `filename` is used as-is (callers pass `paths.losses_png(...)`).
+    filename is used as-is (callers pass paths.losses_png(...)).
     """
     epochs = range(1, len(train_losses) + 1)
     plt.figure(figsize=(8, 5))
@@ -185,11 +180,11 @@ def plot_losses(train_losses, val_losses, best_epoch, label, filename,
     plt.savefig(filename, dpi=150)
     plt.close()
     if verbose:
-        print(f"[SAVED] Loss plot -> {filename}")
+        print(f"*Saved* Loss plot -> {filename}")
 
 
 def plot_aggregate_losses(results, arch_label):
-    """Mean ± std of train / val loss curves across seeds for one arch.
+    """Mean +/- std of train / val loss curves across seeds for one arch.
 
     Per-seed curves remain available in each seed subfolder; this view
     is the one that goes in the report, where seed noise should be a
@@ -203,7 +198,7 @@ def plot_aggregate_losses(results, arch_label):
     val_curves = np.stack([r["val_losses"][:min_epochs] for r in results])
     epochs = np.arange(1, min_epochs + 1)
 
-    # With only one seed, `.std(ddof=1)` is undefined — fall back to zero.
+    # With only one seed, .std(ddof=1) is undefined — fall back to zero.
     if len(results) > 1:
         tr_mean, tr_std = train_curves.mean(0), train_curves.std(0, ddof=1)
         va_mean, va_std = val_curves.mean(0), val_curves.std(0, ddof=1)
@@ -221,11 +216,11 @@ def plot_aggregate_losses(results, arch_label):
     ax.plot(epochs, tr_mean, color="steelblue", linewidth=1.6,
             label=f"Train mean (N={len(results)})")
     ax.fill_between(epochs, tr_mean - tr_std, tr_mean + tr_std,
-                    color="steelblue", alpha=0.25, label="Train ±1σ")
+                    color="steelblue", alpha=0.25, label="Train +/-1σ")
     ax.plot(epochs, va_mean, color="tomato", linewidth=1.6,
             label=f"Val mean (N={len(results)})")
     ax.fill_between(epochs, va_mean - va_std, va_mean + va_std,
-                    color="tomato", alpha=0.25, label="Val ±1σ")
+                    color="tomato", alpha=0.25, label="Val +/-1σ")
     ax.set_xlabel("Epoch")
     ax.set_ylabel("Loss")
     ax.set_title(f"Train vs Val Loss (aggregated over seeds) — {arch_label}")
@@ -253,14 +248,13 @@ def run(csv_file, split_json, seq_len, batch_size, target_col,
     """
     Train an LSTM, evaluate on test set, return results dict.
 
-    Parameters
-    ----------
+    Parameters:
     feature_cols : list[str] or None
         If None, use all columns. If a list, use only those columns.
     label : str
         Name for this experiment (used in prints and filenames).
-        An attention-gate suffix and a `_seed<N>` suffix are appended
-        automatically — see `base_label` / `arch_label` / `label` in the
+        An attention-gate suffix and a _seed<N> suffix are appended
+        automatically — see base_label / arch_label / label in the
         returned dict for the three nesting levels.
     regularization : str or None
         One of None, "l1_noncausal", or "l2_noncausal".
@@ -274,15 +268,15 @@ def run(csv_file, split_json, seq_len, batch_size, target_col,
         plot filenames so different seeds never overwrite each other.
     use_early_stop : bool
         If True, stop training when val loss has not improved for
-        `early_stop_patience` consecutive epochs.
+        early_stop_patience consecutive epochs.
     early_stop_patience : int
         Epoch patience for early stopping (only used when
-        `use_early_stop` is True).
+        use_early_stop is True).
     verbose : bool
         If True, print per-epoch progress and per-run summary lines.
-        End-of-experiment summary tables in `main()` print regardless.
+        End-of-experiment summary tables in main() print regardless.
     """
-    # Layered label: base (experiment)  →  arch (+attn flag)  →  label (+seed)
+    # Layered label: base (experiment)  ->  arch (+attn flag)  ->  label (+seed)
     base_label = label
     arch_label = f"{base_label}-attn" if use_attn_gate else base_label
     label = f"{arch_label}_seed{seed}"
@@ -297,9 +291,9 @@ def run(csv_file, split_json, seq_len, batch_size, target_col,
 
     if verbose:
         print(f"[{label}] Features: {n_features}  |  "
-              f"Train: {len(train_loader.dataset)}  "
-              f"Val: {len(val_loader.dataset)}  "
-              f"Test: {len(test_loader.dataset)}")
+            f"Train: {len(train_loader.dataset)}  "
+            f"Val: {len(val_loader.dataset)}  "
+            f"Test: {len(test_loader.dataset)}")
 
     if regularization is None:
         reg_type = None
@@ -307,18 +301,14 @@ def run(csv_file, split_json, seq_len, batch_size, target_col,
         reg_cols = []
     else:
         if regularization not in {"l1_noncausal", "l2_noncausal"}:
-            raise ValueError(
-                "regularization must be one of None, 'l1_noncausal', or 'l2_noncausal'"
-            )
+            raise ValueError("regularization must be one of None, 'l1_noncausal', or 'l2_noncausal'")
         if causal_cols is None:
             raise ValueError("causal_cols must be provided when regularization is enabled")
         reg_type = regularization.split("_", maxsplit=1)[0]
         causal_set = set(causal_cols)
         reg_cols = [col for col in train_loader.dataset.feature_cols if col not in causal_set]
-        reg_col_idxs = [
-            idx for idx, col in enumerate(train_loader.dataset.feature_cols)
-            if col not in causal_set
-        ]
+        reg_col_idxs = [idx for idx, col in enumerate(train_loader.dataset.feature_cols)
+            if col not in causal_set]
 
     reg_desc = regularization or "none"
     if verbose:
@@ -368,13 +358,13 @@ def run(csv_file, split_json, seq_len, batch_size, target_col,
         # Epoch 1, every 10th, and the final epoch (if not early-stopped).
         if verbose and (epoch == 1 or epoch % 10 == 0 or epoch == epochs):
             print(f"  Epoch {epoch:3d}/{epochs}  "
-                  f"train={train_loss*loss_scale:7.2f}  "
-                  f"val={val_loss*loss_scale:7.2f}")
+                f"train={train_loss*loss_scale:7.2f}  "
+                f"val={val_loss*loss_scale:7.2f}")
 
         if use_early_stop and epochs_no_improve >= early_stop_patience:
             if verbose:
                 print(f"[{label}] Early stop at epoch {epoch} "
-                      f"(best was {best_epoch}, patience={early_stop_patience})")
+                    f"(best was {best_epoch}, patience={early_stop_patience})")
             break
 
     # Plot training curves into the per-run folder. The path already
@@ -474,7 +464,7 @@ def load_causal_features():
         info = json.load(f)
 
     causal_cols = list(info["exogenous_features"])
-    print(f"[INFO] PCMCI selected {len(causal_cols)} exogenous features:")
+    print(f"PCMCI selected {len(causal_cols)} exogenous features:")
     for c in causal_cols:
         print(f"       - {c}")
 
@@ -490,7 +480,7 @@ def load_causal_features():
 def load_granger_features():
     """Load Granger-selected features. Filter to columns present in main CSV.
 
-    Mirrors `load_causal_features`: the Granger sweep produces its own
+    Mirrors load_causal_features: the Granger sweep produces its own
     feature list which may include columns the LSTM dataset doesn't
     carry, so we intersect against the CSV header before use and always
     append TARGET_COL for the AR signal.
@@ -507,8 +497,7 @@ def load_granger_features():
 
     if TARGET_COL not in granger_cols:
         granger_cols.append(TARGET_COL)
-    print(f"[INFO] Granger selected {len(granger_cols)} features "
-          f"(filtered to match LSTM dataset).")
+    print(f"Granger selected {len(granger_cols)} features " f"(filtered to match LSTM dataset).")
     return granger_cols
 
 
@@ -516,7 +505,7 @@ def build_experiments(causal_cols, granger_cols):
     """Return the list of experiment configurations to train over seeds.
 
     Each element is a kwargs dict passed (together with the shared
-    hyperparameters) to `run()`. Keeping configurations declarative lets
+    hyperparameters) to run(). Keeping configurations declarative lets
     the seed loop and the aggregation code stay generic.
     """
     return [
@@ -566,7 +555,7 @@ def build_experiments(causal_cols, granger_cols):
 
 
 def aggregate_by_arch(results):
-    """Group per-seed results by `arch_label` and compute mean / std."""
+    """Group per-seed results by arch_label and compute mean / std."""
     grouped = {}
     for r in results:
         grouped.setdefault(r["arch_label"], []).append(r)
@@ -599,40 +588,40 @@ def summarize_pairwise(all_results, causal_cols):
     with a pooled-std noise band, and an input-weight norm summary split
     by PCMCI / non-PCMCI features.
     """
-    # ── Per-seed table ─────────────────────────────────────────────
+    # Per-seed table
     print("\n" + "=" * 96)
     print("PER-SEED RESULTS")
     print("=" * 96)
     print(f"{'Architecture':<22} {'seed':>6} {'n_feat':>7} "
-          f"{'reg':>14} {'best_epoch':>11} {'Val MSE':>12} {'Test MSE':>12}")
+        f"{'reg':>14} {'best_epoch':>11} {'Val MSE':>12} {'Test MSE':>12}")
     print("-" * 96)
     for r in all_results:
         print(f"{r['arch_label']:<22} {r['seed']:>6d} {r['n_features']:>7d} "
-              f"{r['regularization']:>14} {r['best_epoch']:>11d} "
-              f"{r['best_val_mse']*LOSS_SCALE:>12.2f} "
-              f"{r['test_mse']*LOSS_SCALE:>12.2f}")
+            f"{r['regularization']:>14} {r['best_epoch']:>11d} "
+            f"{r['best_val_mse']*LOSS_SCALE:>12.2f} "
+            f"{r['test_mse']*LOSS_SCALE:>12.2f}")
 
-    # ── Aggregated table ──────────────────────────────────────────
+    # Aggregated table
     agg = aggregate_by_arch(all_results)
     print("\n" + "=" * 102)
     print(f"AGGREGATED OVER SEEDS  (N = {len(SEEDS)} seeds per architecture;  "
-          f"mean ± std, scaled by {LOSS_SCALE:.0e})")
+        f"mean +/- std, scaled by {LOSS_SCALE:.0e})")
     print("=" * 102)
     print(f"{'Architecture':<22} {'n_feat':>7} {'reg':>14} "
-          f"{'best_epoch':>14} {'Val MSE':>20} {'Test MSE':>20}")
+        f"{'best_epoch':>14} {'Val MSE':>20} {'Test MSE':>20}")
     print("-" * 102)
     sorted_archs = sorted(agg.items(), key=lambda kv: kv[1]["test_mean"])
     for arch, s in sorted_archs:
-        val = f"{s['val_mean']*LOSS_SCALE:7.2f} ± {s['val_std']*LOSS_SCALE:5.2f}"
-        tst = f"{s['test_mean']*LOSS_SCALE:7.2f} ± {s['test_std']*LOSS_SCALE:5.2f}"
-        ep = f"{s['epoch_mean']:5.1f} ± {s['epoch_std']:4.1f}"
+        val = f"{s['val_mean']*LOSS_SCALE:7.2f} +/- {s['val_std']*LOSS_SCALE:5.2f}"
+        tst = f"{s['test_mean']*LOSS_SCALE:7.2f} +/- {s['test_std']*LOSS_SCALE:5.2f}"
+        ep = f"{s['epoch_mean']:5.1f} +/- {s['epoch_std']:4.1f}"
         print(f"{arch:<22} {s['n_features']:>7d} {s['regularization']:>14} "
-              f"{ep:>14} {val:>20} {tst:>20}")
+            f"{ep:>14} {val:>20} {tst:>20}")
 
     best_arch, best_stats = sorted_archs[0]
     print(f"\n>> Best mean test MSE: {best_arch}  "
-          f"({best_stats['test_mean']*LOSS_SCALE:.2f} ± "
-          f"{best_stats['test_std']*LOSS_SCALE:.2f})")
+        f"({best_stats['test_mean']*LOSS_SCALE:.2f} +/- "
+        f"{best_stats['test_std']*LOSS_SCALE:.2f})")
 
     # ── Pairwise comparisons on aggregated means ──────────────────
     print("\nPAIRWISE AGGREGATED COMPARISONS  (effect size vs seed noise)")
@@ -650,9 +639,9 @@ def summarize_pairwise(all_results, causal_cols):
         noise = np.sqrt(sa["test_std"] ** 2 + sb["test_std"] ** 2) * LOSS_SCALE
         marker = "  (within seed noise)" if mean_gap < noise else ""
         print(f">> {a} beats {b} by {pct:5.2f}%  "
-              f"(Δ={mean_gap:6.2f},  noise≈{noise:5.2f}){marker}")
+            f"(Δ={mean_gap:6.2f},  noise≈{noise:5.2f}){marker}")
 
-    # ── Weight summary (averaged over seeds) ──────────────────────
+    # Weight summary (averaged over seeds)
     print("\nINPUT WEIGHT SUMMARY  (averaged over seeds)")
     print("-" * 96)
     for arch, s in sorted_archs:
@@ -666,18 +655,15 @@ def summarize_pairwise(all_results, causal_cols):
         other_idxs = [i for i, c in enumerate(feat_cols) if c not in causal_cols]
 
         all_avg = col_norms_mean.mean().item()
-        causal_avg = (col_norms_mean[causal_idxs].mean().item()
-                      if causal_idxs else 0.0)
-        other_avg = (col_norms_mean[other_idxs].mean().item()
-                     if other_idxs else 0.0)
+        causal_avg = (col_norms_mean[causal_idxs].mean().item() if causal_idxs else 0.0)
+        other_avg = (col_norms_mean[other_idxs].mean().item() if other_idxs else 0.0)
 
         print(f"{arch:<22} avg|w| all={all_avg:.4f}  "
-              f"pcmci={causal_avg:.4f}  other={other_avg:.4f}")
+            f"pcmci={causal_avg:.4f}  other={other_avg:.4f}")
         print(f"       - weight shape: {tuple(s['results'][0]['weights'].shape)}  "
-              f"(per-col std across seeds: "
-              f"mean={col_norms_std.mean().item():.4f})")
-        print(f"       - feature split: pcmci={len(causal_idxs)}  "
-              f"other={len(other_idxs)}")
+            f"(per-col std across seeds: "
+            f"mean={col_norms_std.mean().item():.4f})")
+        print(f"       - feature split: pcmci={len(causal_idxs)}  " f"other={len(other_idxs)}")
 
     return agg
 
@@ -685,8 +671,8 @@ def summarize_pairwise(all_results, causal_cols):
 def summarize_metrics(all_results, output_dir=OUTPUT_DIR):
     """Metrics-style summary (colleague's version).
 
-    Groups results by `arch_label`, prints MSE/MAE/RMSE/DirAcc with
-    mean ± std, writes `multi_seed_summary.csv`, and dumps a raw
+    Groups results by arch_label, prints MSE/MAE/RMSE/DirAcc with
+    mean +/- std, writes multi_seed_summary.csv, and dumps a raw
     per-seed JSON (minus non-serializable tensors).
     """
     os.makedirs(output_dir, exist_ok=True)
@@ -697,11 +683,11 @@ def summarize_metrics(all_results, output_dir=OUTPUT_DIR):
 
     print("\n" + "=" * 112)
     print(f"METRICS SUMMARY  (N = {len(SEEDS)} seeds per architecture; "
-          f"Test MSE scaled by {LOSS_SCALE:.0e})")
+        f"Test MSE scaled by {LOSS_SCALE:.0e})")
     print("=" * 112)
     header = (f"{'Model':<22} {'Features':>8}  "
-              f"{'Test MSE':>14}  {'Test MAE':>18}  {'Test RMSE':>18}  "
-              f"{'Test DirAcc':>15}  {'Val DirAcc':>15}")
+            f"{'Test MSE':>14}  {'Test MAE':>18}  {'Test RMSE':>18}  "
+            f"{'Test DirAcc':>15}  {'Val DirAcc':>15}")
     print(header)
     print("-" * len(header))
 
@@ -734,11 +720,11 @@ def summarize_metrics(all_results, output_dir=OUTPUT_DIR):
         summary_rows.append(row)
 
         print(f"{name:<22} {n_feat:>8}  "
-              f"{mses.mean():>7.2f}±{std(mses):>5.2f}  "
-              f"{maes.mean():>8.5f}±{std(maes):>8.5f}  "
-              f"{rmses.mean():>8.5f}±{std(rmses):>8.5f}  "
-              f"{diraccs.mean():>6.3f}±{std(diraccs):>6.3f}  "
-              f"{val_diraccs.mean():>6.3f}±{std(val_diraccs):>6.3f}")
+            f"{mses.mean():>7.2f}+/-{std(mses):>5.2f}  "
+            f"{maes.mean():>8.5f}+/-{std(maes):>8.5f}  "
+            f"{rmses.mean():>8.5f}+/-{std(rmses):>8.5f}  "
+            f"{diraccs.mean():>6.3f}+/-{std(diraccs):>6.3f}  "
+            f"{val_diraccs.mean():>6.3f}+/-{std(val_diraccs):>6.3f}")
 
     if not summary_rows:
         return None
@@ -747,7 +733,7 @@ def summarize_metrics(all_results, output_dir=OUTPUT_DIR):
     summary_df = pd.DataFrame(summary_rows)
     summary_csv = os.path.join(output_dir, "multi_seed_summary.csv")
     summary_df.to_csv(summary_csv, index=False)
-    print(f"\n[SAVED] {summary_csv}")
+    print(f"\n*Saved* {summary_csv}")
 
     # Raw per-seed JSON dump (strip non-serializable fields)
     raw_json = os.path.join(output_dir, "multi_seed_raw_results.json")
@@ -768,7 +754,7 @@ def summarize_metrics(all_results, output_dir=OUTPUT_DIR):
         ]
     with open(raw_json, "w") as f:
         json.dump(serializable, f, indent=2)
-    print(f"[SAVED] {raw_json}")
+    print(f"*Saved* {raw_json}")
 
     # Best by test MSE / DirAcc
     best_mse = min(summary_rows, key=lambda r: r["test_mse_mean"])
@@ -784,7 +770,7 @@ def main():
     granger_cols = load_granger_features()
     experiments = build_experiments(causal_cols, granger_cols)
 
-    # ── Training sweep ─────────────────────────────────────────────
+    # Training sweep
     all_results = []
     for exp_idx, exp in enumerate(experiments, start=1):
         for seed_idx, seed in enumerate(SEEDS, start=1):
@@ -796,10 +782,10 @@ def main():
             )
             print("=" * 78)
             if exp["regularization"]:
-                print(f"[INFO] Regularization: {exp['regularization']}; "
-                      f"Lambda: {REG_LAMBDA}")
+                print(f"Regularization: {exp['regularization']}; "
+                    f"Lambda: {REG_LAMBDA}")
             if exp["pca_components"]:
-                print(f"[INFO] PCA components: {exp['pca_components']}")
+                print(f"PCA components: {exp['pca_components']}")
 
             r = run(
                 CSV, SPLIT_JSON, SEQ_LEN, BATCH_SIZE, TARGET_COL,
@@ -818,7 +804,7 @@ def main():
             )
             all_results.append(r)
 
-    # ── Aggregate loss plots (mean ± std across seeds, per arch) ──
+    # Aggregate loss plots (mean +/- std across seeds, per arch)
     # The per-seed losses.png files in each run folder remain the
     # ground truth; these aggregate views go in the report.
     grouped = {}
@@ -827,7 +813,7 @@ def main():
     for arch, rs in grouped.items():
         plot_aggregate_losses(rs, arch)
 
-    # ── End-of-experiment summary(ies) ───────────────────────────
+    # End-of-experiment summary(ies)
     if SUMMARY_STYLE not in {"pairwise", "metrics", "both"}:
         raise ValueError(
             f"SUMMARY_STYLE must be 'pairwise', 'metrics', or 'both'; "
