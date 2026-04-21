@@ -194,8 +194,12 @@ def plot_aggregate_losses(results, arch_label):
         return None
     # Safeguard: if seeds disagree on #epochs (e.g. early stop), truncate.
     min_epochs = min(len(r["train_losses"]) for r in results)
-    train_curves = np.stack([r["train_losses"][:min_epochs] for r in results])
-    val_curves = np.stack([r["val_losses"][:min_epochs] for r in results])
+    # Scale raw MSE by LOSS_SCALE (1e6) so the y-axis matches the report
+    # tables and the ~1e-4 validation curve stops being squashed against
+    # the x-axis. Log-scaled y further prevents the large first-epoch
+    # training spike from dominating the visible range.
+    train_curves = np.stack([r["train_losses"][:min_epochs] for r in results]) * LOSS_SCALE
+    val_curves = np.stack([r["val_losses"][:min_epochs] for r in results]) * LOSS_SCALE
     epochs = np.arange(1, min_epochs + 1)
 
     # With only one seed, .std(ddof=1) is undefined — fall back to zero.
@@ -208,24 +212,27 @@ def plot_aggregate_losses(results, arch_label):
 
     fig, ax = plt.subplots(figsize=(8, 5))
     # Show individual seeds faintly so outliers are still visible.
-    for r in results:
-        ax.plot(epochs, r["train_losses"][:min_epochs],
-                color="steelblue", alpha=0.15, linewidth=0.8)
-        ax.plot(epochs, r["val_losses"][:min_epochs],
-                color="tomato", alpha=0.15, linewidth=0.8)
+    for curves in train_curves:
+        ax.plot(epochs, curves, color="steelblue", alpha=0.15, linewidth=0.8)
+    for curves in val_curves:
+        ax.plot(epochs, curves, color="tomato", alpha=0.15, linewidth=0.8)
     ax.plot(epochs, tr_mean, color="steelblue", linewidth=1.6,
             label=f"Train mean (N={len(results)})")
-    ax.fill_between(epochs, tr_mean - tr_std, tr_mean + tr_std,
+    # Log-y makes additive bands slightly odd (negative lower bound),
+    # so clip to a small positive floor before shading.
+    floor = max(1e-2, float(min(va_mean.min(), tr_mean.min()) * 0.5))
+    ax.fill_between(epochs, np.maximum(tr_mean - tr_std, floor), tr_mean + tr_std,
                     color="steelblue", alpha=0.25, label="Train +/-1σ")
     ax.plot(epochs, va_mean, color="tomato", linewidth=1.6,
             label=f"Val mean (N={len(results)})")
-    ax.fill_between(epochs, va_mean - va_std, va_mean + va_std,
+    ax.fill_between(epochs, np.maximum(va_mean - va_std, floor), va_mean + va_std,
                     color="tomato", alpha=0.25, label="Val +/-1σ")
+    ax.set_yscale("log")
     ax.set_xlabel("Epoch")
-    ax.set_ylabel("Loss")
+    ax.set_ylabel(f"MSE (x {LOSS_SCALE:.0e})")
     ax.set_title(f"Train vs Val Loss (aggregated over seeds) — {arch_label}")
     ax.legend(loc="best", fontsize=9)
-    ax.grid(alpha=0.3)
+    ax.grid(which="both", alpha=0.3)
     fig.tight_layout()
 
     out_path = os.path.join(paths.aggregate_dir(arch_label),
