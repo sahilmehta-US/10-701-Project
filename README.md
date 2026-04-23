@@ -1,84 +1,206 @@
-# 10-701-Project
+# 10-701 Project
 
 ## Overview
 
-## Install
+This project studies whether causal discovery can improve gold forecasting from macro-financial time-series data. The target is the **next-day COMEX gold log return**, predicted from a 20-day window of stationary-transformed financial features such as the U.S. Dollar Index, USD/JPY, equity-market and volatility measures, commodity prices, and Treasury-rate variables.
 
-To install the required dependencies, first make sure python is installed in your preferred environment. Then run the following command in the root directory:
+The main question is whether a causally filtered input set can match or outperform a full-feature LSTM while remaining smaller and easier to interpret. To test that, the repository compares:
 
-```
+- `PCMCI` for causal feature discovery on the training split
+- `Granger` as a simpler bivariate comparison baseline
+- `VAR` as a linear forecasting baseline
+- several `LSTM` variants trained under the same splits and shared hyperparameters
+
+The default chronological splits are:
+
+- train: `2006-01-03` to `2018-12-31`
+- validation: `2019-01-01` to `2021-12-31`
+- test: `2022-01-01` to `2024-12-31`
+
+## Quickstart
+
+From the project root:
+
+```bash
 python -m pip install -r requirements.txt
 ```
 
-Secondly, write a `.env` file in the data folder with the following API keys:
+Then run the pipeline in this order:
 
-- `FRED_API_KEY`: an API Key to fetch Federal Reserve Economic Data from the [Federal Reserve Bank of St. Louis](fred.stlouisfed.org)
-
-Note that currently we only use the yfinance data for the project. If time permits, we will add the fred data to the project.
-
-## Get the yfinance data
-
-To get the yfinance data, run the following command in the data folder:
-
-```
+```bash
+cd data
 python yfinance_data.py
-```
+cd ..
 
-This will download the yfinance data and run all preprocessing steps. The intermediate files will be saved in the pipeline_steps folder. The files to be used by downstream tasks will be saved in the results folder.
-
-## PCMCI
-
-PCMCI (PC algorithm + momentary conditional independence) with linear partial correlation (`ParCorr`) runs on the **training split** of `data/results/gold_base_stationary_dropna.csv` to discover exogenous variables with a significant causal link to the gold log-return target, subject to the assumptions documented in `PCMCI/pcmci_discovery.py` (linearity, approximate stationarity, no latent confounders, lag truncation, FDR for multiple tests).
-
-**Run** (from the `PCMCI` directory):
-
-```
+cd PCMCI
 python pcmci_discovery.py
-```
+cd ..
 
-**Dependencies** (in addition to the project’s main stack): `tigramite` (and its usual `numpy` / `matplotlib` requirements).
-
-**Outputs** (under `PCMCI/results/pcmci_output/ontrain/`): raw `pcmci_results.pkl`, `causal_features.csv`, `self_links.csv`, plots (`pvalue_heatmap.png`, `causal_graph.png` when available), and **`selected_features.json`**, which lists `exogenous_features` for the LSTM pipeline (`lstm/train.py` reads this file by default).
-
-## Granger
-
-Pairwise **Granger causality** tests every other column against the gold log-return on the **training split** only. This is a bivariate screen (it does not condition on other features), so it is useful as a comparison baseline for PCMCI’s multivariate, conditioning-based MCI step.
-
-**Run** (from the project root, same level as the `data` folder):
-
-```
 python granger_feature_select.py
-```
 
-If `PCMCI/results/pcmci_output/ontrain/selected_features.json` exists, the script also prints a Granger–PCMCI overlap analysis and writes `granger_outputs/granger_vs_pcmci.json`.
-
-**Outputs** (under `granger_outputs/`): `granger_selected_features.json` (same *role* as PCMCI’s selected-features JSON for swapping in training), `granger_full_results.json`, and optional `granger_vs_pcmci.json`.
-
-## VAR
-
-A **vector autoregression** baseline (`statsmodels`) is fit on a fixed set of endogenous series (see `USE_COLS` in `VAR/var_model.py`), with lag order chosen by **AIC** on the training period. Expanding-window multi-step forecasts are produced for configured horizons; metrics (MAE, RMSE, MAPE, directional accuracy) are reported by split (train / validation / test on the `target_date` of each forecast).
-
-**Run** (from the `VAR` directory):
-
-```
-python var_model.py
-```
-
-**Outputs** (under `VAR/var_outputs/`): per-horizon `var_predictions_h{1,5,...}.csv`, `var_metrics.csv`, `var_config.json`, and `var_summary.txt`.
-
-## LSTM
-
-`lstm/train.py` trains and evaluates several LSTM variants (e.g. all features, **PCMCI-selected** features, **Granger-selected** features, PCA, and regularized “all features” with emphasis on non-causal inputs) with shared architecture and **multi-seed** runs so comparisons reflect both average performance and seed variance. Checkpoints, metrics, and optional summaries (pairwise and/or tabular) are written under the paths defined in that script (`CHECKPOINT_DIR`, `OUTPUT_DIR` / `paths.py`).
-
-**Run** (from the `lstm` directory, after `gold_base_stationary_dropna.csv`, `split_definition.json`, and the feature JSONs you intend to use exist):
-
-```
+cd lstm
 python train.py
 ```
 
-**Optional** (same `lstm` directory):
+Notes:
 
-- `python predict.py` — load checkpoints and write test-split predicted vs. actual returns (`lstm/runs/.../returns.csv` by default; supports `--label` or `--checkpoint`).
-- `python recover_prices.py` — after `predict.py`, rebuild **absolute gold prices** from predicted log-returns using realized closes from `data/pipeline_steps/step_4_cleaned_close_prices.csv`. Reads each run’s `returns.csv` and writes `prices.csv`, price/return plots, and cross-seed aggregates. Computes **one-step** prices (true prior close × exp(predicted return), aligned with return evaluation) and **rolling** prices (prior close from the model’s own price path, so errors compound). Optional `--label`, `--plot-start` / `--plot-end` to restrict plot windows; see the script docstring for full output layout under `lstm/runs/`.
-- `python tune_lstm_mse.py` — Optuna search on **validation MSE** for the LSTM-all variant; writes `tune_lstm_best_config.json` to copy into `train.py` (all variants use the same locked config).
-- `python tune_lstm.py` — Optuna search on **validation directional accuracy** (configurable; see that file); also writes a best config JSON to merge into `train.py` by hand.
+- `data/yfinance_data.py` is the required data pipeline for the current project workflow.
+- `lstm/train.py` loads both `PCMCI/results/pcmci_output/ontrain/selected_features.json` and `granger_outputs/granger_selected_features.json` by default, so run both feature-selection steps before training.
+- `VAR` is independent of the LSTM pipeline once the data files in `data/results/` exist.
+
+## Installation
+
+Use any Python environment you prefer, then install:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+The main dependencies used in this repository include `yfinance`, `pandas`, `statsmodels`, `torch`, `scikit-learn`, `matplotlib`, `optuna`, and `tigramite`.
+
+## Optional FRED Setup
+
+You do **not** need a `.env` file for the default Yahoo Finance workflow described above.
+
+If you later run the FRED pipeline, create `data/.env` with:
+
+- `FRED_API_KEY=...`
+
+You can request a key from the [Federal Reserve Bank of St. Louis](https://fred.stlouisfed.org).
+
+## Data Pipeline
+
+Run the Yahoo Finance data download and preprocessing pipeline from the `data` directory:
+
+```bash
+cd data
+python yfinance_data.py
+```
+
+This script downloads raw daily closes, applies the preprocessing pipeline, and writes:
+
+- intermediate provenance files to `data/pipeline_steps/`
+- downstream model inputs to `data/results/`
+
+The most important outputs for later stages are:
+
+- `data/results/gold_base_stationary_dropna.csv`
+- `data/results/split_definition.json`
+- `data/results/feature_dictionary.csv`
+- `data/results/redundancy_check_report.csv`
+- `data/results/no_scaling_policy.json`
+
+## PCMCI
+
+`PCMCI/pcmci_discovery.py` runs PCMCI (PC + momentary conditional independence) with linear partial correlation (`ParCorr`) on the **training split only** of `data/results/gold_base_stationary_dropna.csv`. It is used to identify lagged exogenous variables with statistically significant links to the gold log-return target.
+
+Run from `PCMCI/`:
+
+```bash
+python pcmci_discovery.py
+```
+
+Outputs are written under `PCMCI/results/pcmci_output/ontrain/`:
+
+- `pcmci_results.pkl`
+- `causal_features.csv`
+- `self_links.csv`
+- `pvalue_heatmap.png`
+- `causal_graph.png` when available
+- `selected_features.json`
+
+For the LSTM pipeline, the key artifact is `selected_features.json`, which supplies the PCMCI-selected feature set.
+
+## Granger
+
+`granger_feature_select.py` runs pairwise Granger causality tests for each candidate feature against the gold log-return target on the **training split only**. Unlike PCMCI, this is a bivariate screen and does not condition on the rest of the feature panel.
+
+Run from the project root:
+
+```bash
+python granger_feature_select.py
+```
+
+If PCMCI output already exists, the script also reports overlap between the Granger and PCMCI selections and writes a comparison JSON.
+
+Outputs are written under `granger_outputs/`:
+
+- `granger_selected_features.json`
+- `granger_full_results.json`
+- `granger_vs_pcmci.json` when PCMCI results are present
+
+For the default LSTM workflow, `granger_selected_features.json` is the required downstream artifact.
+
+## VAR Baseline
+
+`VAR/var_model.py` fits a vector autoregression baseline with `statsmodels` on a fixed set of endogenous series (`USE_COLS` in `VAR/var_model.py`). Lag order is chosen by **AIC** on the training period, and forecasts are evaluated by split using MAE, RMSE, MAPE, and directional accuracy.
+
+Run from `VAR/`:
+
+```bash
+python var_model.py
+```
+
+Outputs are written under `VAR/var_outputs/`:
+
+- `var_predictions_h1.csv`, `var_predictions_h5.csv`, ...
+- `var_metrics.csv`
+- `var_config.json`
+- `var_summary.txt`
+
+## LSTM Pipeline
+
+`lstm/train.py` trains multiple LSTM variants with shared architecture and multi-seed evaluation so that comparisons reflect both average performance and seed variance. The implemented variants include:
+
+- `LSTM-all`
+- `LSTM-causal`
+- `LSTM-granger`
+- `LSTM-pca`
+- `LSTM-reg-l1`
+- `LSTM-reg-l2`
+
+Run from `lstm/` after the data pipeline, PCMCI, and Granger steps have completed:
+
+```bash
+python train.py
+```
+
+Main outputs:
+
+- checkpoints under `lstm/checkpoints/`
+- per-run artifacts under `lstm/runs/`
+- summary CSV / JSON outputs under `lstm/experiment_outputs/`
+
+## Optional LSTM Utilities
+
+Run these commands from `lstm/`.
+
+- Generate test-split predicted vs. actual returns for checkpoints:
+
+```bash
+python predict.py
+python predict.py --label LSTM-all_seed42
+python predict.py --checkpoint checkpoints/LSTM-all_seed42.pt
+```
+
+- Recover absolute gold prices from predicted log returns:
+
+```bash
+python recover_prices.py
+python recover_prices.py --label LSTM-all_seed42
+python recover_prices.py --plot-start 2023-01-01 --plot-end 2023-12-31
+```
+
+`recover_prices.py` reads each run's `returns.csv` and writes `prices.csv`, price plots, return plots, and aggregate plots. It reports both:
+
+- **one-step** prices: true prior close times `exp(predicted return)`
+- **rolling** prices: prior close taken from the model's own predicted path
+
+- Tune the locked LSTM hyperparameter configuration with Optuna:
+
+```bash
+python tune_lstm_mse.py
+python tune_lstm.py
+```
+
+Both tuning scripts write `tune_lstm_best_config.json` for manual incorporation into `train.py`.
