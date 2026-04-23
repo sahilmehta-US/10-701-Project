@@ -308,8 +308,6 @@ def main():
     causal_df, self_df = extract_causal_features(results, var_names, target_idx)
 
     save_results(results, causal_df, self_df, pcmci, dataframe)
-
-    print("\nCheck the results/pcmci_output_ontrain/ folder.")
     return causal_df, self_df
 
 
