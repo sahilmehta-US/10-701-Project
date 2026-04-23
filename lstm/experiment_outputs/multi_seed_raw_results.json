@@ -1,0 +1,1214 @@
+{
+  "LSTM-all": [
+    {
+      "label": "LSTM-all_seed42",
+      "seed": 42,
+      "n_features": 15,
+      "best_epoch": 32,
+      "val_metrics": {
+        "mse": 9.693277388578281e-05,
+        "mae": 0.006773355416953564,
+        "rmse": 0.009845444321399761,
+        "directional_acc": 0.5077519379844961
+      },
+      "test_metrics": {
+        "mse": 8.46620459924452e-05,
+        "mae": 0.0068834275007247925,
+        "rmse": 0.009201198073753504,
+        "directional_acc": 0.49104859335038364
+      },
+      "regularization": "none",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-all_seed123",
+      "seed": 123,
+      "n_features": 15,
+      "best_epoch": 50,
+      "val_metrics": {
+        "mse": 9.837286779657006e-05,
+        "mae": 0.006798614747822285,
+        "rmse": 0.009918309724775188,
+        "directional_acc": 0.5038759689922481
+      },
+      "test_metrics": {
+        "mse": 8.172050002031028e-05,
+        "mae": 0.006754482630640268,
+        "rmse": 0.009039939160210664,
+        "directional_acc": 0.4961636828644501
+      },
+      "regularization": "none",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-all_seed456",
+      "seed": 456,
+      "n_features": 15,
+      "best_epoch": 29,
+      "val_metrics": {
+        "mse": 9.580081677995622e-05,
+        "mae": 0.006718243006616831,
+        "rmse": 0.00978778916711819,
+        "directional_acc": 0.49224806201550386
+      },
+      "test_metrics": {
+        "mse": 8.205930498661473e-05,
+        "mae": 0.006761095020920038,
+        "rmse": 0.009058659116371182,
+        "directional_acc": 0.4859335038363171
+      },
+      "regularization": "none",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-all_seed789",
+      "seed": 789,
+      "n_features": 15,
+      "best_epoch": 18,
+      "val_metrics": {
+        "mse": 9.651065920479596e-05,
+        "mae": 0.006887414492666721,
+        "rmse": 0.009823983876452362,
+        "directional_acc": 0.43281653746770027
+      },
+      "test_metrics": {
+        "mse": 8.475630602333695e-05,
+        "mae": 0.006946774665266275,
+        "rmse": 0.009206318809564273,
+        "directional_acc": 0.4782608695652174
+      },
+      "regularization": "none",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-all_seed1024",
+      "seed": 1024,
+      "n_features": 15,
+      "best_epoch": 28,
+      "val_metrics": {
+        "mse": 9.715980559121817e-05,
+        "mae": 0.006806403864175081,
+        "rmse": 0.009856967362795626,
+        "directional_acc": 0.5116279069767442
+      },
+      "test_metrics": {
+        "mse": 8.298024476971477e-05,
+        "mae": 0.006817328277975321,
+        "rmse": 0.009109349305505568,
+        "directional_acc": 0.5025575447570333
+      },
+      "regularization": "none",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-all_seed1234",
+      "seed": 1234,
+      "n_features": 15,
+      "best_epoch": 22,
+      "val_metrics": {
+        "mse": 9.62862468441017e-05,
+        "mae": 0.006818972993642092,
+        "rmse": 0.009812555571516612,
+        "directional_acc": 0.47674418604651164
+      },
+      "test_metrics": {
+        "mse": 8.234880806412548e-05,
+        "mae": 0.00681247329339385,
+        "rmse": 0.00907462440347398,
+        "directional_acc": 0.48081841432225064
+      },
+      "regularization": "none",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-all_seed5678",
+      "seed": 5678,
+      "n_features": 15,
+      "best_epoch": 47,
+      "val_metrics": {
+        "mse": 9.547986701363698e-05,
+        "mae": 0.006762919947504997,
+        "rmse": 0.00977137999535567,
+        "directional_acc": 0.49483204134366926
+      },
+      "test_metrics": {
+        "mse": 8.247143705375493e-05,
+        "mae": 0.006817393470555544,
+        "rmse": 0.009081378587734074,
+        "directional_acc": 0.48721227621483376
+      },
+      "regularization": "none",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-all_seed9101",
+      "seed": 9101,
+      "n_features": 15,
+      "best_epoch": 26,
+      "val_metrics": {
+        "mse": 9.865040192380548e-05,
+        "mae": 0.006913069169968367,
+        "rmse": 0.009932290869875161,
+        "directional_acc": 0.4844961240310077
+      },
+      "test_metrics": {
+        "mse": 8.56257465784438e-05,
+        "mae": 0.006933249998837709,
+        "rmse": 0.00925341810243349,
+        "directional_acc": 0.4718670076726343
+      },
+      "regularization": "none",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-all_seed10086",
+      "seed": 10086,
+      "n_features": 15,
+      "best_epoch": 35,
+      "val_metrics": {
+        "mse": 9.821320418268442e-05,
+        "mae": 0.006840906571596861,
+        "rmse": 0.009910257523530074,
+        "directional_acc": 0.4625322997416021
+      },
+      "test_metrics": {
+        "mse": 8.360086940228939e-05,
+        "mae": 0.00680495286360383,
+        "rmse": 0.00914335110352268,
+        "directional_acc": 0.4833759590792839
+      },
+      "regularization": "none",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-all_seed10701",
+      "seed": 10701,
+      "n_features": 15,
+      "best_epoch": 12,
+      "val_metrics": {
+        "mse": 9.857344412012026e-05,
+        "mae": 0.006796159315854311,
+        "rmse": 0.009928415992499521,
+        "directional_acc": 0.4780361757105943
+      },
+      "test_metrics": {
+        "mse": 8.351848373422399e-05,
+        "mae": 0.006831405684351921,
+        "rmse": 0.009138844770222547,
+        "directional_acc": 0.46930946291560105
+      },
+      "regularization": "none",
+      "pca_components": null
+    }
+  ],
+  "LSTM-causal": [
+    {
+      "label": "LSTM-causal_seed42",
+      "seed": 42,
+      "n_features": 4,
+      "best_epoch": 26,
+      "val_metrics": {
+        "mse": 9.872996452031657e-05,
+        "mae": 0.006889589596539736,
+        "rmse": 0.00993629531164994,
+        "directional_acc": 0.4625322997416021
+      },
+      "test_metrics": {
+        "mse": 8.260950562544167e-05,
+        "mae": 0.006836369168013334,
+        "rmse": 0.009088977149571985,
+        "directional_acc": 0.4629156010230179
+      },
+      "regularization": "none",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-causal_seed123",
+      "seed": 123,
+      "n_features": 4,
+      "best_epoch": 38,
+      "val_metrics": {
+        "mse": 9.673211752669886e-05,
+        "mae": 0.006712633650749922,
+        "rmse": 0.00983524872724116,
+        "directional_acc": 0.479328165374677
+      },
+      "test_metrics": {
+        "mse": 8.093728683888912e-05,
+        "mae": 0.006700068712234497,
+        "rmse": 0.008996515260860125,
+        "directional_acc": 0.5179028132992327
+      },
+      "regularization": "none",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-causal_seed456",
+      "seed": 456,
+      "n_features": 4,
+      "best_epoch": 46,
+      "val_metrics": {
+        "mse": 9.785423026187345e-05,
+        "mae": 0.006765471771359444,
+        "rmse": 0.009892129713154466,
+        "directional_acc": 0.458656330749354
+      },
+      "test_metrics": {
+        "mse": 8.133543451549485e-05,
+        "mae": 0.006735418923199177,
+        "rmse": 0.009018615997784519,
+        "directional_acc": 0.4820971867007673
+      },
+      "regularization": "none",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-causal_seed789",
+      "seed": 789,
+      "n_features": 4,
+      "best_epoch": 13,
+      "val_metrics": {
+        "mse": 9.663033415563405e-05,
+        "mae": 0.006702478043735027,
+        "rmse": 0.009830072947625263,
+        "directional_acc": 0.5
+      },
+      "test_metrics": {
+        "mse": 8.277868619188666e-05,
+        "mae": 0.006766228936612606,
+        "rmse": 0.009098279298410589,
+        "directional_acc": 0.5025575447570333
+      },
+      "regularization": "none",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-causal_seed1024",
+      "seed": 1024,
+      "n_features": 4,
+      "best_epoch": 49,
+      "val_metrics": {
+        "mse": 9.777127706911415e-05,
+        "mae": 0.00676779355853796,
+        "rmse": 0.00988793593573068,
+        "directional_acc": 0.4560723514211886
+      },
+      "test_metrics": {
+        "mse": 8.190346852643415e-05,
+        "mae": 0.00677293399348855,
+        "rmse": 0.009050053509589552,
+        "directional_acc": 0.47570332480818417
+      },
+      "regularization": "none",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-causal_seed1234",
+      "seed": 1234,
+      "n_features": 4,
+      "best_epoch": 46,
+      "val_metrics": {
+        "mse": 9.602479258319363e-05,
+        "mae": 0.006659435108304024,
+        "rmse": 0.009799224080670552,
+        "directional_acc": 0.5116279069767442
+      },
+      "test_metrics": {
+        "mse": 8.078428072622046e-05,
+        "mae": 0.006692321039736271,
+        "rmse": 0.008988007606039308,
+        "directional_acc": 0.5242966751918159
+      },
+      "regularization": "none",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-causal_seed5678",
+      "seed": 5678,
+      "n_features": 4,
+      "best_epoch": 19,
+      "val_metrics": {
+        "mse": 9.738629887579009e-05,
+        "mae": 0.006757169961929321,
+        "rmse": 0.00986844966931433,
+        "directional_acc": 0.46511627906976744
+      },
+      "test_metrics": {
+        "mse": 8.226303907576948e-05,
+        "mae": 0.006789527367800474,
+        "rmse": 0.009069897412637558,
+        "directional_acc": 0.4782608695652174
+      },
+      "regularization": "none",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-causal_seed9101",
+      "seed": 9101,
+      "n_features": 4,
+      "best_epoch": 21,
+      "val_metrics": {
+        "mse": 9.81212651822716e-05,
+        "mae": 0.006873176433146,
+        "rmse": 0.009905617859693135,
+        "directional_acc": 0.43023255813953487
+      },
+      "test_metrics": {
+        "mse": 8.28113334137015e-05,
+        "mae": 0.006849381607025862,
+        "rmse": 0.009100073264194168,
+        "directional_acc": 0.4629156010230179
+      },
+      "regularization": "none",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-causal_seed10086",
+      "seed": 10086,
+      "n_features": 4,
+      "best_epoch": 25,
+      "val_metrics": {
+        "mse": 9.752856567502022e-05,
+        "mae": 0.006731038447469473,
+        "rmse": 0.00987565520231545,
+        "directional_acc": 0.4780361757105943
+      },
+      "test_metrics": {
+        "mse": 8.148013148456812e-05,
+        "mae": 0.006717022508382797,
+        "rmse": 0.009026634560264868,
+        "directional_acc": 0.5153452685421995
+      },
+      "regularization": "none",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-causal_seed10701",
+      "seed": 10701,
+      "n_features": 4,
+      "best_epoch": 34,
+      "val_metrics": {
+        "mse": 9.64808277785778e-05,
+        "mae": 0.0067096296697855,
+        "rmse": 0.0098224654633436,
+        "directional_acc": 0.4819121447028424
+      },
+      "test_metrics": {
+        "mse": 8.098106627585366e-05,
+        "mae": 0.006739551201462746,
+        "rmse": 0.008998948064960353,
+        "directional_acc": 0.47058823529411764
+      },
+      "regularization": "none",
+      "pca_components": null
+    }
+  ],
+  "LSTM-granger": [
+    {
+      "label": "LSTM-granger_seed42",
+      "seed": 42,
+      "n_features": 13,
+      "best_epoch": 18,
+      "val_metrics": {
+        "mse": 9.578474418958649e-05,
+        "mae": 0.0067479307763278484,
+        "rmse": 0.009786968079522201,
+        "directional_acc": 0.5038759689922481
+      },
+      "test_metrics": {
+        "mse": 8.35451137390919e-05,
+        "mae": 0.006881227251142263,
+        "rmse": 0.009140301621888192,
+        "directional_acc": 0.46930946291560105
+      },
+      "regularization": "none",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-granger_seed123",
+      "seed": 123,
+      "n_features": 13,
+      "best_epoch": 15,
+      "val_metrics": {
+        "mse": 9.680918446974829e-05,
+        "mae": 0.00680543715134263,
+        "rmse": 0.009839165842171189,
+        "directional_acc": 0.524547803617571
+      },
+      "test_metrics": {
+        "mse": 8.18090484244749e-05,
+        "mae": 0.0067819226533174515,
+        "rmse": 0.00904483545590935,
+        "directional_acc": 0.5076726342710998
+      },
+      "regularization": "none",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-granger_seed456",
+      "seed": 456,
+      "n_features": 13,
+      "best_epoch": 47,
+      "val_metrics": {
+        "mse": 9.637710900278762e-05,
+        "mae": 0.006757322233170271,
+        "rmse": 0.00981718437245566,
+        "directional_acc": 0.5025839793281653
+      },
+      "test_metrics": {
+        "mse": 8.312628051498905e-05,
+        "mae": 0.006813342217355967,
+        "rmse": 0.009117361488664856,
+        "directional_acc": 0.4820971867007673
+      },
+      "regularization": "none",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-granger_seed789",
+      "seed": 789,
+      "n_features": 13,
+      "best_epoch": 14,
+      "val_metrics": {
+        "mse": 9.760060493135825e-05,
+        "mae": 0.006859788205474615,
+        "rmse": 0.009879301844328791,
+        "directional_acc": 0.48578811369509045
+      },
+      "test_metrics": {
+        "mse": 8.271636761492118e-05,
+        "mae": 0.006812121253460646,
+        "rmse": 0.009094853908388038,
+        "directional_acc": 0.4846547314578005
+      },
+      "regularization": "none",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-granger_seed1024",
+      "seed": 1024,
+      "n_features": 13,
+      "best_epoch": 39,
+      "val_metrics": {
+        "mse": 9.68781387200579e-05,
+        "mae": 0.006791631691157818,
+        "rmse": 0.009842669288361664,
+        "directional_acc": 0.47674418604651164
+      },
+      "test_metrics": {
+        "mse": 8.339708438143134e-05,
+        "mae": 0.006813331041485071,
+        "rmse": 0.009132200412903307,
+        "directional_acc": 0.48721227621483376
+      },
+      "regularization": "none",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-granger_seed1234",
+      "seed": 1234,
+      "n_features": 13,
+      "best_epoch": 31,
+      "val_metrics": {
+        "mse": 9.721868264023215e-05,
+        "mae": 0.006852812133729458,
+        "rmse": 0.009859953480632256,
+        "directional_acc": 0.4483204134366925
+      },
+      "test_metrics": {
+        "mse": 8.26738978503272e-05,
+        "mae": 0.006819256115704775,
+        "rmse": 0.009092518784711264,
+        "directional_acc": 0.47698209718670076
+      },
+      "regularization": "none",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-granger_seed5678",
+      "seed": 5678,
+      "n_features": 13,
+      "best_epoch": 20,
+      "val_metrics": {
+        "mse": 9.699991642264649e-05,
+        "mae": 0.006849990226328373,
+        "rmse": 0.009848853558797922,
+        "directional_acc": 0.5064599483204134
+      },
+      "test_metrics": {
+        "mse": 8.408549183513969e-05,
+        "mae": 0.006855935323983431,
+        "rmse": 0.009169814165790912,
+        "directional_acc": 0.5012787723785166
+      },
+      "regularization": "none",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-granger_seed9101",
+      "seed": 9101,
+      "n_features": 13,
+      "best_epoch": 12,
+      "val_metrics": {
+        "mse": 9.684572432888672e-05,
+        "mae": 0.00679838377982378,
+        "rmse": 0.009841022524559463,
+        "directional_acc": 0.4896640826873385
+      },
+      "test_metrics": {
+        "mse": 8.219086157623678e-05,
+        "mae": 0.006762541830539703,
+        "rmse": 0.009065917580489953,
+        "directional_acc": 0.49872122762148335
+      },
+      "regularization": "none",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-granger_seed10086",
+      "seed": 10086,
+      "n_features": 13,
+      "best_epoch": 29,
+      "val_metrics": {
+        "mse": 9.796464291866869e-05,
+        "mae": 0.006829005666077137,
+        "rmse": 0.009897708973225505,
+        "directional_acc": 0.4496124031007752
+      },
+      "test_metrics": {
+        "mse": 8.301048364955932e-05,
+        "mae": 0.006824806798249483,
+        "rmse": 0.009111008925994932,
+        "directional_acc": 0.489769820971867
+      },
+      "regularization": "none",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-granger_seed10701",
+      "seed": 10701,
+      "n_features": 13,
+      "best_epoch": 38,
+      "val_metrics": {
+        "mse": 0.00010128417488886043,
+        "mae": 0.00694954302161932,
+        "rmse": 0.01006400391935836,
+        "directional_acc": 0.4728682170542636
+      },
+      "test_metrics": {
+        "mse": 8.383291424252093e-05,
+        "mae": 0.006844229064881802,
+        "rmse": 0.009156031577191122,
+        "directional_acc": 0.5063938618925832
+      },
+      "regularization": "none",
+      "pca_components": null
+    }
+  ],
+  "LSTM-pca": [
+    {
+      "label": "LSTM-pca_seed42",
+      "seed": 42,
+      "n_features": 4,
+      "best_epoch": 22,
+      "val_metrics": {
+        "mse": 9.824345033848658e-05,
+        "mae": 0.006845529191195965,
+        "rmse": 0.00991178340857419,
+        "directional_acc": 0.47416020671834624
+      },
+      "test_metrics": {
+        "mse": 8.2010192272719e-05,
+        "mae": 0.0067991577088832855,
+        "rmse": 0.009055947894766124,
+        "directional_acc": 0.48081841432225064
+      },
+      "regularization": "none",
+      "pca_components": 4
+    },
+    {
+      "label": "LSTM-pca_seed123",
+      "seed": 123,
+      "n_features": 4,
+      "best_epoch": 28,
+      "val_metrics": {
+        "mse": 9.47938606259413e-05,
+        "mae": 0.0066809505224227905,
+        "rmse": 0.009736213875318337,
+        "directional_acc": 0.5090439276485789
+      },
+      "test_metrics": {
+        "mse": 8.201765012927353e-05,
+        "mae": 0.0067656696774065495,
+        "rmse": 0.00905635965105591,
+        "directional_acc": 0.47698209718670076
+      },
+      "regularization": "none",
+      "pca_components": 4
+    },
+    {
+      "label": "LSTM-pca_seed456",
+      "seed": 456,
+      "n_features": 4,
+      "best_epoch": 12,
+      "val_metrics": {
+        "mse": 9.489819058217108e-05,
+        "mae": 0.006718757562339306,
+        "rmse": 0.00974157023185539,
+        "directional_acc": 0.49483204134366926
+      },
+      "test_metrics": {
+        "mse": 8.214185072574764e-05,
+        "mae": 0.006767217069864273,
+        "rmse": 0.009063214149833802,
+        "directional_acc": 0.5025575447570333
+      },
+      "regularization": "none",
+      "pca_components": 4
+    },
+    {
+      "label": "LSTM-pca_seed789",
+      "seed": 789,
+      "n_features": 4,
+      "best_epoch": 19,
+      "val_metrics": {
+        "mse": 9.772106568561867e-05,
+        "mae": 0.006779038812965155,
+        "rmse": 0.00988539658716931,
+        "directional_acc": 0.5038759689922481
+      },
+      "test_metrics": {
+        "mse": 8.32937439554371e-05,
+        "mae": 0.006800803821533918,
+        "rmse": 0.009126540634623674,
+        "directional_acc": 0.5
+      },
+      "regularization": "none",
+      "pca_components": 4
+    },
+    {
+      "label": "LSTM-pca_seed1024",
+      "seed": 1024,
+      "n_features": 4,
+      "best_epoch": 19,
+      "val_metrics": {
+        "mse": 9.78775424300693e-05,
+        "mae": 0.006831079255789518,
+        "rmse": 0.009893307961954348,
+        "directional_acc": 0.4509043927648579
+      },
+      "test_metrics": {
+        "mse": 8.289897959912196e-05,
+        "mae": 0.006811819039285183,
+        "rmse": 0.009104887676359438,
+        "directional_acc": 0.45652173913043476
+      },
+      "regularization": "none",
+      "pca_components": 4
+    },
+    {
+      "label": "LSTM-pca_seed1234",
+      "seed": 1234,
+      "n_features": 4,
+      "best_epoch": 23,
+      "val_metrics": {
+        "mse": 9.921610035235062e-05,
+        "mae": 0.006863491144031286,
+        "rmse": 0.009960727902736357,
+        "directional_acc": 0.458656330749354
+      },
+      "test_metrics": {
+        "mse": 8.339442138094455e-05,
+        "mae": 0.006827216595411301,
+        "rmse": 0.009132054608955454,
+        "directional_acc": 0.46675191815856776
+      },
+      "regularization": "none",
+      "pca_components": 4
+    },
+    {
+      "label": "LSTM-pca_seed5678",
+      "seed": 5678,
+      "n_features": 4,
+      "best_epoch": 9,
+      "val_metrics": {
+        "mse": 9.879437129711732e-05,
+        "mae": 0.006810077466070652,
+        "rmse": 0.009939535768692486,
+        "directional_acc": 0.4974160206718346
+      },
+      "test_metrics": {
+        "mse": 8.327818795805797e-05,
+        "mae": 0.006825856864452362,
+        "rmse": 0.009125688355299998,
+        "directional_acc": 0.4820971867007673
+      },
+      "regularization": "none",
+      "pca_components": 4
+    },
+    {
+      "label": "LSTM-pca_seed9101",
+      "seed": 9101,
+      "n_features": 4,
+      "best_epoch": 15,
+      "val_metrics": {
+        "mse": 0.00010091210424434394,
+        "mae": 0.007065129932016134,
+        "rmse": 0.01004550169201837,
+        "directional_acc": 0.4470284237726098
+      },
+      "test_metrics": {
+        "mse": 8.637286373414099e-05,
+        "mae": 0.007015112321823835,
+        "rmse": 0.009293700217574322,
+        "directional_acc": 0.4539641943734015
+      },
+      "regularization": "none",
+      "pca_components": 4
+    },
+    {
+      "label": "LSTM-pca_seed10086",
+      "seed": 10086,
+      "n_features": 4,
+      "best_epoch": 12,
+      "val_metrics": {
+        "mse": 9.629899432184175e-05,
+        "mae": 0.006820798385888338,
+        "rmse": 0.009813205099346582,
+        "directional_acc": 0.4715762273901809
+      },
+      "test_metrics": {
+        "mse": 8.30917342682369e-05,
+        "mae": 0.006823843345046043,
+        "rmse": 0.009115466760854153,
+        "directional_acc": 0.49744245524296676
+      },
+      "regularization": "none",
+      "pca_components": 4
+    },
+    {
+      "label": "LSTM-pca_seed10701",
+      "seed": 10701,
+      "n_features": 4,
+      "best_epoch": 27,
+      "val_metrics": {
+        "mse": 9.546205546939746e-05,
+        "mae": 0.00671360595151782,
+        "rmse": 0.009770468538887859,
+        "directional_acc": 0.5297157622739018
+      },
+      "test_metrics": {
+        "mse": 8.1874561146833e-05,
+        "mae": 0.006716044154018164,
+        "rmse": 0.009048456285291597,
+        "directional_acc": 0.5025575447570333
+      },
+      "regularization": "none",
+      "pca_components": 4
+    }
+  ],
+  "LSTM-reg-l1": [
+    {
+      "label": "LSTM-reg-l1_seed42",
+      "seed": 42,
+      "n_features": 15,
+      "best_epoch": 4,
+      "val_metrics": {
+        "mse": 9.868870256468654e-05,
+        "mae": 0.006759095937013626,
+        "rmse": 0.009934218769721479,
+        "directional_acc": 0.5077519379844961
+      },
+      "test_metrics": {
+        "mse": 8.606546907685697e-05,
+        "mae": 0.006930640432983637,
+        "rmse": 0.009277147680017656,
+        "directional_acc": 0.4936061381074169
+      },
+      "regularization": "l1_noncausal",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-reg-l1_seed123",
+      "seed": 123,
+      "n_features": 15,
+      "best_epoch": 49,
+      "val_metrics": {
+        "mse": 9.66691441135481e-05,
+        "mae": 0.0066883559338748455,
+        "rmse": 0.009832046791667954,
+        "directional_acc": 0.5090439276485789
+      },
+      "test_metrics": {
+        "mse": 8.09416378615424e-05,
+        "mae": 0.006689686328172684,
+        "rmse": 0.008996757074721001,
+        "directional_acc": 0.5153452685421995
+      },
+      "regularization": "l1_noncausal",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-reg-l1_seed456",
+      "seed": 456,
+      "n_features": 15,
+      "best_epoch": 35,
+      "val_metrics": {
+        "mse": 9.844041051110253e-05,
+        "mae": 0.006808476988226175,
+        "rmse": 0.009921714091380708,
+        "directional_acc": 0.4496124031007752
+      },
+      "test_metrics": {
+        "mse": 8.172317029675469e-05,
+        "mae": 0.006758979521691799,
+        "rmse": 0.00904008685227939,
+        "directional_acc": 0.489769820971867
+      },
+      "regularization": "l1_noncausal",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-reg-l1_seed789",
+      "seed": 789,
+      "n_features": 15,
+      "best_epoch": 44,
+      "val_metrics": {
+        "mse": 9.748222510097548e-05,
+        "mae": 0.006740371696650982,
+        "rmse": 0.009873308721040554,
+        "directional_acc": 0.4715762273901809
+      },
+      "test_metrics": {
+        "mse": 8.164180326275527e-05,
+        "mae": 0.0067679425701498985,
+        "rmse": 0.009035585385726554,
+        "directional_acc": 0.4718670076726343
+      },
+      "regularization": "l1_noncausal",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-reg-l1_seed1024",
+      "seed": 1024,
+      "n_features": 15,
+      "best_epoch": 39,
+      "val_metrics": {
+        "mse": 9.717214561533183e-05,
+        "mae": 0.006688007153570652,
+        "rmse": 0.009857593297318156,
+        "directional_acc": 0.5193798449612403
+      },
+      "test_metrics": {
+        "mse": 8.098870603134856e-05,
+        "mae": 0.0066942498087882996,
+        "rmse": 0.008999372535424264,
+        "directional_acc": 0.5242966751918159
+      },
+      "regularization": "l1_noncausal",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-reg-l1_seed1234",
+      "seed": 1234,
+      "n_features": 15,
+      "best_epoch": 11,
+      "val_metrics": {
+        "mse": 9.745085844770074e-05,
+        "mae": 0.006748936139047146,
+        "rmse": 0.009871720136212368,
+        "directional_acc": 0.4715762273901809
+      },
+      "test_metrics": {
+        "mse": 8.165664621628821e-05,
+        "mae": 0.006740501616150141,
+        "rmse": 0.009036406709322473,
+        "directional_acc": 0.489769820971867
+      },
+      "regularization": "l1_noncausal",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-reg-l1_seed5678",
+      "seed": 5678,
+      "n_features": 15,
+      "best_epoch": 31,
+      "val_metrics": {
+        "mse": 9.765678260009736e-05,
+        "mae": 0.006707190070301294,
+        "rmse": 0.009882144635659678,
+        "directional_acc": 0.49224806201550386
+      },
+      "test_metrics": {
+        "mse": 8.154425449902192e-05,
+        "mae": 0.0067337797954678535,
+        "rmse": 0.009030185740006786,
+        "directional_acc": 0.48721227621483376
+      },
+      "regularization": "l1_noncausal",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-reg-l1_seed9101",
+      "seed": 9101,
+      "n_features": 15,
+      "best_epoch": 15,
+      "val_metrics": {
+        "mse": 9.703712566988543e-05,
+        "mae": 0.006766204722225666,
+        "rmse": 0.009850742391814203,
+        "directional_acc": 0.4974160206718346
+      },
+      "test_metrics": {
+        "mse": 8.368563430849463e-05,
+        "mae": 0.006843413691967726,
+        "rmse": 0.009147985259525435,
+        "directional_acc": 0.47570332480818417
+      },
+      "regularization": "l1_noncausal",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-reg-l1_seed10086",
+      "seed": 10086,
+      "n_features": 15,
+      "best_epoch": 18,
+      "val_metrics": {
+        "mse": 9.629428677726537e-05,
+        "mae": 0.006712277885526419,
+        "rmse": 0.00981296523876781,
+        "directional_acc": 0.5129198966408268
+      },
+      "test_metrics": {
+        "mse": 8.309127588290721e-05,
+        "mae": 0.006783945951610804,
+        "rmse": 0.009115441617546963,
+        "directional_acc": 0.4936061381074169
+      },
+      "regularization": "l1_noncausal",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-reg-l1_seed10701",
+      "seed": 10701,
+      "n_features": 15,
+      "best_epoch": 8,
+      "val_metrics": {
+        "mse": 9.607210085960105e-05,
+        "mae": 0.006672147195786238,
+        "rmse": 0.009801637662125705,
+        "directional_acc": 0.46511627906976744
+      },
+      "test_metrics": {
+        "mse": 8.221839379984885e-05,
+        "mae": 0.006785843521356583,
+        "rmse": 0.009067435899958095,
+        "directional_acc": 0.479539641943734
+      },
+      "regularization": "l1_noncausal",
+      "pca_components": null
+    }
+  ],
+  "LSTM-reg-l2": [
+    {
+      "label": "LSTM-reg-l2_seed42",
+      "seed": 42,
+      "n_features": 15,
+      "best_epoch": 7,
+      "val_metrics": {
+        "mse": 9.84605067060329e-05,
+        "mae": 0.006715459283441305,
+        "rmse": 0.009922726777757861,
+        "directional_acc": 0.5232558139534884
+      },
+      "test_metrics": {
+        "mse": 8.331448043463752e-05,
+        "mae": 0.0068055703304708,
+        "rmse": 0.009127676617553752,
+        "directional_acc": 0.49744245524296676
+      },
+      "regularization": "l2_noncausal",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-reg-l2_seed123",
+      "seed": 123,
+      "n_features": 15,
+      "best_epoch": 43,
+      "val_metrics": {
+        "mse": 9.729736484587193e-05,
+        "mae": 0.006719644647091627,
+        "rmse": 0.009863942662336998,
+        "directional_acc": 0.49612403100775193
+      },
+      "test_metrics": {
+        "mse": 8.090358460322022e-05,
+        "mae": 0.006699615623801947,
+        "rmse": 0.008994641994166318,
+        "directional_acc": 0.5153452685421995
+      },
+      "regularization": "l2_noncausal",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-reg-l2_seed456",
+      "seed": 456,
+      "n_features": 15,
+      "best_epoch": 15,
+      "val_metrics": {
+        "mse": 9.750740719027817e-05,
+        "mae": 0.006717151962220669,
+        "rmse": 0.009874583899601956,
+        "directional_acc": 0.524547803617571
+      },
+      "test_metrics": {
+        "mse": 8.119006088236347e-05,
+        "mae": 0.006695246323943138,
+        "rmse": 0.009010552751211407,
+        "directional_acc": 0.5319693094629157
+      },
+      "regularization": "l2_noncausal",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-reg-l2_seed789",
+      "seed": 789,
+      "n_features": 15,
+      "best_epoch": 14,
+      "val_metrics": {
+        "mse": 9.853622759692371e-05,
+        "mae": 0.006835938896983862,
+        "rmse": 0.009926541572819997,
+        "directional_acc": 0.46124031007751937
+      },
+      "test_metrics": {
+        "mse": 8.219473966164514e-05,
+        "mae": 0.006780481897294521,
+        "rmse": 0.009066131460642137,
+        "directional_acc": 0.4820971867007673
+      },
+      "regularization": "l2_noncausal",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-reg-l2_seed1024",
+      "seed": 1024,
+      "n_features": 15,
+      "best_epoch": 39,
+      "val_metrics": {
+        "mse": 9.718615910969675e-05,
+        "mae": 0.006693697534501553,
+        "rmse": 0.00985830406863659,
+        "directional_acc": 0.5129198966408268
+      },
+      "test_metrics": {
+        "mse": 8.102488936856389e-05,
+        "mae": 0.006698880810290575,
+        "rmse": 0.009001382636493345,
+        "directional_acc": 0.5179028132992327
+      },
+      "regularization": "l2_noncausal",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-reg-l2_seed1234",
+      "seed": 1234,
+      "n_features": 15,
+      "best_epoch": 11,
+      "val_metrics": {
+        "mse": 9.696819324744865e-05,
+        "mae": 0.006776516325771809,
+        "rmse": 0.009847242926192521,
+        "directional_acc": 0.4806201550387597
+      },
+      "test_metrics": {
+        "mse": 8.241012983489782e-05,
+        "mae": 0.006780402269214392,
+        "rmse": 0.009078002524503824,
+        "directional_acc": 0.4948849104859335
+      },
+      "regularization": "l2_noncausal",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-reg-l2_seed5678",
+      "seed": 5678,
+      "n_features": 15,
+      "best_epoch": 31,
+      "val_metrics": {
+        "mse": 9.750440221978351e-05,
+        "mae": 0.006714828312397003,
+        "rmse": 0.009874431741613465,
+        "directional_acc": 0.49870801033591733
+      },
+      "test_metrics": {
+        "mse": 8.158970013028011e-05,
+        "mae": 0.0067466446198523045,
+        "rmse": 0.009032701707146103,
+        "directional_acc": 0.49104859335038364
+      },
+      "regularization": "l2_noncausal",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-reg-l2_seed9101",
+      "seed": 9101,
+      "n_features": 15,
+      "best_epoch": 18,
+      "val_metrics": {
+        "mse": 9.559223690303043e-05,
+        "mae": 0.0067325131967663765,
+        "rmse": 0.009777128254402231,
+        "directional_acc": 0.49870801033591733
+      },
+      "test_metrics": {
+        "mse": 8.359151979675516e-05,
+        "mae": 0.00684006093069911,
+        "rmse": 0.00914283981029719,
+        "directional_acc": 0.47698209718670076
+      },
+      "regularization": "l2_noncausal",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-reg-l2_seed10086",
+      "seed": 10086,
+      "n_features": 15,
+      "best_epoch": 22,
+      "val_metrics": {
+        "mse": 9.523981134407222e-05,
+        "mae": 0.006727628875523806,
+        "rmse": 0.009759088653356533,
+        "directional_acc": 0.4909560723514212
+      },
+      "test_metrics": {
+        "mse": 8.292970596812665e-05,
+        "mae": 0.006780399940907955,
+        "rmse": 0.009106574875776659,
+        "directional_acc": 0.5
+      },
+      "regularization": "l2_noncausal",
+      "pca_components": null
+    },
+    {
+      "label": "LSTM-reg-l2_seed10701",
+      "seed": 10701,
+      "n_features": 15,
+      "best_epoch": 16,
+      "val_metrics": {
+        "mse": 9.655636677052826e-05,
+        "mae": 0.006759387440979481,
+        "rmse": 0.009826309926443816,
+        "directional_acc": 0.46511627906976744
+      },
+      "test_metrics": {
+        "mse": 8.310452540172264e-05,
+        "mae": 0.006843030918389559,
+        "rmse": 0.009116168350887485,
+        "directional_acc": 0.4846547314578005
+      },
+      "regularization": "l2_noncausal",
+      "pca_components": null
+    }
+  ]
+}

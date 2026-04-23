@@ -40,18 +40,18 @@ mlruns/
 
 # Generated data under data/ (* matches fred_, yfinance_, or empty prefix)
 data/*pipeline_steps/
-data/*results/
+# data/*results/
 
 # PCMCI/results: ignore all
-PCMCI/results/*
+# PCMCI/results/*
 
 # granger_outputs/: ignore all
-granger_outputs/*
+# granger_outputs/*
 
 # lstm/: ignore all except top-level Python sources (plots, checkpoints, caches, etc.)
-lstm/*
-!lstm/*.py
+# lstm/*
+# !lstm/*.py
 
 # var/: ignore all except top-level Python sources (plots, checkpoints, caches, etc.)
-VAR/*
-!VAR/*.py
+# VAR/*
+# !VAR/*.py

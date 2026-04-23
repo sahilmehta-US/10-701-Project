@@ -1,0 +1,1351 @@
+VAR baseline summary
+====================================================================================================
+
+{
+  "data_root": "../data/results",
+  "dataset_name": "gold_base_stationary_dropna.csv",
+  "split_file": "../results/split_definition.json",
+  "date_column": "Date",
+  "target_column": "Gold Futures (COMEX) | log_return",
+  "n_endogenous_series": 11,
+  "endogenous_columns": [
+    "Gold Futures (COMEX) | log_return",
+    "U.S. Dollar Index | log_return",
+    "USD / JPY Exchange Rate | log_return",
+    "S&P 500 | log_return",
+    "CBOE Volatility Index | diff_1",
+    "ICE BofA MOVE Index | diff_1",
+    "WTI Crude Oil Futures | log_return",
+    "Silver Futures | log_return",
+    "Copper Futures | log_return",
+    "US 10Y Treasury Yield | diff_1",
+    "US 3M Treasury Yield | diff_1"
+  ],
+  "train_rows": 3361,
+  "val_rows": 774,
+  "test_rows": 782,
+  "lag_order_selection_ic": "aic",
+  "selected_lag_order": 10,
+  "maxlags_searched": 20,
+  "trend": "c",
+  "horizons": [
+    1,
+    5
+  ],
+  "nobs_used_for_forecast": 3351
+}
+
+  Summary of Regression Results   
+==================================
+Model:                         VAR
+Method:                        OLS
+Date:           Mon, 20, Apr, 2026
+Time:                     12:01:41
+--------------------------------------------------------------------
+No. of Equations:         11.0000    BIC:                   -71.2736
+Nobs:                     3351.00    HQIC:                  -72.7053
+Log likelihood:           72070.9    FPE:                1.19784e-32
+AIC:                     -73.5025    Det(Omega_mle):     8.36986e-33
+--------------------------------------------------------------------
+Results for equation Gold Futures (COMEX) | log_return
+===========================================================================================================
+                                              coefficient       std. error           t-stat            prob
+-----------------------------------------------------------------------------------------------------------
+const                                            0.000286         0.000200            1.427           0.154
+L1.Gold Futures (COMEX) | log_return            -0.003847         0.031927           -0.120           0.904
+L1.U.S. Dollar Index | log_return               -0.169915         0.047947           -3.544           0.000
+L1.USD / JPY Exchange Rate | log_return         -0.006074         0.029150           -0.208           0.835
+L1.S&P 500 | log_return                          0.004821         0.033965            0.142           0.887
+L1.CBOE Volatility Index | diff_1               -0.000455         0.000213           -2.134           0.033
+L1.ICE BofA MOVE Index | diff_1                  0.000076         0.000058            1.321           0.186
+L1.WTI Crude Oil Futures | log_return            0.010264         0.010298            0.997           0.319
+L1.Silver Futures | log_return                  -0.020914         0.018199           -1.149           0.250
+L1.Copper Futures | log_return                  -0.027238         0.013903           -1.959           0.050
+L1.US 10Y Treasury Yield | diff_1               -0.019449         0.004376           -4.445           0.000
+L1.US 3M Treasury Yield | diff_1                 0.008906         0.004426            2.012           0.044
+L2.Gold Futures (COMEX) | log_return             0.005088         0.031966            0.159           0.874
+L2.U.S. Dollar Index | log_return                0.029153         0.049674            0.587           0.557
+L2.USD / JPY Exchange Rate | log_return          0.005321         0.030872            0.172           0.863
+L2.S&P 500 | log_return                          0.061843         0.034570            1.789           0.074
+L2.CBOE Volatility Index | diff_1                0.000172         0.000216            0.795           0.426
+L2.ICE BofA MOVE Index | diff_1                  0.000216         0.000058            3.727           0.000
+L2.WTI Crude Oil Futures | log_return           -0.008565         0.010303           -0.831           0.406
+L2.Silver Futures | log_return                  -0.016066         0.018199           -0.883           0.377
+L2.Copper Futures | log_return                   0.008908         0.013952            0.638           0.523
+L2.US 10Y Treasury Yield | diff_1               -0.007071         0.004494           -1.573           0.116
+L2.US 3M Treasury Yield | diff_1                -0.011304         0.004472           -2.528           0.011
+L3.Gold Futures (COMEX) | log_return            -0.004647         0.032024           -0.145           0.885
+L3.U.S. Dollar Index | log_return               -0.023534         0.049500           -0.475           0.634
+L3.USD / JPY Exchange Rate | log_return          0.007834         0.030930            0.253           0.800
+L3.S&P 500 | log_return                          0.031311         0.034562            0.906           0.365
+L3.CBOE Volatility Index | diff_1                0.000060         0.000217            0.279           0.780
+L3.ICE BofA MOVE Index | diff_1                  0.000051         0.000059            0.878           0.380
+L3.WTI Crude Oil Futures | log_return           -0.014515         0.010286           -1.411           0.158
+L3.Silver Futures | log_return                   0.007495         0.018233            0.411           0.681
+L3.Copper Futures | log_return                   0.000736         0.013912            0.053           0.958
+L3.US 10Y Treasury Yield | diff_1               -0.013644         0.004499           -3.033           0.002
+L3.US 3M Treasury Yield | diff_1                -0.011226         0.004466           -2.514           0.012
+L4.Gold Futures (COMEX) | log_return            -0.044933         0.031896           -1.409           0.159
+L4.U.S. Dollar Index | log_return                0.021342         0.049546            0.431           0.667
+L4.USD / JPY Exchange Rate | log_return         -0.009224         0.031095           -0.297           0.767
+L4.S&P 500 | log_return                         -0.032165         0.034580           -0.930           0.352
+L4.CBOE Volatility Index | diff_1               -0.000316         0.000214           -1.473           0.141
+L4.ICE BofA MOVE Index | diff_1                 -0.000006         0.000058           -0.098           0.922
+L4.WTI Crude Oil Futures | log_return            0.002290         0.010313            0.222           0.824
+L4.Silver Futures | log_return                   0.026299         0.018207            1.444           0.149
+L4.Copper Futures | log_return                   0.000389         0.013921            0.028           0.978
+L4.US 10Y Treasury Yield | diff_1                0.001114         0.004509            0.247           0.805
+L4.US 3M Treasury Yield | diff_1                 0.007293         0.004455            1.637           0.102
+L5.Gold Futures (COMEX) | log_return             0.021731         0.031815            0.683           0.495
+L5.U.S. Dollar Index | log_return               -0.033911         0.049702           -0.682           0.495
+L5.USD / JPY Exchange Rate | log_return         -0.040165         0.031093           -1.292           0.196
+L5.S&P 500 | log_return                          0.019119         0.034569            0.553           0.580
+L5.CBOE Volatility Index | diff_1               -0.000032         0.000214           -0.150           0.880
+L5.ICE BofA MOVE Index | diff_1                  0.000042         0.000059            0.713           0.476
+L5.WTI Crude Oil Futures | log_return           -0.002244         0.010311           -0.218           0.828
+L5.Silver Futures | log_return                  -0.019427         0.018249           -1.065           0.287
+L5.Copper Futures | log_return                   0.035007         0.013910            2.517           0.012
+L5.US 10Y Treasury Yield | diff_1               -0.006603         0.004507           -1.465           0.143
+L5.US 3M Treasury Yield | diff_1                -0.007497         0.004457           -1.682           0.093
+L6.Gold Futures (COMEX) | log_return            -0.027971         0.031726           -0.882           0.378
+L6.U.S. Dollar Index | log_return               -0.010180         0.049688           -0.205           0.838
+L6.USD / JPY Exchange Rate | log_return         -0.013086         0.031154           -0.420           0.674
+L6.S&P 500 | log_return                         -0.051012         0.034517           -1.478           0.139
+L6.CBOE Volatility Index | diff_1               -0.000337         0.000215           -1.566           0.117
+L6.ICE BofA MOVE Index | diff_1                  0.000074         0.000059            1.257           0.209
+L6.WTI Crude Oil Futures | log_return           -0.001031         0.010290           -0.100           0.920
+L6.Silver Futures | log_return                  -0.017689         0.018185           -0.973           0.331
+L6.Copper Futures | log_return                  -0.003222         0.013916           -0.232           0.817
+L6.US 10Y Treasury Yield | diff_1               -0.001799         0.004517           -0.398           0.690
+L6.US 3M Treasury Yield | diff_1                 0.008588         0.004448            1.931           0.053
+L7.Gold Futures (COMEX) | log_return            -0.071079         0.031699           -2.242           0.025
+L7.U.S. Dollar Index | log_return               -0.004079         0.049564           -0.082           0.934
+L7.USD / JPY Exchange Rate | log_return         -0.005244         0.031198           -0.168           0.867
+L7.S&P 500 | log_return                          0.042570         0.034350            1.239           0.215
+L7.CBOE Volatility Index | diff_1                0.000402         0.000213            1.890           0.059
+L7.ICE BofA MOVE Index | diff_1                  0.000105         0.000059            1.787           0.074
+L7.WTI Crude Oil Futures | log_return           -0.016313         0.010269           -1.589           0.112
+L7.Silver Futures | log_return                   0.052942         0.018149            2.917           0.004
+L7.Copper Futures | log_return                  -0.005196         0.013925           -0.373           0.709
+L7.US 10Y Treasury Yield | diff_1               -0.001163         0.004505           -0.258           0.796
+L7.US 3M Treasury Yield | diff_1                 0.002271         0.004471            0.508           0.611
+L8.Gold Futures (COMEX) | log_return            -0.027267         0.031622           -0.862           0.389
+L8.U.S. Dollar Index | log_return                0.037210         0.049502            0.752           0.452
+L8.USD / JPY Exchange Rate | log_return          0.034967         0.031272            1.118           0.263
+L8.S&P 500 | log_return                          0.059347         0.034153            1.738           0.082
+L8.CBOE Volatility Index | diff_1                0.000661         0.000212            3.120           0.002
+L8.ICE BofA MOVE Index | diff_1                 -0.000082         0.000059           -1.401           0.161
+L8.WTI Crude Oil Futures | log_return           -0.005484         0.010264           -0.534           0.593
+L8.Silver Futures | log_return                   0.002968         0.018140            0.164           0.870
+L8.Copper Futures | log_return                   0.035967         0.013915            2.585           0.010
+L8.US 10Y Treasury Yield | diff_1               -0.005288         0.004510           -1.173           0.241
+L8.US 3M Treasury Yield | diff_1                 0.010192         0.004492            2.269           0.023
+L9.Gold Futures (COMEX) | log_return             0.065093         0.031413            2.072           0.038
+L9.U.S. Dollar Index | log_return                0.003654         0.049516            0.074           0.941
+L9.USD / JPY Exchange Rate | log_return         -0.003707         0.031127           -0.119           0.905
+L9.S&P 500 | log_return                         -0.062578         0.034202           -1.830           0.067
+L9.CBOE Volatility Index | diff_1               -0.000208         0.000211           -0.982           0.326
+L9.ICE BofA MOVE Index | diff_1                 -0.000067         0.000059           -1.138           0.255
+L9.WTI Crude Oil Futures | log_return           -0.010250         0.010264           -0.999           0.318
+L9.Silver Futures | log_return                  -0.023419         0.018084           -1.295           0.195
+L9.Copper Futures | log_return                   0.022760         0.013937            1.633           0.102
+L9.US 10Y Treasury Yield | diff_1               -0.001567         0.004514           -0.347           0.728
+L9.US 3M Treasury Yield | diff_1                -0.001557         0.004486           -0.347           0.728
+L10.Gold Futures (COMEX) | log_return           -0.046419         0.031160           -1.490           0.136
+L10.U.S. Dollar Index | log_return               0.103818         0.049043            2.117           0.034
+L10.USD / JPY Exchange Rate | log_return         0.021873         0.027901            0.784           0.433
+L10.S&P 500 | log_return                        -0.085253         0.033890           -2.516           0.012
+L10.CBOE Volatility Index | diff_1              -0.000532         0.000209           -2.550           0.011
+L10.ICE BofA MOVE Index | diff_1                 0.000079         0.000058            1.355           0.175
+L10.WTI Crude Oil Futures | log_return           0.007560         0.010252            0.737           0.461
+L10.Silver Futures | log_return                  0.023615         0.017891            1.320           0.187
+L10.Copper Futures | log_return                  0.005173         0.013868            0.373           0.709
+L10.US 10Y Treasury Yield | diff_1              -0.004218         0.004493           -0.939           0.348
+L10.US 3M Treasury Yield | diff_1                0.002689         0.004476            0.601           0.548
+===========================================================================================================
+
+Results for equation U.S. Dollar Index | log_return
+===========================================================================================================
+                                              coefficient       std. error           t-stat            prob
+-----------------------------------------------------------------------------------------------------------
+const                                            0.000015         0.000084            0.177           0.859
+L1.Gold Futures (COMEX) | log_return            -0.007464         0.013420           -0.556           0.578
+L1.U.S. Dollar Index | log_return               -0.030846         0.020153           -1.531           0.126
+L1.USD / JPY Exchange Rate | log_return          0.008003         0.012252            0.653           0.514
+L1.S&P 500 | log_return                         -0.077659         0.014276           -5.440           0.000
+L1.CBOE Volatility Index | diff_1               -0.000273         0.000090           -3.049           0.002
+L1.ICE BofA MOVE Index | diff_1                 -0.000021         0.000024           -0.854           0.393
+L1.WTI Crude Oil Futures | log_return           -0.001072         0.004328           -0.248           0.804
+L1.Silver Futures | log_return                   0.001424         0.007650            0.186           0.852
+L1.Copper Futures | log_return                   0.001597         0.005844            0.273           0.785
+L1.US 10Y Treasury Yield | diff_1                0.003911         0.001839            2.126           0.033
+L1.US 3M Treasury Yield | diff_1                -0.003592         0.001861           -1.931           0.054
+L2.Gold Futures (COMEX) | log_return            -0.043167         0.013436           -3.213           0.001
+L2.U.S. Dollar Index | log_return               -0.033320         0.020879           -1.596           0.111
+L2.USD / JPY Exchange Rate | log_return          0.023278         0.012976            1.794           0.073
+L2.S&P 500 | log_return                         -0.027449         0.014531           -1.889           0.059
+L2.CBOE Volatility Index | diff_1               -0.000124         0.000091           -1.362           0.173
+L2.ICE BofA MOVE Index | diff_1                 -0.000012         0.000024           -0.480           0.632
+L2.WTI Crude Oil Futures | log_return            0.000851         0.004331            0.197           0.844
+L2.Silver Futures | log_return                   0.009233         0.007649            1.207           0.227
+L2.Copper Futures | log_return                  -0.000094         0.005865           -0.016           0.987
+L2.US 10Y Treasury Yield | diff_1                0.001892         0.001889            1.002           0.316
+L2.US 3M Treasury Yield | diff_1                 0.000683         0.001880            0.364           0.716
+L3.Gold Futures (COMEX) | log_return            -0.008489         0.013461           -0.631           0.528
+L3.U.S. Dollar Index | log_return               -0.009697         0.020806           -0.466           0.641
+L3.USD / JPY Exchange Rate | log_return         -0.002662         0.013001           -0.205           0.838
+L3.S&P 500 | log_return                          0.010996         0.014527            0.757           0.449
+L3.CBOE Volatility Index | diff_1               -0.000012         0.000091           -0.136           0.892
+L3.ICE BofA MOVE Index | diff_1                 -0.000016         0.000025           -0.632           0.527
+L3.WTI Crude Oil Futures | log_return           -0.005453         0.004324           -1.261           0.207
+L3.Silver Futures | log_return                   0.006791         0.007664            0.886           0.376
+L3.Copper Futures | log_return                  -0.001127         0.005848           -0.193           0.847
+L3.US 10Y Treasury Yield | diff_1               -0.001097         0.001891           -0.580           0.562
+L3.US 3M Treasury Yield | diff_1                 0.002691         0.001877            1.434           0.152
+L4.Gold Futures (COMEX) | log_return             0.007402         0.013407            0.552           0.581
+L4.U.S. Dollar Index | log_return               -0.004779         0.020825           -0.230           0.818
+L4.USD / JPY Exchange Rate | log_return         -0.009902         0.013070           -0.758           0.449
+L4.S&P 500 | log_return                          0.024798         0.014535            1.706           0.088
+L4.CBOE Volatility Index | diff_1                0.000177         0.000090            1.963           0.050
+L4.ICE BofA MOVE Index | diff_1                  0.000003         0.000025            0.130           0.896
+L4.WTI Crude Oil Futures | log_return           -0.003878         0.004335           -0.895           0.371
+L4.Silver Futures | log_return                   0.001177         0.007653            0.154           0.878
+L4.Copper Futures | log_return                   0.000950         0.005851            0.162           0.871
+L4.US 10Y Treasury Yield | diff_1                0.000683         0.001895            0.360           0.719
+L4.US 3M Treasury Yield | diff_1                 0.003464         0.001873            1.850           0.064
+L5.Gold Futures (COMEX) | log_return            -0.004018         0.013373           -0.300           0.764
+L5.U.S. Dollar Index | log_return                0.015808         0.020891            0.757           0.449
+L5.USD / JPY Exchange Rate | log_return          0.010819         0.013069            0.828           0.408
+L5.S&P 500 | log_return                         -0.002277         0.014530           -0.157           0.875
+L5.CBOE Volatility Index | diff_1                0.000012         0.000090            0.131           0.896
+L5.ICE BofA MOVE Index | diff_1                 -0.000018         0.000025           -0.736           0.462
+L5.WTI Crude Oil Futures | log_return           -0.001161         0.004334           -0.268           0.789
+L5.Silver Futures | log_return                  -0.000467         0.007671           -0.061           0.951
+L5.Copper Futures | log_return                   0.002171         0.005847            0.371           0.710
+L5.US 10Y Treasury Yield | diff_1               -0.000060         0.001895           -0.032           0.975
+L5.US 3M Treasury Yield | diff_1                 0.001114         0.001873            0.595           0.552
+L6.Gold Futures (COMEX) | log_return            -0.001234         0.013335           -0.093           0.926
+L6.U.S. Dollar Index | log_return                0.011894         0.020885            0.569           0.569
+L6.USD / JPY Exchange Rate | log_return         -0.031711         0.013095           -2.422           0.015
+L6.S&P 500 | log_return                         -0.004463         0.014509           -0.308           0.758
+L6.CBOE Volatility Index | diff_1                0.000011         0.000090            0.124           0.901
+L6.ICE BofA MOVE Index | diff_1                  0.000000         0.000025            0.016           0.987
+L6.WTI Crude Oil Futures | log_return            0.009879         0.004325            2.284           0.022
+L6.Silver Futures | log_return                   0.002723         0.007644            0.356           0.722
+L6.Copper Futures | log_return                  -0.010336         0.005849           -1.767           0.077
+L6.US 10Y Treasury Yield | diff_1                0.001104         0.001899            0.582           0.561
+L6.US 3M Treasury Yield | diff_1                 0.003206         0.001870            1.715           0.086
+L7.Gold Futures (COMEX) | log_return             0.019284         0.013324            1.447           0.148
+L7.U.S. Dollar Index | log_return                0.006666         0.020833            0.320           0.749
+L7.USD / JPY Exchange Rate | log_return         -0.047633         0.013113           -3.632           0.000
+L7.S&P 500 | log_return                         -0.000906         0.014438           -0.063           0.950
+L7.CBOE Volatility Index | diff_1                0.000010         0.000089            0.113           0.910
+L7.ICE BofA MOVE Index | diff_1                 -0.000025         0.000025           -1.016           0.310
+L7.WTI Crude Oil Futures | log_return            0.001367         0.004316            0.317           0.751
+L7.Silver Futures | log_return                  -0.018865         0.007629           -2.473           0.013
+L7.Copper Futures | log_return                   0.006848         0.005853            1.170           0.242
+L7.US 10Y Treasury Yield | diff_1                0.001733         0.001893            0.915           0.360
+L7.US 3M Treasury Yield | diff_1                 0.000839         0.001879            0.447           0.655
+L8.Gold Futures (COMEX) | log_return             0.039749         0.013292            2.990           0.003
+L8.U.S. Dollar Index | log_return                0.064131         0.020807            3.082           0.002
+L8.USD / JPY Exchange Rate | log_return         -0.033627         0.013144           -2.558           0.011
+L8.S&P 500 | log_return                          0.014873         0.014355            1.036           0.300
+L8.CBOE Volatility Index | diff_1                0.000070         0.000089            0.787           0.431
+L8.ICE BofA MOVE Index | diff_1                 -0.000002         0.000025           -0.081           0.935
+L8.WTI Crude Oil Futures | log_return           -0.010340         0.004314           -2.397           0.017
+L8.Silver Futures | log_return                  -0.003255         0.007625           -0.427           0.669
+L8.Copper Futures | log_return                  -0.006755         0.005849           -1.155           0.248
+L8.US 10Y Treasury Yield | diff_1                0.005816         0.001896            3.068           0.002
+L8.US 3M Treasury Yield | diff_1                -0.002824         0.001888           -1.496           0.135
+L9.Gold Futures (COMEX) | log_return             0.007245         0.013204            0.549           0.583
+L9.U.S. Dollar Index | log_return               -0.003893         0.020813           -0.187           0.852
+L9.USD / JPY Exchange Rate | log_return          0.020038         0.013083            1.532           0.126
+L9.S&P 500 | log_return                          0.018831         0.014376            1.310           0.190
+L9.CBOE Volatility Index | diff_1                0.000082         0.000089            0.918           0.359
+L9.ICE BofA MOVE Index | diff_1                 -0.000002         0.000025           -0.088           0.930
+L9.WTI Crude Oil Futures | log_return           -0.009529         0.004314           -2.209           0.027
+L9.Silver Futures | log_return                   0.004433         0.007601            0.583           0.560
+L9.Copper Futures | log_return                  -0.001196         0.005858           -0.204           0.838
+L9.US 10Y Treasury Yield | diff_1                0.006804         0.001897            3.587           0.000
+L9.US 3M Treasury Yield | diff_1                -0.003884         0.001885           -2.060           0.039
+L10.Gold Futures (COMEX) | log_return            0.027917         0.013097            2.132           0.033
+L10.U.S. Dollar Index | log_return              -0.034434         0.020614           -1.670           0.095
+L10.USD / JPY Exchange Rate | log_return         0.029669         0.011727            2.530           0.011
+L10.S&P 500 | log_return                        -0.000117         0.014245           -0.008           0.993
+L10.CBOE Volatility Index | diff_1              -0.000086         0.000088           -0.977           0.329
+L10.ICE BofA MOVE Index | diff_1                 0.000061         0.000024            2.513           0.012
+L10.WTI Crude Oil Futures | log_return          -0.005625         0.004309           -1.305           0.192
+L10.Silver Futures | log_return                 -0.013730         0.007520           -1.826           0.068
+L10.Copper Futures | log_return                  0.001688         0.005829            0.290           0.772
+L10.US 10Y Treasury Yield | diff_1               0.000427         0.001889            0.226           0.821
+L10.US 3M Treasury Yield | diff_1                0.001748         0.001881            0.929           0.353
+===========================================================================================================
+
+Results for equation USD / JPY Exchange Rate | log_return
+===========================================================================================================
+                                              coefficient       std. error           t-stat            prob
+-----------------------------------------------------------------------------------------------------------
+const                                            0.000022         0.000128            0.170           0.865
+L1.Gold Futures (COMEX) | log_return            -0.048333         0.020325           -2.378           0.017
+L1.U.S. Dollar Index | log_return                0.440211         0.030524           14.422           0.000
+L1.USD / JPY Exchange Rate | log_return         -0.352113         0.018557          -18.974           0.000
+L1.S&P 500 | log_return                         -0.002050         0.021623           -0.095           0.924
+L1.CBOE Volatility Index | diff_1               -0.000446         0.000136           -3.285           0.001
+L1.ICE BofA MOVE Index | diff_1                  0.000041         0.000037            1.120           0.263
+L1.WTI Crude Oil Futures | log_return           -0.001413         0.006556           -0.216           0.829
+L1.Silver Futures | log_return                   0.016923         0.011586            1.461           0.144
+L1.Copper Futures | log_return                   0.014418         0.008851            1.629           0.103
+L1.US 10Y Treasury Yield | diff_1                0.029429         0.002786           10.564           0.000
+L1.US 3M Treasury Yield | diff_1                -0.001226         0.002818           -0.435           0.664
+L2.Gold Futures (COMEX) | log_return            -0.021543         0.020350           -1.059           0.290
+L2.U.S. Dollar Index | log_return                0.092099         0.031623            2.912           0.004
+L2.USD / JPY Exchange Rate | log_return         -0.138526         0.019654           -7.048           0.000
+L2.S&P 500 | log_return                          0.007043         0.022008            0.320           0.749
+L2.CBOE Volatility Index | diff_1               -0.000172         0.000137           -1.252           0.211
+L2.ICE BofA MOVE Index | diff_1                 -0.000012         0.000037           -0.334           0.738
+L2.WTI Crude Oil Futures | log_return           -0.007585         0.006559           -1.156           0.248
+L2.Silver Futures | log_return                   0.014961         0.011586            1.291           0.197
+L2.Copper Futures | log_return                   0.008288         0.008882            0.933           0.351
+L2.US 10Y Treasury Yield | diff_1                0.004072         0.002861            1.423           0.155
+L2.US 3M Treasury Yield | diff_1                -0.002285         0.002847           -0.803           0.422
+L3.Gold Futures (COMEX) | log_return            -0.043673         0.020387           -2.142           0.032
+L3.U.S. Dollar Index | log_return                0.038978         0.031513            1.237           0.216
+L3.USD / JPY Exchange Rate | log_return         -0.049734         0.019691           -2.526           0.012
+L3.S&P 500 | log_return                          0.000938         0.022003            0.043           0.966
+L3.CBOE Volatility Index | diff_1               -0.000186         0.000138           -1.351           0.177
+L3.ICE BofA MOVE Index | diff_1                  0.000028         0.000037            0.754           0.451
+L3.WTI Crude Oil Futures | log_return            0.009530         0.006549            1.455           0.146
+L3.Silver Futures | log_return                   0.010299         0.011607            0.887           0.375
+L3.Copper Futures | log_return                   0.013554         0.008857            1.530           0.126
+L3.US 10Y Treasury Yield | diff_1                0.002664         0.002864            0.930           0.352
+L3.US 3M Treasury Yield | diff_1                 0.000864         0.002843            0.304           0.761
+L4.Gold Futures (COMEX) | log_return             0.003840         0.020305            0.189           0.850
+L4.U.S. Dollar Index | log_return               -0.018988         0.031542           -0.602           0.547
+L4.USD / JPY Exchange Rate | log_return         -0.001978         0.019796           -0.100           0.920
+L4.S&P 500 | log_return                         -0.005816         0.022014           -0.264           0.792
+L4.CBOE Volatility Index | diff_1               -0.000182         0.000136           -1.332           0.183
+L4.ICE BofA MOVE Index | diff_1                  0.000106         0.000037            2.856           0.004
+L4.WTI Crude Oil Futures | log_return           -0.001569         0.006565           -0.239           0.811
+L4.Silver Futures | log_return                  -0.014933         0.011591           -1.288           0.198
+L4.Copper Futures | log_return                   0.013952         0.008862            1.574           0.115
+L4.US 10Y Treasury Yield | diff_1                0.001602         0.002871            0.558           0.577
+L4.US 3M Treasury Yield | diff_1                -0.009321         0.002836           -3.287           0.001
+L5.Gold Futures (COMEX) | log_return            -0.052064         0.020254           -2.571           0.010
+L5.U.S. Dollar Index | log_return                0.018161         0.031641            0.574           0.566
+L5.USD / JPY Exchange Rate | log_return         -0.038646         0.019794           -1.952           0.051
+L5.S&P 500 | log_return                         -0.038045         0.022007           -1.729           0.084
+L5.CBOE Volatility Index | diff_1               -0.000233         0.000137           -1.709           0.087
+L5.ICE BofA MOVE Index | diff_1                  0.000012         0.000037            0.317           0.751
+L5.WTI Crude Oil Futures | log_return            0.000043         0.006564            0.007           0.995
+L5.Silver Futures | log_return                   0.008490         0.011618            0.731           0.465
+L5.Copper Futures | log_return                   0.003660         0.008855            0.413           0.679
+L5.US 10Y Treasury Yield | diff_1               -0.001981         0.002869           -0.690           0.490
+L5.US 3M Treasury Yield | diff_1                 0.000408         0.002838            0.144           0.886
+L6.Gold Futures (COMEX) | log_return             0.042520         0.020197            2.105           0.035
+L6.U.S. Dollar Index | log_return                0.027976         0.031632            0.884           0.376
+L6.USD / JPY Exchange Rate | log_return         -0.024232         0.019833           -1.222           0.222
+L6.S&P 500 | log_return                         -0.001318         0.021974           -0.060           0.952
+L6.CBOE Volatility Index | diff_1               -0.000217         0.000137           -1.583           0.113
+L6.ICE BofA MOVE Index | diff_1                  0.000072         0.000037            1.925           0.054
+L6.WTI Crude Oil Futures | log_return            0.013148         0.006551            2.007           0.045
+L6.Silver Futures | log_return                  -0.017454         0.011577           -1.508           0.132
+L6.Copper Futures | log_return                  -0.008359         0.008859           -0.944           0.345
+L6.US 10Y Treasury Yield | diff_1                0.002783         0.002876            0.968           0.333
+L6.US 3M Treasury Yield | diff_1                 0.000546         0.002832            0.193           0.847
+L7.Gold Futures (COMEX) | log_return            -0.001817         0.020180           -0.090           0.928
+L7.U.S. Dollar Index | log_return               -0.086898         0.031553           -2.754           0.006
+L7.USD / JPY Exchange Rate | log_return         -0.025325         0.019861           -1.275           0.202
+L7.S&P 500 | log_return                         -0.048264         0.021868           -2.207           0.027
+L7.CBOE Volatility Index | diff_1               -0.000390         0.000136           -2.882           0.004
+L7.ICE BofA MOVE Index | diff_1                  0.000041         0.000037            1.090           0.276
+L7.WTI Crude Oil Futures | log_return           -0.004260         0.006537           -0.652           0.515
+L7.Silver Futures | log_return                  -0.019447         0.011554           -1.683           0.092
+L7.Copper Futures | log_return                  -0.000716         0.008865           -0.081           0.936
+L7.US 10Y Treasury Yield | diff_1                0.007131         0.002868            2.487           0.013
+L7.US 3M Treasury Yield | diff_1                -0.002221         0.002846           -0.780           0.435
+L8.Gold Futures (COMEX) | log_return             0.006618         0.020131            0.329           0.742
+L8.U.S. Dollar Index | log_return                0.031462         0.031514            0.998           0.318
+L8.USD / JPY Exchange Rate | log_return          0.040269         0.019908            2.023           0.043
+L8.S&P 500 | log_return                          0.022223         0.021742            1.022           0.307
+L8.CBOE Volatility Index | diff_1               -0.000438         0.000135           -3.249           0.001
+L8.ICE BofA MOVE Index | diff_1                  0.000099         0.000037            2.654           0.008
+L8.WTI Crude Oil Futures | log_return           -0.000060         0.006534           -0.009           0.993
+L8.Silver Futures | log_return                  -0.001970         0.011548           -0.171           0.865
+L8.Copper Futures | log_return                   0.001327         0.008859            0.150           0.881
+L8.US 10Y Treasury Yield | diff_1               -0.009793         0.002871           -3.411           0.001
+L8.US 3M Treasury Yield | diff_1                 0.004575         0.002860            1.600           0.110
+L9.Gold Futures (COMEX) | log_return             0.048191         0.019998            2.410           0.016
+L9.U.S. Dollar Index | log_return               -0.056612         0.031523           -1.796           0.073
+L9.USD / JPY Exchange Rate | log_return          0.013640         0.019816            0.688           0.491
+L9.S&P 500 | log_return                          0.019014         0.021773            0.873           0.383
+L9.CBOE Volatility Index | diff_1               -0.000146         0.000135           -1.088           0.276
+L9.ICE BofA MOVE Index | diff_1                  0.000066         0.000037            1.762           0.078
+L9.WTI Crude Oil Futures | log_return            0.002496         0.006534            0.382           0.702
+L9.Silver Futures | log_return                  -0.030628         0.011512           -2.660           0.008
+L9.Copper Futures | log_return                  -0.013092         0.008872           -1.476           0.140
+L9.US 10Y Treasury Yield | diff_1               -0.000616         0.002873           -0.214           0.830
+L9.US 3M Treasury Yield | diff_1                 0.007015         0.002856            2.456           0.014
+L10.Gold Futures (COMEX) | log_return           -0.017898         0.019837           -0.902           0.367
+L10.U.S. Dollar Index | log_return               0.035176         0.031222            1.127           0.260
+L10.USD / JPY Exchange Rate | log_return         0.009073         0.017762            0.511           0.609
+L10.S&P 500 | log_return                         0.042427         0.021575            1.966           0.049
+L10.CBOE Volatility Index | diff_1              -0.000010         0.000133           -0.077           0.938
+L10.ICE BofA MOVE Index | diff_1                -0.000205         0.000037           -5.553           0.000
+L10.WTI Crude Oil Futures | log_return           0.001999         0.006527            0.306           0.759
+L10.Silver Futures | log_return                  0.017151         0.011390            1.506           0.132
+L10.Copper Futures | log_return                 -0.025763         0.008828           -2.918           0.004
+L10.US 10Y Treasury Yield | diff_1               0.005076         0.002860            1.775           0.076
+L10.US 3M Treasury Yield | diff_1               -0.004599         0.002850           -1.614           0.107
+===========================================================================================================
+
+Results for equation S&P 500 | log_return
+===========================================================================================================
+                                              coefficient       std. error           t-stat            prob
+-----------------------------------------------------------------------------------------------------------
+const                                            0.000243         0.000203            1.200           0.230
+L1.Gold Futures (COMEX) | log_return            -0.025721         0.032318           -0.796           0.426
+L1.U.S. Dollar Index | log_return                0.055027         0.048534            1.134           0.257
+L1.USD / JPY Exchange Rate | log_return         -0.048196         0.029507           -1.633           0.102
+L1.S&P 500 | log_return                         -0.046565         0.034381           -1.354           0.176
+L1.CBOE Volatility Index | diff_1                0.000171         0.000216            0.791           0.429
+L1.ICE BofA MOVE Index | diff_1                  0.000025         0.000059            0.422           0.673
+L1.WTI Crude Oil Futures | log_return           -0.019111         0.010424           -1.833           0.067
+L1.Silver Futures | log_return                  -0.001433         0.018422           -0.078           0.938
+L1.Copper Futures | log_return                   0.027803         0.014074            1.976           0.048
+L1.US 10Y Treasury Yield | diff_1               -0.001137         0.004430           -0.257           0.797
+L1.US 3M Treasury Yield | diff_1                -0.016162         0.004481           -3.607           0.000
+L2.Gold Futures (COMEX) | log_return             0.053571         0.032358            1.656           0.098
+L2.U.S. Dollar Index | log_return               -0.032037         0.050283           -0.637           0.524
+L2.USD / JPY Exchange Rate | log_return         -0.045695         0.031251           -1.462           0.144
+L2.S&P 500 | log_return                          0.002938         0.034993            0.084           0.933
+L2.CBOE Volatility Index | diff_1                0.000494         0.000218            2.263           0.024
+L2.ICE BofA MOVE Index | diff_1                 -0.000085         0.000059           -1.439           0.150
+L2.WTI Crude Oil Futures | log_return           -0.006910         0.010429           -0.663           0.508
+L2.Silver Futures | log_return                  -0.014110         0.018422           -0.766           0.444
+L2.Copper Futures | log_return                   0.000532         0.014123            0.038           0.970
+L2.US 10Y Treasury Yield | diff_1                0.010560         0.004549            2.321           0.020
+L2.US 3M Treasury Yield | diff_1                -0.008784         0.004526           -1.941           0.052
+L3.Gold Futures (COMEX) | log_return             0.015054         0.032417            0.464           0.642
+L3.U.S. Dollar Index | log_return               -0.024467         0.050107           -0.488           0.625
+L3.USD / JPY Exchange Rate | log_return         -0.024125         0.031309           -0.771           0.441
+L3.S&P 500 | log_return                          0.002923         0.034986            0.084           0.933
+L3.CBOE Volatility Index | diff_1               -0.000130         0.000219           -0.592           0.554
+L3.ICE BofA MOVE Index | diff_1                  0.000175         0.000059            2.951           0.003
+L3.WTI Crude Oil Futures | log_return            0.003291         0.010413            0.316           0.752
+L3.Silver Futures | log_return                   0.002326         0.018456            0.126           0.900
+L3.Copper Futures | log_return                   0.004194         0.014083            0.298           0.766
+L3.US 10Y Treasury Yield | diff_1               -0.005537         0.004554           -1.216           0.224
+L3.US 3M Treasury Yield | diff_1                 0.009567         0.004520            2.116           0.034
+L4.Gold Futures (COMEX) | log_return            -0.033940         0.032287           -1.051           0.293
+L4.U.S. Dollar Index | log_return               -0.023590         0.050153           -0.470           0.638
+L4.USD / JPY Exchange Rate | log_return         -0.003346         0.031476           -0.106           0.915
+L4.S&P 500 | log_return                          0.007425         0.035004            0.212           0.832
+L4.CBOE Volatility Index | diff_1                0.000246         0.000217            1.135           0.256
+L4.ICE BofA MOVE Index | diff_1                  0.000073         0.000059            1.236           0.216
+L4.WTI Crude Oil Futures | log_return            0.013018         0.010439            1.247           0.212
+L4.Silver Futures | log_return                  -0.000166         0.018430           -0.009           0.993
+L4.Copper Futures | log_return                   0.027805         0.014092            1.973           0.048
+L4.US 10Y Treasury Yield | diff_1                0.002945         0.004564            0.645           0.519
+L4.US 3M Treasury Yield | diff_1                -0.005689         0.004510           -1.262           0.207
+L5.Gold Futures (COMEX) | log_return            -0.034501         0.032205           -1.071           0.284
+L5.U.S. Dollar Index | log_return                0.048068         0.050311            0.955           0.339
+L5.USD / JPY Exchange Rate | log_return         -0.114781         0.031474           -3.647           0.000
+L5.S&P 500 | log_return                          0.018578         0.034993            0.531           0.595
+L5.CBOE Volatility Index | diff_1                0.000109         0.000217            0.502           0.616
+L5.ICE BofA MOVE Index | diff_1                  0.000184         0.000059            3.102           0.002
+L5.WTI Crude Oil Futures | log_return           -0.013030         0.010437           -1.248           0.212
+L5.Silver Futures | log_return                   0.022324         0.018473            1.208           0.227
+L5.Copper Futures | log_return                  -0.004878         0.014080           -0.346           0.729
+L5.US 10Y Treasury Yield | diff_1               -0.008874         0.004563           -1.945           0.052
+L5.US 3M Treasury Yield | diff_1                 0.008507         0.004512            1.885           0.059
+L6.Gold Futures (COMEX) | log_return            -0.063005         0.032115           -1.962           0.050
+L6.U.S. Dollar Index | log_return               -0.010624         0.050297           -0.211           0.833
+L6.USD / JPY Exchange Rate | log_return         -0.006854         0.031536           -0.217           0.828
+L6.S&P 500 | log_return                          0.029905         0.034941            0.856           0.392
+L6.CBOE Volatility Index | diff_1                0.000128         0.000218            0.589           0.556
+L6.ICE BofA MOVE Index | diff_1                  0.000070         0.000060            1.173           0.241
+L6.WTI Crude Oil Futures | log_return            0.008249         0.010416            0.792           0.428
+L6.Silver Futures | log_return                   0.023919         0.018408            1.299           0.194
+L6.Copper Futures | log_return                   0.002745         0.014086            0.195           0.845
+L6.US 10Y Treasury Yield | diff_1                0.001725         0.004572            0.377           0.706
+L6.US 3M Treasury Yield | diff_1                -0.006827         0.004502           -1.516           0.129
+L7.Gold Futures (COMEX) | log_return            -0.111359         0.032087           -3.470           0.001
+L7.U.S. Dollar Index | log_return               -0.105025         0.050172           -2.093           0.036
+L7.USD / JPY Exchange Rate | log_return         -0.004837         0.031580           -0.153           0.878
+L7.S&P 500 | log_return                         -0.029382         0.034771           -0.845           0.398
+L7.CBOE Volatility Index | diff_1                0.000139         0.000215            0.644           0.520
+L7.ICE BofA MOVE Index | diff_1                  0.000038         0.000059            0.638           0.524
+L7.WTI Crude Oil Futures | log_return            0.007995         0.010395            0.769           0.442
+L7.Silver Futures | log_return                   0.036384         0.018372            1.980           0.048
+L7.Copper Futures | log_return                  -0.008219         0.014096           -0.583           0.560
+L7.US 10Y Treasury Yield | diff_1                0.003424         0.004560            0.751           0.453
+L7.US 3M Treasury Yield | diff_1                -0.001036         0.004525           -0.229           0.819
+L8.Gold Futures (COMEX) | log_return            -0.024745         0.032010           -0.773           0.439
+L8.U.S. Dollar Index | log_return               -0.027192         0.050109           -0.543           0.587
+L8.USD / JPY Exchange Rate | log_return          0.037850         0.031655            1.196           0.232
+L8.S&P 500 | log_return                         -0.026192         0.034571           -0.758           0.449
+L8.CBOE Volatility Index | diff_1               -0.000537         0.000214           -2.506           0.012
+L8.ICE BofA MOVE Index | diff_1                  0.000100         0.000059            1.694           0.090
+L8.WTI Crude Oil Futures | log_return           -0.024589         0.010390           -2.367           0.018
+L8.Silver Futures | log_return                  -0.007318         0.018362           -0.399           0.690
+L8.Copper Futures | log_return                   0.007888         0.014086            0.560           0.575
+L8.US 10Y Treasury Yield | diff_1               -0.011698         0.004565           -2.562           0.010
+L8.US 3M Treasury Yield | diff_1                 0.010613         0.004547            2.334           0.020
+L9.Gold Futures (COMEX) | log_return             0.021356         0.031798            0.672           0.502
+L9.U.S. Dollar Index | log_return                0.047603         0.050123            0.950           0.342
+L9.USD / JPY Exchange Rate | log_return          0.007672         0.031508            0.243           0.808
+L9.S&P 500 | log_return                         -0.057906         0.034621           -1.673           0.094
+L9.CBOE Volatility Index | diff_1               -0.000211         0.000214           -0.988           0.323
+L9.ICE BofA MOVE Index | diff_1                  0.000105         0.000059            1.771           0.077
+L9.WTI Crude Oil Futures | log_return            0.036933         0.010390            3.555           0.000
+L9.Silver Futures | log_return                  -0.039566         0.018305           -2.161           0.031
+L9.Copper Futures | log_return                   0.022392         0.014107            1.587           0.112
+L9.US 10Y Treasury Yield | diff_1               -0.004923         0.004569           -1.078           0.281
+L9.US 3M Treasury Yield | diff_1                 0.002378         0.004541            0.524           0.600
+L10.Gold Futures (COMEX) | log_return            0.051497         0.031542            1.633           0.103
+L10.U.S. Dollar Index | log_return               0.045845         0.049644            0.923           0.356
+L10.USD / JPY Exchange Rate | log_return        -0.023288         0.028243           -0.825           0.410
+L10.S&P 500 | log_return                        -0.018894         0.034306           -0.551           0.582
+L10.CBOE Volatility Index | diff_1              -0.000494         0.000211           -2.338           0.019
+L10.ICE BofA MOVE Index | diff_1                -0.000238         0.000059           -4.067           0.000
+L10.WTI Crude Oil Futures | log_return           0.000322         0.010378            0.031           0.975
+L10.Silver Futures | log_return                 -0.043570         0.018110           -2.406           0.016
+L10.Copper Futures | log_return                  0.004272         0.014038            0.304           0.761
+L10.US 10Y Treasury Yield | diff_1              -0.004082         0.004548           -0.897           0.369
+L10.US 3M Treasury Yield | diff_1               -0.003386         0.004531           -0.747           0.455
+===========================================================================================================
+
+Results for equation CBOE Volatility Index | diff_1
+===========================================================================================================
+                                              coefficient       std. error           t-stat            prob
+-----------------------------------------------------------------------------------------------------------
+const                                           -0.004095         0.030819           -0.133           0.894
+L1.Gold Futures (COMEX) | log_return             3.270253         4.911130            0.666           0.505
+L1.U.S. Dollar Index | log_return               -8.847525         7.375348           -1.200           0.230
+L1.USD / JPY Exchange Rate | log_return          2.070926         4.483925            0.462           0.644
+L1.S&P 500 | log_return                         -3.921480         5.224563           -0.751           0.453
+L1.CBOE Volatility Index | diff_1               -0.153113         0.032774           -4.672           0.000
+L1.ICE BofA MOVE Index | diff_1                  0.016986         0.008904            1.908           0.056
+L1.WTI Crude Oil Futures | log_return            3.460306         1.584069            2.184           0.029
+L1.Silver Futures | log_return                  -0.486876         2.799497           -0.174           0.862
+L1.Copper Futures | log_return                  -5.515184         2.138680           -2.579           0.010
+L1.US 10Y Treasury Yield | diff_1                0.326845         0.673126            0.486           0.627
+L1.US 3M Treasury Yield | diff_1                 1.046648         0.680895            1.537           0.124
+L2.Gold Futures (COMEX) | log_return             2.407663         4.917101            0.490           0.624
+L2.U.S. Dollar Index | log_return               12.671838         7.640984            1.658           0.097
+L2.USD / JPY Exchange Rate | log_return          3.947190         4.748888            0.831           0.406
+L2.S&P 500 | log_return                          2.624639         5.317632            0.494           0.622
+L2.CBOE Volatility Index | diff_1               -0.127911         0.033202           -3.852           0.000
+L2.ICE BofA MOVE Index | diff_1                  0.007649         0.008933            0.856           0.392
+L2.WTI Crude Oil Futures | log_return            0.883698         1.584855            0.558           0.577
+L2.Silver Futures | log_return                  -1.962648         2.799364           -0.701           0.483
+L2.Copper Futures | log_return                   0.372642         2.146191            0.174           0.862
+L2.US 10Y Treasury Yield | diff_1               -1.478612         0.691302           -2.139           0.032
+L2.US 3M Treasury Yield | diff_1                 0.932585         0.687850            1.356           0.175
+L3.Gold Futures (COMEX) | log_return            -6.514386         4.926065           -1.322           0.186
+L3.U.S. Dollar Index | log_return                0.540114         7.614305            0.071           0.943
+L3.USD / JPY Exchange Rate | log_return         -1.060630         4.757805           -0.223           0.824
+L3.S&P 500 | log_return                          3.016424         5.316493            0.567           0.570
+L3.CBOE Volatility Index | diff_1               -0.041910         0.033328           -1.257           0.209
+L3.ICE BofA MOVE Index | diff_1                 -0.009524         0.009006           -1.058           0.290
+L3.WTI Crude Oil Futures | log_return           -2.094753         1.582301           -1.324           0.186
+L3.Silver Futures | log_return                   2.247333         2.804596            0.801           0.423
+L3.Copper Futures | log_return                  -1.985270         2.140007           -0.928           0.354
+L3.US 10Y Treasury Yield | diff_1                0.900918         0.692024            1.302           0.193
+L3.US 3M Treasury Yield | diff_1                -1.056755         0.686903           -1.538           0.124
+L4.Gold Futures (COMEX) | log_return             5.917131         4.906321            1.206           0.228
+L4.U.S. Dollar Index | log_return               14.102963         7.621270            1.850           0.064
+L4.USD / JPY Exchange Rate | log_return         -3.566697         4.783137           -0.746           0.456
+L4.S&P 500 | log_return                         -0.644683         5.319186           -0.121           0.904
+L4.CBOE Volatility Index | diff_1               -0.107931         0.032976           -3.273           0.001
+L4.ICE BofA MOVE Index | diff_1                  0.014465         0.008990            1.609           0.108
+L4.WTI Crude Oil Futures | log_return           -0.721007         1.586317           -0.455           0.649
+L4.Silver Futures | log_return                  -1.104052         2.800605           -0.394           0.693
+L4.Copper Futures | log_return                  -3.158473         2.141410           -1.475           0.140
+L4.US 10Y Treasury Yield | diff_1               -0.875177         0.693616           -1.262           0.207
+L4.US 3M Treasury Yield | diff_1                 1.591053         0.685311            2.322           0.020
+L5.Gold Futures (COMEX) | log_return             1.086413         4.893890            0.222           0.824
+L5.U.S. Dollar Index | log_return               -7.942999         7.645268           -1.039           0.299
+L5.USD / JPY Exchange Rate | log_return         11.319302         4.782813            2.367           0.018
+L5.S&P 500 | log_return                          1.305429         5.317555            0.245           0.806
+L5.CBOE Volatility Index | diff_1                0.000063         0.032991            0.002           0.998
+L5.ICE BofA MOVE Index | diff_1                 -0.035492         0.009026           -3.932           0.000
+L5.WTI Crude Oil Futures | log_return            1.282610         1.586086            0.809           0.419
+L5.Silver Futures | log_return                  -0.753725         2.807195           -0.268           0.788
+L5.Copper Futures | log_return                  -0.472878         2.139661           -0.221           0.825
+L5.US 10Y Treasury Yield | diff_1                2.158127         0.693345            3.113           0.002
+L5.US 3M Treasury Yield | diff_1                -1.286185         0.685617           -1.876           0.061
+L6.Gold Futures (COMEX) | log_return             6.971853         4.880243            1.429           0.153
+L6.U.S. Dollar Index | log_return               -2.908112         7.643165           -0.380           0.704
+L6.USD / JPY Exchange Rate | log_return          7.897569         4.792220            1.648           0.099
+L6.S&P 500 | log_return                         -4.973563         5.309602           -0.937           0.349
+L6.CBOE Volatility Index | diff_1               -0.036098         0.033057           -1.092           0.275
+L6.ICE BofA MOVE Index | diff_1                 -0.006617         0.009056           -0.731           0.465
+L6.WTI Crude Oil Futures | log_return           -1.169134         1.582884           -0.739           0.460
+L6.Silver Futures | log_return                  -1.737443         2.797251           -0.621           0.535
+L6.Copper Futures | log_return                  -0.114098         2.140542           -0.053           0.957
+L6.US 10Y Treasury Yield | diff_1               -0.230978         0.694809           -0.332           0.740
+L6.US 3M Treasury Yield | diff_1                 1.799957         0.684178            2.631           0.009
+L7.Gold Futures (COMEX) | log_return            19.453618         4.876048            3.990           0.000
+L7.U.S. Dollar Index | log_return               10.164533         7.624113            1.333           0.182
+L7.USD / JPY Exchange Rate | log_return          9.914605         4.798953            2.066           0.039
+L7.S&P 500 | log_return                          3.710286         5.283804            0.702           0.483
+L7.CBOE Volatility Index | diff_1               -0.070463         0.032741           -2.152           0.031
+L7.ICE BofA MOVE Index | diff_1                 -0.017613         0.009015           -1.954           0.051
+L7.WTI Crude Oil Futures | log_return           -1.094433         1.579601           -0.693           0.488
+L7.Silver Futures | log_return                  -7.176846         2.791763           -2.571           0.010
+L7.Copper Futures | log_return                   0.196829         2.142005            0.092           0.927
+L7.US 10Y Treasury Yield | diff_1               -0.296023         0.692925           -0.427           0.669
+L7.US 3M Treasury Yield | diff_1                -0.116823         0.687675           -0.170           0.865
+L8.Gold Futures (COMEX) | log_return             6.585098         4.864272            1.354           0.176
+L8.U.S. Dollar Index | log_return               -0.896096         7.614585           -0.118           0.906
+L8.USD / JPY Exchange Rate | log_return         -4.910806         4.810399           -1.021           0.307
+L8.S&P 500 | log_return                          4.468371         5.253476            0.851           0.395
+L8.CBOE Volatility Index | diff_1                0.037004         0.032566            1.136           0.256
+L8.ICE BofA MOVE Index | diff_1                 -0.013719         0.009013           -1.522           0.128
+L8.WTI Crude Oil Futures | log_return            2.999150         1.578905            1.900           0.057
+L8.Silver Futures | log_return                  -1.786244         2.790362           -0.640           0.522
+L8.Copper Futures | log_return                  -0.678688         2.140452           -0.317           0.751
+L8.US 10Y Treasury Yield | diff_1                0.617912         0.693724            0.891           0.373
+L8.US 3M Treasury Yield | diff_1                -1.313088         0.691004           -1.900           0.057
+L9.Gold Futures (COMEX) | log_return            -6.539188         4.832115           -1.353           0.176
+L9.U.S. Dollar Index | log_return               -5.094660         7.616790           -0.669           0.504
+L9.USD / JPY Exchange Rate | log_return         -3.740793         4.788038           -0.781           0.435
+L9.S&P 500 | log_return                         14.105206         5.261040            2.681           0.007
+L9.CBOE Volatility Index | diff_1                0.034894         0.032515            1.073           0.283
+L9.ICE BofA MOVE Index | diff_1                 -0.007739         0.009003           -0.860           0.390
+L9.WTI Crude Oil Futures | log_return           -5.195996         1.578805           -3.291           0.001
+L9.Silver Futures | log_return                   4.549199         2.781708            1.635           0.102
+L9.Copper Futures | log_return                  -0.839142         2.143777           -0.391           0.695
+L9.US 10Y Treasury Yield | diff_1                0.098727         0.694288            0.142           0.887
+L9.US 3M Treasury Yield | diff_1                -0.627650         0.689998           -0.910           0.363
+L10.Gold Futures (COMEX) | log_return           -6.017228         4.793109           -1.255           0.209
+L10.U.S. Dollar Index | log_return              -5.216679         7.544017           -0.691           0.489
+L10.USD / JPY Exchange Rate | log_return         1.596440         4.291775            0.372           0.710
+L10.S&P 500 | log_return                         8.911900         5.213116            1.710           0.087
+L10.CBOE Volatility Index | diff_1               0.114163         0.032096            3.557           0.000
+L10.ICE BofA MOVE Index | diff_1                 0.031925         0.008910            3.583           0.000
+L10.WTI Crude Oil Futures | log_return           2.037427         1.576977            1.292           0.196
+L10.Silver Futures | log_return                  5.083287         2.752053            1.847           0.065
+L10.Copper Futures | log_return                  0.344330         2.133158            0.161           0.872
+L10.US 10Y Treasury Yield | diff_1               0.819780         0.691132            1.186           0.236
+L10.US 3M Treasury Yield | diff_1               -0.659675         0.688521           -0.958           0.338
+===========================================================================================================
+
+Results for equation ICE BofA MOVE Index | diff_1
+===========================================================================================================
+                                              coefficient       std. error           t-stat            prob
+-----------------------------------------------------------------------------------------------------------
+const                                            0.008266         0.064217            0.129           0.898
+L1.Gold Futures (COMEX) | log_return            22.924526        10.233344            2.240           0.025
+L1.U.S. Dollar Index | log_return                8.442269        15.368045            0.549           0.583
+L1.USD / JPY Exchange Rate | log_return         -0.891991         9.343175           -0.095           0.924
+L1.S&P 500 | log_return                        -32.521101        10.886446           -2.987           0.003
+L1.CBOE Volatility Index | diff_1                0.090966         0.068291            1.332           0.183
+L1.ICE BofA MOVE Index | diff_1                  0.036128         0.018554            1.947           0.052
+L1.WTI Crude Oil Futures | log_return            6.062271         3.300731            1.837           0.066
+L1.Silver Futures | log_return                  -4.383385         5.833325           -0.751           0.452
+L1.Copper Futures | log_return                  -0.655037         4.456377           -0.147           0.883
+L1.US 10Y Treasury Yield | diff_1                5.597781         1.402595            3.991           0.000
+L1.US 3M Treasury Yield | diff_1                -5.026802         1.418785           -3.543           0.000
+L2.Gold Futures (COMEX) | log_return            -0.984315        10.245785           -0.096           0.923
+L2.U.S. Dollar Index | log_return               18.596605        15.921554            1.168           0.243
+L2.USD / JPY Exchange Rate | log_return         14.537484         9.895279            1.469           0.142
+L2.S&P 500 | log_return                         -7.776209        11.080373           -0.702           0.483
+L2.CBOE Volatility Index | diff_1               -0.012327         0.069183           -0.178           0.859
+L2.ICE BofA MOVE Index | diff_1                 -0.073325         0.018614           -3.939           0.000
+L2.WTI Crude Oil Futures | log_return           -1.409524         3.302369           -0.427           0.670
+L2.Silver Futures | log_return                   8.759631         5.833047            1.502           0.133
+L2.Copper Futures | log_return                  -2.518016         4.472028           -0.563           0.573
+L2.US 10Y Treasury Yield | diff_1               -3.448260         1.440469           -2.394           0.017
+L2.US 3M Treasury Yield | diff_1                 2.559129         1.433275            1.786           0.074
+L3.Gold Futures (COMEX) | log_return           -16.474000        10.264465           -1.605           0.109
+L3.U.S. Dollar Index | log_return               -5.049735        15.865962           -0.318           0.750
+L3.USD / JPY Exchange Rate | log_return         37.510786         9.913859            3.784           0.000
+L3.S&P 500 | log_return                        -15.386123        11.078001           -1.389           0.165
+L3.CBOE Volatility Index | diff_1                0.033830         0.069446            0.487           0.626
+L3.ICE BofA MOVE Index | diff_1                 -0.014481         0.018765           -0.772           0.440
+L3.WTI Crude Oil Futures | log_return            0.321489         3.297048            0.098           0.922
+L3.Silver Futures | log_return                  14.966584         5.843949            2.561           0.010
+L3.Copper Futures | log_return                  -8.161872         4.459142           -1.830           0.067
+L3.US 10Y Treasury Yield | diff_1               -0.691570         1.441973           -0.480           0.632
+L3.US 3M Treasury Yield | diff_1                 1.083539         1.431303            0.757           0.449
+L4.Gold Futures (COMEX) | log_return            13.379055        10.223323            1.309           0.191
+L4.U.S. Dollar Index | log_return              -37.435068        15.880476           -2.357           0.018
+L4.USD / JPY Exchange Rate | log_return         19.867525         9.966644            1.993           0.046
+L4.S&P 500 | log_return                        -20.143750        11.083612           -1.817           0.069
+L4.CBOE Volatility Index | diff_1                0.023695         0.068711            0.345           0.730
+L4.ICE BofA MOVE Index | diff_1                 -0.026343         0.018733           -1.406           0.160
+L4.WTI Crude Oil Futures | log_return            2.273855         3.305416            0.688           0.492
+L4.Silver Futures | log_return                 -15.359189         5.835632           -2.632           0.008
+L4.Copper Futures | log_return                   6.026317         4.462066            1.351           0.177
+L4.US 10Y Treasury Yield | diff_1               -3.640144         1.445292           -2.519           0.012
+L4.US 3M Treasury Yield | diff_1                 0.399428         1.427987            0.280           0.780
+L5.Gold Futures (COMEX) | log_return             1.757226        10.197422            0.172           0.863
+L5.U.S. Dollar Index | log_return                2.867104        15.930480            0.180           0.857
+L5.USD / JPY Exchange Rate | log_return          1.288385         9.965970            0.129           0.897
+L5.S&P 500 | log_return                         -1.268885        11.080213           -0.115           0.909
+L5.CBOE Volatility Index | diff_1                0.048959         0.068743            0.712           0.476
+L5.ICE BofA MOVE Index | diff_1                 -0.056918         0.018807           -3.026           0.002
+L5.WTI Crude Oil Futures | log_return            1.939368         3.304935            0.587           0.557
+L5.Silver Futures | log_return                  -1.309369         5.849365           -0.224           0.823
+L5.Copper Futures | log_return                   0.113203         4.458421            0.025           0.980
+L5.US 10Y Treasury Yield | diff_1               -2.367839         1.444727           -1.639           0.101
+L5.US 3M Treasury Yield | diff_1                 1.297028         1.428623            0.908           0.364
+L6.Gold Futures (COMEX) | log_return             9.900789        10.168985            0.974           0.330
+L6.U.S. Dollar Index | log_return                8.912562        15.926098            0.560           0.576
+L6.USD / JPY Exchange Rate | log_return        -26.562825         9.985570           -2.660           0.008
+L6.S&P 500 | log_return                          7.456193        11.063641            0.674           0.500
+L6.CBOE Volatility Index | diff_1                0.075283         0.068881            1.093           0.274
+L6.ICE BofA MOVE Index | diff_1                 -0.041023         0.018869           -2.174           0.030
+L6.WTI Crude Oil Futures | log_return            5.147557         3.298262            1.561           0.119
+L6.Silver Futures | log_return                  -5.511907         5.828644           -0.946           0.344
+L6.Copper Futures | log_return                 -12.398728         4.460257           -2.780           0.005
+L6.US 10Y Treasury Yield | diff_1               -0.240159         1.447776           -0.166           0.868
+L6.US 3M Treasury Yield | diff_1                 1.914206         1.425625            1.343           0.179
+L7.Gold Futures (COMEX) | log_return            16.638324        10.160243            1.638           0.102
+L7.U.S. Dollar Index | log_return               27.334881        15.886399            1.721           0.085
+L7.USD / JPY Exchange Rate | log_return        -28.553574         9.999601           -2.855           0.004
+L7.S&P 500 | log_return                          0.927749        11.009887            0.084           0.933
+L7.CBOE Volatility Index | diff_1                0.068990         0.068222            1.011           0.312
+L7.ICE BofA MOVE Index | diff_1                 -0.000843         0.018785           -0.045           0.964
+L7.WTI Crude Oil Futures | log_return           -5.210150         3.291422           -1.583           0.113
+L7.Silver Futures | log_return                   0.419929         5.817210            0.072           0.942
+L7.Copper Futures | log_return                  -1.321716         4.463305           -0.296           0.767
+L7.US 10Y Treasury Yield | diff_1                1.550710         1.443851            1.074           0.283
+L7.US 3M Treasury Yield | diff_1                 2.865800         1.432912            2.000           0.046
+L8.Gold Futures (COMEX) | log_return             5.178483        10.135705            0.511           0.609
+L8.U.S. Dollar Index | log_return               18.328617        15.866545            1.155           0.248
+L8.USD / JPY Exchange Rate | log_return        -10.546946        10.023450           -1.052           0.293
+L8.S&P 500 | log_return                          8.991913        10.946693            0.821           0.411
+L8.CBOE Volatility Index | diff_1                0.024029         0.067859            0.354           0.723
+L8.ICE BofA MOVE Index | diff_1                 -0.001435         0.018780           -0.076           0.939
+L8.WTI Crude Oil Futures | log_return           -1.628386         3.289971           -0.495           0.621
+L8.Silver Futures | log_return                   6.393731         5.814291            1.100           0.271
+L8.Copper Futures | log_return                  -4.419140         4.460070           -0.991           0.322
+L8.US 10Y Treasury Yield | diff_1                1.663268         1.445516            1.151           0.250
+L8.US 3M Treasury Yield | diff_1                -2.124043         1.439848           -1.475           0.140
+L9.Gold Futures (COMEX) | log_return           -27.754919        10.068701           -2.757           0.006
+L9.U.S. Dollar Index | log_return              -10.487241        15.871139           -0.661           0.509
+L9.USD / JPY Exchange Rate | log_return          7.934272         9.976857            0.795           0.426
+L9.S&P 500 | log_return                         11.599544        10.962453            1.058           0.290
+L9.CBOE Volatility Index | diff_1                0.020417         0.067751            0.301           0.763
+L9.ICE BofA MOVE Index | diff_1                  0.048403         0.018759            2.580           0.010
+L9.WTI Crude Oil Futures | log_return           -4.851299         3.289762           -1.475           0.140
+L9.Silver Futures | log_return                  10.248017         5.796258            1.768           0.077
+L9.Copper Futures | log_return                   4.421832         4.466997            0.990           0.322
+L9.US 10Y Treasury Yield | diff_1               -1.824756         1.446690           -1.261           0.207
+L9.US 3M Treasury Yield | diff_1                -2.749534         1.437753           -1.912           0.056
+L10.Gold Futures (COMEX) | log_return           -4.750143         9.987423           -0.476           0.634
+L10.U.S. Dollar Index | log_return              -3.190994        15.719503           -0.203           0.839
+L10.USD / JPY Exchange Rate | log_return       -10.071179         8.942791           -1.126           0.260
+L10.S&P 500 | log_return                        -8.352409        10.862593           -0.769           0.442
+L10.CBOE Volatility Index | diff_1               0.017025         0.066879            0.255           0.799
+L10.ICE BofA MOVE Index | diff_1                 0.034688         0.018567            1.868           0.062
+L10.WTI Crude Oil Futures | log_return           1.899531         3.285955            0.578           0.563
+L10.Silver Futures | log_return                  4.955313         5.734466            0.864           0.388
+L10.Copper Futures | log_return                 -7.651925         4.444870           -1.722           0.085
+L10.US 10Y Treasury Yield | diff_1               1.355353         1.440114            0.941           0.347
+L10.US 3M Treasury Yield | diff_1               -3.444934         1.434675           -2.401           0.016
+===========================================================================================================
+
+Results for equation WTI Crude Oil Futures | log_return
+===========================================================================================================
+                                              coefficient       std. error           t-stat            prob
+-----------------------------------------------------------------------------------------------------------
+const                                           -0.000068         0.000399           -0.170           0.865
+L1.Gold Futures (COMEX) | log_return             0.082522         0.063548            1.299           0.194
+L1.U.S. Dollar Index | log_return                0.153472         0.095434            1.608           0.108
+L1.USD / JPY Exchange Rate | log_return          0.008950         0.058020            0.154           0.877
+L1.S&P 500 | log_return                          0.248608         0.067604            3.677           0.000
+L1.CBOE Volatility Index | diff_1                0.000377         0.000424            0.890           0.374
+L1.ICE BofA MOVE Index | diff_1                  0.000266         0.000115            2.310           0.021
+L1.WTI Crude Oil Futures | log_return           -0.062794         0.020497           -3.064           0.002
+L1.Silver Futures | log_return                  -0.031948         0.036224           -0.882           0.378
+L1.Copper Futures | log_return                  -0.029454         0.027674           -1.064           0.287
+L1.US 10Y Treasury Yield | diff_1               -0.013200         0.008710           -1.515           0.130
+L1.US 3M Treasury Yield | diff_1                 0.029915         0.008811            3.395           0.001
+L2.Gold Futures (COMEX) | log_return             0.022085         0.063625            0.347           0.729
+L2.U.S. Dollar Index | log_return                0.148187         0.098871            1.499           0.134
+L2.USD / JPY Exchange Rate | log_return         -0.008199         0.061449           -0.133           0.894
+L2.S&P 500 | log_return                         -0.028711         0.068808           -0.417           0.676
+L2.CBOE Volatility Index | diff_1               -0.000696         0.000430           -1.620           0.105
+L2.ICE BofA MOVE Index | diff_1                  0.000081         0.000116            0.705           0.481
+L2.WTI Crude Oil Futures | log_return           -0.034684         0.020507           -1.691           0.091
+L2.Silver Futures | log_return                   0.077225         0.036223            2.132           0.033
+L2.Copper Futures | log_return                  -0.001740         0.027771           -0.063           0.950
+L2.US 10Y Treasury Yield | diff_1               -0.015731         0.008945           -1.759           0.079
+L2.US 3M Treasury Yield | diff_1                -0.011037         0.008900           -1.240           0.215
+L3.Gold Futures (COMEX) | log_return             0.054299         0.063741            0.852           0.394
+L3.U.S. Dollar Index | log_return               -0.099688         0.098526           -1.012           0.312
+L3.USD / JPY Exchange Rate | log_return          0.192882         0.061564            3.133           0.002
+L3.S&P 500 | log_return                         -0.038321         0.068793           -0.557           0.577
+L3.CBOE Volatility Index | diff_1               -0.000111         0.000431           -0.257           0.797
+L3.ICE BofA MOVE Index | diff_1                  0.000243         0.000117            2.082           0.037
+L3.WTI Crude Oil Futures | log_return            0.054269         0.020474            2.651           0.008
+L3.Silver Futures | log_return                  -0.018546         0.036290           -0.511           0.609
+L3.Copper Futures | log_return                  -0.050753         0.027691           -1.833           0.067
+L3.US 10Y Treasury Yield | diff_1               -0.004343         0.008955           -0.485           0.628
+L3.US 3M Treasury Yield | diff_1                -0.004648         0.008888           -0.523           0.601
+L4.Gold Futures (COMEX) | log_return            -0.064250         0.063486           -1.012           0.312
+L4.U.S. Dollar Index | log_return               -0.297384         0.098616           -3.016           0.003
+L4.USD / JPY Exchange Rate | log_return          0.119698         0.061892            1.934           0.053
+L4.S&P 500 | log_return                          0.055775         0.068828            0.810           0.418
+L4.CBOE Volatility Index | diff_1                0.000849         0.000427            1.989           0.047
+L4.ICE BofA MOVE Index | diff_1                 -0.000150         0.000116           -1.293           0.196
+L4.WTI Crude Oil Futures | log_return            0.023468         0.020526            1.143           0.253
+L4.Silver Futures | log_return                  -0.024746         0.036239           -0.683           0.495
+L4.Copper Futures | log_return                   0.058489         0.027709            2.111           0.035
+L4.US 10Y Treasury Yield | diff_1               -0.003717         0.008975           -0.414           0.679
+L4.US 3M Treasury Yield | diff_1                 0.012571         0.008868            1.418           0.156
+L5.Gold Futures (COMEX) | log_return             0.022954         0.063325            0.362           0.717
+L5.U.S. Dollar Index | log_return               -0.059761         0.098927           -0.604           0.546
+L5.USD / JPY Exchange Rate | log_return          0.066233         0.061888            1.070           0.285
+L5.S&P 500 | log_return                          0.071395         0.068807            1.038           0.299
+L5.CBOE Volatility Index | diff_1                0.000893         0.000427            2.092           0.036
+L5.ICE BofA MOVE Index | diff_1                  0.000038         0.000117            0.327           0.744
+L5.WTI Crude Oil Futures | log_return           -0.005888         0.020523           -0.287           0.774
+L5.Silver Futures | log_return                  -0.060770         0.036324           -1.673           0.094
+L5.Copper Futures | log_return                   0.007189         0.027686            0.260           0.795
+L5.US 10Y Treasury Yield | diff_1               -0.004166         0.008972           -0.464           0.642
+L5.US 3M Treasury Yield | diff_1                -0.018804         0.008872           -2.120           0.034
+L6.Gold Futures (COMEX) | log_return            -0.089299         0.063148           -1.414           0.157
+L6.U.S. Dollar Index | log_return                0.036155         0.098899            0.366           0.715
+L6.USD / JPY Exchange Rate | log_return         -0.003853         0.062009           -0.062           0.950
+L6.S&P 500 | log_return                          0.012219         0.068704            0.178           0.859
+L6.CBOE Volatility Index | diff_1               -0.000315         0.000428           -0.736           0.462
+L6.ICE BofA MOVE Index | diff_1                  0.000026         0.000117            0.219           0.827
+L6.WTI Crude Oil Futures | log_return            0.008053         0.020482            0.393           0.694
+L6.Silver Futures | log_return                   0.027269         0.036195            0.753           0.451
+L6.Copper Futures | log_return                   0.003530         0.027698            0.127           0.899
+L6.US 10Y Treasury Yield | diff_1               -0.005605         0.008991           -0.623           0.533
+L6.US 3M Treasury Yield | diff_1                -0.016229         0.008853           -1.833           0.067
+L7.Gold Futures (COMEX) | log_return            -0.161335         0.063094           -2.557           0.011
+L7.U.S. Dollar Index | log_return               -0.035860         0.098653           -0.364           0.716
+L7.USD / JPY Exchange Rate | log_return         -0.003178         0.062097           -0.051           0.959
+L7.S&P 500 | log_return                         -0.150023         0.068370           -2.194           0.028
+L7.CBOE Volatility Index | diff_1               -0.000352         0.000424           -0.830           0.406
+L7.ICE BofA MOVE Index | diff_1                  0.000009         0.000117            0.075           0.940
+L7.WTI Crude Oil Futures | log_return            0.000371         0.020439            0.018           0.986
+L7.Silver Futures | log_return                   0.122575         0.036124            3.393           0.001
+L7.Copper Futures | log_return                  -0.041950         0.027717           -1.514           0.130
+L7.US 10Y Treasury Yield | diff_1                0.010019         0.008966            1.117           0.264
+L7.US 3M Treasury Yield | diff_1                 0.017407         0.008898            1.956           0.050
+L8.Gold Futures (COMEX) | log_return            -0.074784         0.062942           -1.188           0.235
+L8.U.S. Dollar Index | log_return               -0.070471         0.098530           -0.715           0.474
+L8.USD / JPY Exchange Rate | log_return         -0.053922         0.062245           -0.866           0.386
+L8.S&P 500 | log_return                         -0.167808         0.067978           -2.469           0.014
+L8.CBOE Volatility Index | diff_1               -0.000412         0.000421           -0.977           0.329
+L8.ICE BofA MOVE Index | diff_1                 -0.000246         0.000117           -2.108           0.035
+L8.WTI Crude Oil Futures | log_return           -0.015271         0.020430           -0.747           0.455
+L8.Silver Futures | log_return                  -0.001077         0.036106           -0.030           0.976
+L8.Copper Futures | log_return                   0.087442         0.027697            3.157           0.002
+L8.US 10Y Treasury Yield | diff_1                0.014270         0.008977            1.590           0.112
+L8.US 3M Treasury Yield | diff_1                 0.011318         0.008941            1.266           0.206
+L9.Gold Futures (COMEX) | log_return             0.040697         0.062526            0.651           0.515
+L9.U.S. Dollar Index | log_return                0.049815         0.098558            0.505           0.613
+L9.USD / JPY Exchange Rate | log_return         -0.138398         0.061955           -2.234           0.025
+L9.S&P 500 | log_return                         -0.071577         0.068076           -1.051           0.293
+L9.CBOE Volatility Index | diff_1               -0.000689         0.000421           -1.637           0.102
+L9.ICE BofA MOVE Index | diff_1                 -0.000111         0.000116           -0.950           0.342
+L9.WTI Crude Oil Futures | log_return           -0.002394         0.020429           -0.117           0.907
+L9.Silver Futures | log_return                  -0.073198         0.035994           -2.034           0.042
+L9.Copper Futures | log_return                   0.050765         0.027740            1.830           0.067
+L9.US 10Y Treasury Yield | diff_1                0.003707         0.008984            0.413           0.680
+L9.US 3M Treasury Yield | diff_1                -0.015730         0.008928           -1.762           0.078
+L10.Gold Futures (COMEX) | log_return            0.011809         0.062021            0.190           0.849
+L10.U.S. Dollar Index | log_return               0.116201         0.097617            1.190           0.234
+L10.USD / JPY Exchange Rate | log_return         0.046503         0.055534            0.837           0.402
+L10.S&P 500 | log_return                         0.056300         0.067456            0.835           0.404
+L10.CBOE Volatility Index | diff_1               0.000124         0.000415            0.299           0.765
+L10.ICE BofA MOVE Index | diff_1                -0.000224         0.000115           -1.939           0.052
+L10.WTI Crude Oil Futures | log_return           0.001978         0.020405            0.097           0.923
+L10.Silver Futures | log_return                 -0.005949         0.035610           -0.167           0.867
+L10.Copper Futures | log_return                  0.010413         0.027602            0.377           0.706
+L10.US 10Y Treasury Yield | diff_1              -0.005439         0.008943           -0.608           0.543
+L10.US 3M Treasury Yield | diff_1                0.002639         0.008909            0.296           0.767
+===========================================================================================================
+
+Results for equation Silver Futures | log_return
+===========================================================================================================
+                                              coefficient       std. error           t-stat            prob
+-----------------------------------------------------------------------------------------------------------
+const                                            0.000210         0.000358            0.586           0.558
+L1.Gold Futures (COMEX) | log_return             0.074513         0.056974            1.308           0.191
+L1.U.S. Dollar Index | log_return               -0.258534         0.085561           -3.022           0.003
+L1.USD / JPY Exchange Rate | log_return          0.057095         0.052018            1.098           0.272
+L1.S&P 500 | log_return                          0.233129         0.060610            3.846           0.000
+L1.CBOE Volatility Index | diff_1               -0.000191         0.000380           -0.501           0.616
+L1.ICE BofA MOVE Index | diff_1                  0.000091         0.000103            0.882           0.378
+L1.WTI Crude Oil Futures | log_return            0.016162         0.018377            0.879           0.379
+L1.Silver Futures | log_return                  -0.085485         0.032477           -2.632           0.008
+L1.Copper Futures | log_return                  -0.052978         0.024811           -2.135           0.033
+L1.US 10Y Treasury Yield | diff_1               -0.033198         0.007809           -4.251           0.000
+L1.US 3M Treasury Yield | diff_1                 0.024785         0.007899            3.138           0.002
+L2.Gold Futures (COMEX) | log_return             0.051106         0.057043            0.896           0.370
+L2.U.S. Dollar Index | log_return                0.007643         0.088642            0.086           0.931
+L2.USD / JPY Exchange Rate | log_return         -0.053710         0.055091           -0.975           0.330
+L2.S&P 500 | log_return                          0.000826         0.061689            0.013           0.989
+L2.CBOE Volatility Index | diff_1               -0.000185         0.000385           -0.480           0.631
+L2.ICE BofA MOVE Index | diff_1                  0.000227         0.000104            2.186           0.029
+L2.WTI Crude Oil Futures | log_return           -0.034377         0.018386           -1.870           0.062
+L2.Silver Futures | log_return                  -0.011886         0.032475           -0.366           0.714
+L2.Copper Futures | log_return                   0.027944         0.024898            1.122           0.262
+L2.US 10Y Treasury Yield | diff_1               -0.007756         0.008020           -0.967           0.333
+L2.US 3M Treasury Yield | diff_1                -0.011187         0.007980           -1.402           0.161
+L3.Gold Futures (COMEX) | log_return             0.005594         0.057147            0.098           0.922
+L3.U.S. Dollar Index | log_return                0.108600         0.088333            1.229           0.219
+L3.USD / JPY Exchange Rate | log_return         -0.074830         0.055195           -1.356           0.175
+L3.S&P 500 | log_return                          0.096437         0.061676            1.564           0.118
+L3.CBOE Volatility Index | diff_1                0.000077         0.000387            0.200           0.842
+L3.ICE BofA MOVE Index | diff_1                  0.000158         0.000104            1.515           0.130
+L3.WTI Crude Oil Futures | log_return           -0.003927         0.018356           -0.214           0.831
+L3.Silver Futures | log_return                   0.004799         0.032536            0.147           0.883
+L3.Copper Futures | log_return                   0.010215         0.024826            0.411           0.681
+L3.US 10Y Treasury Yield | diff_1               -0.020727         0.008028           -2.582           0.010
+L3.US 3M Treasury Yield | diff_1                 0.001612         0.007969            0.202           0.840
+L4.Gold Futures (COMEX) | log_return            -0.091342         0.056918           -1.605           0.109
+L4.U.S. Dollar Index | log_return                0.050922         0.088414            0.576           0.565
+L4.USD / JPY Exchange Rate | log_return          0.018411         0.055489            0.332           0.740
+L4.S&P 500 | log_return                         -0.137429         0.061707           -2.227           0.026
+L4.CBOE Volatility Index | diff_1               -0.000448         0.000383           -1.171           0.242
+L4.ICE BofA MOVE Index | diff_1                 -0.000048         0.000104           -0.458           0.647
+L4.WTI Crude Oil Futures | log_return            0.016918         0.018403            0.919           0.358
+L4.Silver Futures | log_return                   0.022606         0.032490            0.696           0.487
+L4.Copper Futures | log_return                   0.020190         0.024842            0.813           0.416
+L4.US 10Y Treasury Yield | diff_1                0.015407         0.008047            1.915           0.056
+L4.US 3M Treasury Yield | diff_1                 0.005601         0.007950            0.705           0.481
+L5.Gold Futures (COMEX) | log_return             0.038386         0.056774            0.676           0.499
+L5.U.S. Dollar Index | log_return               -0.021603         0.088692           -0.244           0.808
+L5.USD / JPY Exchange Rate | log_return         -0.091203         0.055485           -1.644           0.100
+L5.S&P 500 | log_return                          0.106934         0.061688            1.733           0.083
+L5.CBOE Volatility Index | diff_1                0.000882         0.000383            2.304           0.021
+L5.ICE BofA MOVE Index | diff_1                  0.000076         0.000105            0.726           0.468
+L5.WTI Crude Oil Futures | log_return            0.000444         0.018400            0.024           0.981
+L5.Silver Futures | log_return                  -0.040462         0.032566           -1.242           0.214
+L5.Copper Futures | log_return                   0.065758         0.024822            2.649           0.008
+L5.US 10Y Treasury Yield | diff_1               -0.015421         0.008043           -1.917           0.055
+L5.US 3M Treasury Yield | diff_1                -0.007256         0.007954           -0.912           0.362
+L6.Gold Futures (COMEX) | log_return            -0.031998         0.056615           -0.565           0.572
+L6.U.S. Dollar Index | log_return                0.016809         0.088668            0.190           0.850
+L6.USD / JPY Exchange Rate | log_return         -0.071398         0.055594           -1.284           0.199
+L6.S&P 500 | log_return                          0.004137         0.061596            0.067           0.946
+L6.CBOE Volatility Index | diff_1               -0.000120         0.000383           -0.313           0.754
+L6.ICE BofA MOVE Index | diff_1                  0.000027         0.000105            0.262           0.794
+L6.WTI Crude Oil Futures | log_return           -0.005291         0.018363           -0.288           0.773
+L6.Silver Futures | log_return                  -0.020478         0.032451           -0.631           0.528
+L6.Copper Futures | log_return                   0.018381         0.024832            0.740           0.459
+L6.US 10Y Treasury Yield | diff_1                0.000915         0.008060            0.113           0.910
+L6.US 3M Treasury Yield | diff_1                 0.005269         0.007937            0.664           0.507
+L7.Gold Futures (COMEX) | log_return            -0.144003         0.056567           -2.546           0.011
+L7.U.S. Dollar Index | log_return                0.030473         0.088447            0.345           0.730
+L7.USD / JPY Exchange Rate | log_return         -0.010128         0.055672           -0.182           0.856
+L7.S&P 500 | log_return                          0.012430         0.061297            0.203           0.839
+L7.CBOE Volatility Index | diff_1                0.000231         0.000380            0.607           0.544
+L7.ICE BofA MOVE Index | diff_1                  0.000131         0.000105            1.256           0.209
+L7.WTI Crude Oil Futures | log_return           -0.009106         0.018325           -0.497           0.619
+L7.Silver Futures | log_return                   0.111339         0.032387            3.438           0.001
+L7.Copper Futures | log_return                  -0.025347         0.024849           -1.020           0.308
+L7.US 10Y Treasury Yield | diff_1                0.008068         0.008039            1.004           0.316
+L7.US 3M Treasury Yield | diff_1                -0.010054         0.007978           -1.260           0.208
+L8.Gold Futures (COMEX) | log_return            -0.078368         0.056430           -1.389           0.165
+L8.U.S. Dollar Index | log_return                0.046217         0.088336            0.523           0.601
+L8.USD / JPY Exchange Rate | log_return          0.023819         0.055805            0.427           0.670
+L8.S&P 500 | log_return                          0.109422         0.060945            1.795           0.073
+L8.CBOE Volatility Index | diff_1                0.000975         0.000378            2.580           0.010
+L8.ICE BofA MOVE Index | diff_1                 -0.000016         0.000105           -0.153           0.879
+L8.WTI Crude Oil Futures | log_return           -0.017008         0.018317           -0.929           0.353
+L8.Silver Futures | log_return                   0.014798         0.032371            0.457           0.648
+L8.Copper Futures | log_return                   0.063389         0.024831            2.553           0.011
+L8.US 10Y Treasury Yield | diff_1               -0.006103         0.008048           -0.758           0.448
+L8.US 3M Treasury Yield | diff_1                 0.016117         0.008016            2.011           0.044
+L9.Gold Futures (COMEX) | log_return             0.132902         0.056057            2.371           0.018
+L9.U.S. Dollar Index | log_return               -0.004567         0.088362           -0.052           0.959
+L9.USD / JPY Exchange Rate | log_return          0.035227         0.055546            0.634           0.526
+L9.S&P 500 | log_return                         -0.100388         0.061033           -1.645           0.100
+L9.CBOE Volatility Index | diff_1               -0.000495         0.000377           -1.312           0.190
+L9.ICE BofA MOVE Index | diff_1                  0.000012         0.000104            0.114           0.909
+L9.WTI Crude Oil Futures | log_return           -0.002543         0.018316           -0.139           0.890
+L9.Silver Futures | log_return                  -0.031818         0.032270           -0.986           0.324
+L9.Copper Futures | log_return                   0.004685         0.024870            0.188           0.851
+L9.US 10Y Treasury Yield | diff_1               -0.005891         0.008054           -0.731           0.465
+L9.US 3M Treasury Yield | diff_1                 0.002572         0.008005            0.321           0.748
+L10.Gold Futures (COMEX) | log_return           -0.016351         0.055604           -0.294           0.769
+L10.U.S. Dollar Index | log_return               0.114424         0.087517            1.307           0.191
+L10.USD / JPY Exchange Rate | log_return         0.059880         0.049788            1.203           0.229
+L10.S&P 500 | log_return                        -0.181528         0.060477           -3.002           0.003
+L10.CBOE Volatility Index | diff_1              -0.001001         0.000372           -2.687           0.007
+L10.ICE BofA MOVE Index | diff_1                 0.000098         0.000103            0.951           0.342
+L10.WTI Crude Oil Futures | log_return           0.009408         0.018294            0.514           0.607
+L10.Silver Futures | log_return                 -0.008052         0.031926           -0.252           0.801
+L10.Copper Futures | log_return                  0.006312         0.024747            0.255           0.799
+L10.US 10Y Treasury Yield | diff_1              -0.009277         0.008018           -1.157           0.247
+L10.US 3M Treasury Yield | diff_1                0.013988         0.007987            1.751           0.080
+===========================================================================================================
+
+Results for equation Copper Futures | log_return
+===========================================================================================================
+                                              coefficient       std. error           t-stat            prob
+-----------------------------------------------------------------------------------------------------------
+const                                            0.000099         0.000312            0.317           0.751
+L1.Gold Futures (COMEX) | log_return             0.058821         0.049785            1.181           0.237
+L1.U.S. Dollar Index | log_return               -0.063031         0.074766           -0.843           0.399
+L1.USD / JPY Exchange Rate | log_return          0.071311         0.045455            1.569           0.117
+L1.S&P 500 | log_return                          0.279899         0.052963            5.285           0.000
+L1.CBOE Volatility Index | diff_1                0.000456         0.000332            1.372           0.170
+L1.ICE BofA MOVE Index | diff_1                  0.000138         0.000090            1.530           0.126
+L1.WTI Crude Oil Futures | log_return           -0.027453         0.016058           -1.710           0.087
+L1.Silver Futures | log_return                  -0.050147         0.028379           -1.767           0.077
+L1.Copper Futures | log_return                  -0.089934         0.021680           -4.148           0.000
+L1.US 10Y Treasury Yield | diff_1               -0.005432         0.006824           -0.796           0.426
+L1.US 3M Treasury Yield | diff_1                 0.009887         0.006902            1.432           0.152
+L2.Gold Futures (COMEX) | log_return             0.045805         0.049846            0.919           0.358
+L2.U.S. Dollar Index | log_return               -0.083384         0.077459           -1.077           0.282
+L2.USD / JPY Exchange Rate | log_return         -0.040418         0.048141           -0.840           0.401
+L2.S&P 500 | log_return                         -0.046845         0.053906           -0.869           0.385
+L2.CBOE Volatility Index | diff_1               -0.000150         0.000337           -0.447           0.655
+L2.ICE BofA MOVE Index | diff_1                 -0.000014         0.000091           -0.157           0.875
+L2.WTI Crude Oil Futures | log_return           -0.005376         0.016066           -0.335           0.738
+L2.Silver Futures | log_return                  -0.009587         0.028378           -0.338           0.735
+L2.Copper Futures | log_return                   0.001937         0.021757            0.089           0.929
+L2.US 10Y Treasury Yield | diff_1                0.004272         0.007008            0.610           0.542
+L2.US 3M Treasury Yield | diff_1                -0.012104         0.006973           -1.736           0.083
+L3.Gold Futures (COMEX) | log_return             0.028553         0.049937            0.572           0.567
+L3.U.S. Dollar Index | log_return               -0.044209         0.077188           -0.573           0.567
+L3.USD / JPY Exchange Rate | log_return         -0.010265         0.048231           -0.213           0.831
+L3.S&P 500 | log_return                          0.003242         0.053895            0.060           0.952
+L3.CBOE Volatility Index | diff_1               -0.000011         0.000338           -0.032           0.974
+L3.ICE BofA MOVE Index | diff_1                  0.000257         0.000091            2.820           0.005
+L3.WTI Crude Oil Futures | log_return            0.018112         0.016040            1.129           0.259
+L3.Silver Futures | log_return                  -0.027052         0.028431           -0.951           0.341
+L3.Copper Futures | log_return                   0.003805         0.021694            0.175           0.861
+L3.US 10Y Treasury Yield | diff_1                0.004244         0.007015            0.605           0.545
+L3.US 3M Treasury Yield | diff_1                 0.000833         0.006963            0.120           0.905
+L4.Gold Futures (COMEX) | log_return            -0.152044         0.049737           -3.057           0.002
+L4.U.S. Dollar Index | log_return                0.002531         0.077259            0.033           0.974
+L4.USD / JPY Exchange Rate | log_return          0.028668         0.048488            0.591           0.554
+L4.S&P 500 | log_return                          0.019449         0.053922            0.361           0.718
+L4.CBOE Volatility Index | diff_1                0.000238         0.000334            0.713           0.476
+L4.ICE BofA MOVE Index | diff_1                  0.000004         0.000091            0.047           0.963
+L4.WTI Crude Oil Futures | log_return            0.004814         0.016081            0.299           0.765
+L4.Silver Futures | log_return                   0.064819         0.028391            2.283           0.022
+L4.Copper Futures | log_return                   0.026664         0.021708            1.228           0.219
+L4.US 10Y Treasury Yield | diff_1               -0.003060         0.007031           -0.435           0.663
+L4.US 3M Treasury Yield | diff_1                 0.000283         0.006947            0.041           0.967
+L5.Gold Futures (COMEX) | log_return             0.026622         0.049611            0.537           0.592
+L5.U.S. Dollar Index | log_return                0.004258         0.077502            0.055           0.956
+L5.USD / JPY Exchange Rate | log_return         -0.040582         0.048485           -0.837           0.403
+L5.S&P 500 | log_return                          0.015121         0.053906            0.281           0.779
+L5.CBOE Volatility Index | diff_1               -0.000142         0.000334           -0.424           0.672
+L5.ICE BofA MOVE Index | diff_1                  0.000079         0.000091            0.864           0.388
+L5.WTI Crude Oil Futures | log_return           -0.010031         0.016079           -0.624           0.533
+L5.Silver Futures | log_return                  -0.019507         0.028457           -0.685           0.493
+L5.Copper Futures | log_return                  -0.012046         0.021690           -0.555           0.579
+L5.US 10Y Treasury Yield | diff_1               -0.009005         0.007029           -1.281           0.200
+L5.US 3M Treasury Yield | diff_1                 0.007214         0.006950            1.038           0.299
+L6.Gold Futures (COMEX) | log_return             0.020668         0.049472            0.418           0.676
+L6.U.S. Dollar Index | log_return               -0.024123         0.077481           -0.311           0.756
+L6.USD / JPY Exchange Rate | log_return         -0.049219         0.048580           -1.013           0.311
+L6.S&P 500 | log_return                         -0.071314         0.053825           -1.325           0.185
+L6.CBOE Volatility Index | diff_1               -0.000617         0.000335           -1.842           0.065
+L6.ICE BofA MOVE Index | diff_1                 -0.000047         0.000092           -0.515           0.607
+L6.WTI Crude Oil Futures | log_return            0.011260         0.016046            0.702           0.483
+L6.Silver Futures | log_return                  -0.011441         0.028357           -0.403           0.687
+L6.Copper Futures | log_return                   0.018917         0.021699            0.872           0.383
+L6.US 10Y Treasury Yield | diff_1                0.005912         0.007043            0.839           0.401
+L6.US 3M Treasury Yield | diff_1                -0.010423         0.006936           -1.503           0.133
+L7.Gold Futures (COMEX) | log_return             0.008959         0.049430            0.181           0.856
+L7.U.S. Dollar Index | log_return               -0.006069         0.077288           -0.079           0.937
+L7.USD / JPY Exchange Rate | log_return          0.058071         0.048648            1.194           0.233
+L7.S&P 500 | log_return                         -0.054145         0.053563           -1.011           0.312
+L7.CBOE Volatility Index | diff_1                0.000050         0.000332            0.152           0.879
+L7.ICE BofA MOVE Index | diff_1                  0.000007         0.000091            0.072           0.943
+L7.WTI Crude Oil Futures | log_return            0.011975         0.016013            0.748           0.455
+L7.Silver Futures | log_return                  -0.003775         0.028301           -0.133           0.894
+L7.Copper Futures | log_return                  -0.008969         0.021714           -0.413           0.680
+L7.US 10Y Treasury Yield | diff_1                0.013843         0.007024            1.971           0.049
+L7.US 3M Treasury Yield | diff_1                 0.005016         0.006971            0.720           0.472
+L8.Gold Futures (COMEX) | log_return            -0.068488         0.049310           -1.389           0.165
+L8.U.S. Dollar Index | log_return               -0.148750         0.077191           -1.927           0.054
+L8.USD / JPY Exchange Rate | log_return         -0.004857         0.048764           -0.100           0.921
+L8.S&P 500 | log_return                         -0.042119         0.053256           -0.791           0.429
+L8.CBOE Volatility Index | diff_1                0.000147         0.000330            0.444           0.657
+L8.ICE BofA MOVE Index | diff_1                 -0.000090         0.000091           -0.986           0.324
+L8.WTI Crude Oil Futures | log_return            0.016436         0.016006            1.027           0.304
+L8.Silver Futures | log_return                  -0.023241         0.028287           -0.822           0.411
+L8.Copper Futures | log_return                   0.067250         0.021698            3.099           0.002
+L8.US 10Y Treasury Yield | diff_1               -0.000038         0.007032           -0.005           0.996
+L8.US 3M Treasury Yield | diff_1                 0.002708         0.007005            0.387           0.699
+L9.Gold Futures (COMEX) | log_return             0.116174         0.048985            2.372           0.018
+L9.U.S. Dollar Index | log_return                0.030606         0.077214            0.396           0.692
+L9.USD / JPY Exchange Rate | log_return          0.025476         0.048538            0.525           0.600
+L9.S&P 500 | log_return                         -0.054519         0.053333           -1.022           0.307
+L9.CBOE Volatility Index | diff_1               -0.000429         0.000330           -1.302           0.193
+L9.ICE BofA MOVE Index | diff_1                 -0.000071         0.000091           -0.782           0.434
+L9.WTI Crude Oil Futures | log_return            0.018729         0.016005            1.170           0.242
+L9.Silver Futures | log_return                  -0.071617         0.028199           -2.540           0.011
+L9.Copper Futures | log_return                   0.042501         0.021732            1.956           0.051
+L9.US 10Y Treasury Yield | diff_1               -0.001806         0.007038           -0.257           0.797
+L9.US 3M Treasury Yield | diff_1                 0.001350         0.006995            0.193           0.847
+L10.Gold Futures (COMEX) | log_return            0.019142         0.048589            0.394           0.694
+L10.U.S. Dollar Index | log_return               0.101203         0.076476            1.323           0.186
+L10.USD / JPY Exchange Rate | log_return         0.036901         0.043507            0.848           0.396
+L10.S&P 500 | log_return                        -0.036987         0.052847           -0.700           0.484
+L10.CBOE Volatility Index | diff_1              -0.000411         0.000325           -1.263           0.207
+L10.ICE BofA MOVE Index | diff_1                -0.000234         0.000090           -2.592           0.010
+L10.WTI Crude Oil Futures | log_return           0.005213         0.015986            0.326           0.744
+L10.Silver Futures | log_return                 -0.016810         0.027898           -0.603           0.547
+L10.Copper Futures | log_return                  0.007106         0.021624            0.329           0.742
+L10.US 10Y Treasury Yield | diff_1              -0.001319         0.007006           -0.188           0.851
+L10.US 3M Treasury Yield | diff_1                0.008681         0.006980            1.244           0.214
+===========================================================================================================
+
+Results for equation US 10Y Treasury Yield | diff_1
+===========================================================================================================
+                                              coefficient       std. error           t-stat            prob
+-----------------------------------------------------------------------------------------------------------
+const                                           -0.000440         0.000943           -0.466           0.641
+L1.Gold Futures (COMEX) | log_return            -0.138248         0.150228           -0.920           0.357
+L1.U.S. Dollar Index | log_return                0.065553         0.225607            0.291           0.771
+L1.USD / JPY Exchange Rate | log_return          0.111401         0.137160            0.812           0.417
+L1.S&P 500 | log_return                         -0.001136         0.159816           -0.007           0.994
+L1.CBOE Volatility Index | diff_1                0.000296         0.001003            0.295           0.768
+L1.ICE BofA MOVE Index | diff_1                  0.001039         0.000272            3.814           0.000
+L1.WTI Crude Oil Futures | log_return            0.062321         0.048456            1.286           0.198
+L1.Silver Futures | log_return                   0.052925         0.085635            0.618           0.537
+L1.Copper Futures | log_return                   0.012645         0.065421            0.193           0.847
+L1.US 10Y Treasury Yield | diff_1               -0.048501         0.020590           -2.355           0.018
+L1.US 3M Treasury Yield | diff_1                 0.020921         0.020828            1.004           0.315
+L2.Gold Futures (COMEX) | log_return             0.214130         0.150411            1.424           0.155
+L2.U.S. Dollar Index | log_return               -0.100592         0.233733           -0.430           0.667
+L2.USD / JPY Exchange Rate | log_return          0.083683         0.145265            0.576           0.565
+L2.S&P 500 | log_return                          0.150005         0.162663            0.922           0.356
+L2.CBOE Volatility Index | diff_1                0.001716         0.001016            1.690           0.091
+L2.ICE BofA MOVE Index | diff_1                 -0.000088         0.000273           -0.321           0.748
+L2.WTI Crude Oil Futures | log_return            0.054528         0.048480            1.125           0.261
+L2.Silver Futures | log_return                  -0.046157         0.085631           -0.539           0.590
+L2.Copper Futures | log_return                   0.041900         0.065651            0.638           0.523
+L2.US 10Y Treasury Yield | diff_1               -0.048981         0.021146           -2.316           0.021
+L2.US 3M Treasury Yield | diff_1                -0.036023         0.021041           -1.712           0.087
+L3.Gold Futures (COMEX) | log_return             0.022099         0.150685            0.147           0.883
+L3.U.S. Dollar Index | log_return               -0.013837         0.232917           -0.059           0.953
+L3.USD / JPY Exchange Rate | log_return         -0.011676         0.145538           -0.080           0.936
+L3.S&P 500 | log_return                         -0.344247         0.162628           -2.117           0.034
+L3.CBOE Volatility Index | diff_1               -0.000538         0.001019           -0.528           0.598
+L3.ICE BofA MOVE Index | diff_1                  0.000790         0.000275            2.868           0.004
+L3.WTI Crude Oil Futures | log_return            0.091055         0.048402            1.881           0.060
+L3.Silver Futures | log_return                   0.001082         0.085791            0.013           0.990
+L3.Copper Futures | log_return                   0.080430         0.065461            1.229           0.219
+L3.US 10Y Treasury Yield | diff_1                0.015378         0.021169            0.726           0.468
+L3.US 3M Treasury Yield | diff_1                 0.022681         0.021012            1.079           0.280
+L4.Gold Futures (COMEX) | log_return            -0.389456         0.150081           -2.595           0.009
+L4.U.S. Dollar Index | log_return                0.092728         0.233130            0.398           0.691
+L4.USD / JPY Exchange Rate | log_return         -0.195702         0.146313           -1.338           0.181
+L4.S&P 500 | log_return                         -0.005763         0.162710           -0.035           0.972
+L4.CBOE Volatility Index | diff_1                0.000480         0.001009            0.476           0.634
+L4.ICE BofA MOVE Index | diff_1                  0.000575         0.000275            2.089           0.037
+L4.WTI Crude Oil Futures | log_return           -0.001366         0.048524           -0.028           0.978
+L4.Silver Futures | log_return                   0.147096         0.085669            1.717           0.086
+L4.Copper Futures | log_return                   0.137124         0.065504            2.093           0.036
+L4.US 10Y Treasury Yield | diff_1                0.006963         0.021217            0.328           0.743
+L4.US 3M Treasury Yield | diff_1                -0.040774         0.020963           -1.945           0.052
+L5.Gold Futures (COMEX) | log_return            -0.259327         0.149701           -1.732           0.083
+L5.U.S. Dollar Index | log_return                0.157773         0.233864            0.675           0.500
+L5.USD / JPY Exchange Rate | log_return          0.023340         0.146303            0.160           0.873
+L5.S&P 500 | log_return                          0.093997         0.162661            0.578           0.563
+L5.CBOE Volatility Index | diff_1                0.001060         0.001009            1.050           0.294
+L5.ICE BofA MOVE Index | diff_1                  0.000011         0.000276            0.040           0.968
+L5.WTI Crude Oil Futures | log_return           -0.028545         0.048517           -0.588           0.556
+L5.Silver Futures | log_return                   0.079813         0.085870            0.929           0.353
+L5.Copper Futures | log_return                  -0.011409         0.065451           -0.174           0.862
+L5.US 10Y Treasury Yield | diff_1               -0.029469         0.021209           -1.389           0.165
+L5.US 3M Treasury Yield | diff_1                -0.005494         0.020973           -0.262           0.793
+L6.Gold Futures (COMEX) | log_return            -0.175014         0.149284           -1.172           0.241
+L6.U.S. Dollar Index | log_return                0.180212         0.233800            0.771           0.441
+L6.USD / JPY Exchange Rate | log_return         -0.321472         0.146591           -2.193           0.028
+L6.S&P 500 | log_return                         -0.045622         0.162417           -0.281           0.779
+L6.CBOE Volatility Index | diff_1               -0.000136         0.001011           -0.135           0.893
+L6.ICE BofA MOVE Index | diff_1                  0.000298         0.000277            1.077           0.282
+L6.WTI Crude Oil Futures | log_return            0.135074         0.048419            2.790           0.005
+L6.Silver Futures | log_return                   0.216058         0.085566            2.525           0.012
+L6.Copper Futures | log_return                  -0.122909         0.065478           -1.877           0.061
+L6.US 10Y Treasury Yield | diff_1               -0.010916         0.021254           -0.514           0.608
+L6.US 3M Treasury Yield | diff_1                -0.014215         0.020929           -0.679           0.497
+L7.Gold Futures (COMEX) | log_return             0.024648         0.149155            0.165           0.869
+L7.U.S. Dollar Index | log_return                0.142875         0.233217            0.613           0.540
+L7.USD / JPY Exchange Rate | log_return         -0.089730         0.146797           -0.611           0.541
+L7.S&P 500 | log_return                         -0.083382         0.161628           -0.516           0.606
+L7.CBOE Volatility Index | diff_1                0.000542         0.001002            0.541           0.589
+L7.ICE BofA MOVE Index | diff_1                 -0.000093         0.000276           -0.337           0.736
+L7.WTI Crude Oil Futures | log_return            0.038598         0.048319            0.799           0.424
+L7.Silver Futures | log_return                  -0.035699         0.085398           -0.418           0.676
+L7.Copper Futures | log_return                  -0.010421         0.065523           -0.159           0.874
+L7.US 10Y Treasury Yield | diff_1                0.022037         0.021196            1.040           0.298
+L7.US 3M Treasury Yield | diff_1                 0.060124         0.021036            2.858           0.004
+L8.Gold Futures (COMEX) | log_return            -0.146378         0.148795           -0.984           0.325
+L8.U.S. Dollar Index | log_return                0.345701         0.232925            1.484           0.138
+L8.USD / JPY Exchange Rate | log_return         -0.193673         0.147147           -1.316           0.188
+L8.S&P 500 | log_return                         -0.070554         0.160700           -0.439           0.661
+L8.CBOE Volatility Index | diff_1               -0.001215         0.000996           -1.219           0.223
+L8.ICE BofA MOVE Index | diff_1                  0.000177         0.000276            0.641           0.521
+L8.WTI Crude Oil Futures | log_return           -0.015515         0.048298           -0.321           0.748
+L8.Silver Futures | log_return                  -0.123442         0.085355           -1.446           0.148
+L8.Copper Futures | log_return                   0.097349         0.065475            1.487           0.137
+L8.US 10Y Treasury Yield | diff_1               -0.048003         0.021221           -2.262           0.024
+L8.US 3M Treasury Yield | diff_1                 0.006338         0.021137            0.300           0.764
+L9.Gold Futures (COMEX) | log_return             0.013500         0.147811            0.091           0.927
+L9.U.S. Dollar Index | log_return               -0.007327         0.232993           -0.031           0.975
+L9.USD / JPY Exchange Rate | log_return         -0.103431         0.146463           -0.706           0.480
+L9.S&P 500 | log_return                          0.081104         0.160932            0.504           0.614
+L9.CBOE Volatility Index | diff_1               -0.001057         0.000995           -1.062           0.288
+L9.ICE BofA MOVE Index | diff_1                  0.000678         0.000275            2.461           0.014
+L9.WTI Crude Oil Futures | log_return            0.096889         0.048295            2.006           0.045
+L9.Silver Futures | log_return                  -0.147579         0.085091           -1.734           0.083
+L9.Copper Futures | log_return                   0.094785         0.065577            1.445           0.148
+L9.US 10Y Treasury Yield | diff_1               -0.013326         0.021238           -0.627           0.530
+L9.US 3M Treasury Yield | diff_1                -0.031760         0.021107           -1.505           0.132
+L10.Gold Futures (COMEX) | log_return            0.392636         0.146618            2.678           0.007
+L10.U.S. Dollar Index | log_return               0.165638         0.230767            0.718           0.473
+L10.USD / JPY Exchange Rate | log_return         0.174937         0.131283            1.333           0.183
+L10.S&P 500 | log_return                         0.553748         0.159466            3.473           0.001
+L10.CBOE Volatility Index | diff_1               0.000825         0.000982            0.840           0.401
+L10.ICE BofA MOVE Index | diff_1                 0.000042         0.000273            0.155           0.877
+L10.WTI Crude Oil Futures | log_return          -0.045980         0.048239           -0.953           0.341
+L10.Silver Futures | log_return                 -0.147373         0.084184           -1.751           0.080
+L10.Copper Futures | log_return                 -0.172050         0.065252           -2.637           0.008
+L10.US 10Y Treasury Yield | diff_1               0.031203         0.021141            1.476           0.140
+L10.US 3M Treasury Yield | diff_1               -0.016439         0.021061           -0.781           0.435
+===========================================================================================================
+
+Results for equation US 3M Treasury Yield | diff_1
+===========================================================================================================
+                                              coefficient       std. error           t-stat            prob
+-----------------------------------------------------------------------------------------------------------
+const                                           -0.000939         0.000820           -1.145           0.252
+L1.Gold Futures (COMEX) | log_return             0.110480         0.130597            0.846           0.398
+L1.U.S. Dollar Index | log_return                0.487397         0.196125            2.485           0.013
+L1.USD / JPY Exchange Rate | log_return          0.270061         0.119236            2.265           0.024
+L1.S&P 500 | log_return                          0.378620         0.138931            2.725           0.006
+L1.CBOE Volatility Index | diff_1                0.001562         0.000872            1.793           0.073
+L1.ICE BofA MOVE Index | diff_1                  0.000052         0.000237            0.218           0.827
+L1.WTI Crude Oil Futures | log_return           -0.032942         0.042124           -0.782           0.434
+L1.Silver Futures | log_return                   0.067139         0.074444            0.902           0.367
+L1.Copper Futures | log_return                   0.003995         0.056872            0.070           0.944
+L1.US 10Y Treasury Yield | diff_1               -0.052726         0.017900           -2.946           0.003
+L1.US 3M Treasury Yield | diff_1                 0.095300         0.018106            5.263           0.000
+L2.Gold Futures (COMEX) | log_return             0.167584         0.130755            1.282           0.200
+L2.U.S. Dollar Index | log_return               -0.274704         0.203189           -1.352           0.176
+L2.USD / JPY Exchange Rate | log_return          0.150308         0.126282            1.190           0.234
+L2.S&P 500 | log_return                         -0.091185         0.141406           -0.645           0.519
+L2.CBOE Volatility Index | diff_1                0.000898         0.000883            1.017           0.309
+L2.ICE BofA MOVE Index | diff_1                 -0.001071         0.000238           -4.507           0.000
+L2.WTI Crude Oil Futures | log_return           -0.019260         0.042144           -0.457           0.648
+L2.Silver Futures | log_return                  -0.043585         0.074441           -0.586           0.558
+L2.Copper Futures | log_return                   0.046660         0.057071            0.818           0.414
+L2.US 10Y Treasury Yield | diff_1                0.035314         0.018383            1.921           0.055
+L2.US 3M Treasury Yield | diff_1                -0.051487         0.018291           -2.815           0.005
+L3.Gold Futures (COMEX) | log_return            -0.017238         0.130994           -0.132           0.895
+L3.U.S. Dollar Index | log_return               -0.120992         0.202479           -0.598           0.550
+L3.USD / JPY Exchange Rate | log_return          0.168503         0.126519            1.332           0.183
+L3.S&P 500 | log_return                          0.011095         0.141376            0.078           0.937
+L3.CBOE Volatility Index | diff_1               -0.001661         0.000886           -1.874           0.061
+L3.ICE BofA MOVE Index | diff_1                  0.000634         0.000239            2.648           0.008
+L3.WTI Crude Oil Futures | log_return           -0.010425         0.042077           -0.248           0.804
+L3.Silver Futures | log_return                  -0.138038         0.074580           -1.851           0.064
+L3.Copper Futures | log_return                  -0.024510         0.056907           -0.431           0.667
+L3.US 10Y Treasury Yield | diff_1               -0.018866         0.018402           -1.025           0.305
+L3.US 3M Treasury Yield | diff_1                -0.055755         0.018266           -3.052           0.002
+L4.Gold Futures (COMEX) | log_return             0.119366         0.130469            0.915           0.360
+L4.U.S. Dollar Index | log_return               -0.156103         0.202665           -0.770           0.441
+L4.USD / JPY Exchange Rate | log_return          0.103131         0.127193            0.811           0.417
+L4.S&P 500 | log_return                         -0.020236         0.141448           -0.143           0.886
+L4.CBOE Volatility Index | diff_1               -0.001306         0.000877           -1.490           0.136
+L4.ICE BofA MOVE Index | diff_1                 -0.000413         0.000239           -1.729           0.084
+L4.WTI Crude Oil Futures | log_return           -0.001729         0.042183           -0.041           0.967
+L4.Silver Futures | log_return                  -0.074632         0.074474           -1.002           0.316
+L4.Copper Futures | log_return                   0.000934         0.056944            0.016           0.987
+L4.US 10Y Treasury Yield | diff_1                0.026932         0.018445            1.460           0.144
+L4.US 3M Treasury Yield | diff_1                -0.103195         0.018224           -5.663           0.000
+L5.Gold Futures (COMEX) | log_return             0.076206         0.130138            0.586           0.558
+L5.U.S. Dollar Index | log_return                0.184246         0.203303            0.906           0.365
+L5.USD / JPY Exchange Rate | log_return         -0.051143         0.127184           -0.402           0.688
+L5.S&P 500 | log_return                          0.438812         0.141404            3.103           0.002
+L5.CBOE Volatility Index | diff_1                0.001817         0.000877            2.071           0.038
+L5.ICE BofA MOVE Index | diff_1                 -0.000748         0.000240           -3.116           0.002
+L5.WTI Crude Oil Futures | log_return           -0.127610         0.042177           -3.026           0.002
+L5.Silver Futures | log_return                   0.052855         0.074649            0.708           0.479
+L5.Copper Futures | log_return                  -0.034952         0.056898           -0.614           0.539
+L5.US 10Y Treasury Yield | diff_1                0.016250         0.018437            0.881           0.378
+L5.US 3M Treasury Yield | diff_1                 0.029164         0.018232            1.600           0.110
+L6.Gold Futures (COMEX) | log_return             0.036301         0.129775            0.280           0.780
+L6.U.S. Dollar Index | log_return                0.190247         0.203247            0.936           0.349
+L6.USD / JPY Exchange Rate | log_return         -0.203472         0.127435           -1.597           0.110
+L6.S&P 500 | log_return                          0.159643         0.141193            1.131           0.258
+L6.CBOE Volatility Index | diff_1                0.001767         0.000879            2.010           0.044
+L6.ICE BofA MOVE Index | diff_1                 -0.000507         0.000241           -2.105           0.035
+L6.WTI Crude Oil Futures | log_return           -0.002208         0.042092           -0.052           0.958
+L6.Silver Futures | log_return                   0.039889         0.074384            0.536           0.592
+L6.Copper Futures | log_return                   0.016709         0.056921            0.294           0.769
+L6.US 10Y Treasury Yield | diff_1                0.055127         0.018476            2.984           0.003
+L6.US 3M Treasury Yield | diff_1                -0.118946         0.018194           -6.538           0.000
+L7.Gold Futures (COMEX) | log_return             0.158118         0.129664            1.219           0.223
+L7.U.S. Dollar Index | log_return               -0.121361         0.202740           -0.599           0.549
+L7.USD / JPY Exchange Rate | log_return          0.023930         0.127614            0.188           0.851
+L7.S&P 500 | log_return                         -0.215059         0.140507           -1.531           0.126
+L7.CBOE Volatility Index | diff_1                0.000306         0.000871            0.352           0.725
+L7.ICE BofA MOVE Index | diff_1                 -0.000587         0.000240           -2.449           0.014
+L7.WTI Crude Oil Futures | log_return            0.021500         0.042005            0.512           0.609
+L7.Silver Futures | log_return                  -0.124633         0.074238           -1.679           0.093
+L7.Copper Futures | log_return                   0.015329         0.056960            0.269           0.788
+L7.US 10Y Treasury Yield | diff_1                0.063855         0.018426            3.465           0.001
+L7.US 3M Treasury Yield | diff_1                 0.098830         0.018287            5.404           0.000
+L8.Gold Futures (COMEX) | log_return            -0.077468         0.129351           -0.599           0.549
+L8.U.S. Dollar Index | log_return               -0.090080         0.202487           -0.445           0.656
+L8.USD / JPY Exchange Rate | log_return          0.209607         0.127918            1.639           0.101
+L8.S&P 500 | log_return                         -0.332979         0.139700           -2.384           0.017
+L8.CBOE Volatility Index | diff_1               -0.001398         0.000866           -1.614           0.106
+L8.ICE BofA MOVE Index | diff_1                  0.000855         0.000240            3.566           0.000
+L8.WTI Crude Oil Futures | log_return            0.046179         0.041986            1.100           0.271
+L8.Silver Futures | log_return                   0.017413         0.074201            0.235           0.814
+L8.Copper Futures | log_return                   0.022777         0.056919            0.400           0.689
+L8.US 10Y Treasury Yield | diff_1               -0.024178         0.018447           -1.311           0.190
+L8.US 3M Treasury Yield | diff_1                -0.035794         0.018375           -1.948           0.051
+L9.Gold Futures (COMEX) | log_return             0.372151         0.128495            2.896           0.004
+L9.U.S. Dollar Index | log_return                0.010872         0.202545            0.054           0.957
+L9.USD / JPY Exchange Rate | log_return          0.036714         0.127323            0.288           0.773
+L9.S&P 500 | log_return                          0.012882         0.139901            0.092           0.927
+L9.CBOE Volatility Index | diff_1                0.000070         0.000865            0.080           0.936
+L9.ICE BofA MOVE Index | diff_1                 -0.000598         0.000239           -2.496           0.013
+L9.WTI Crude Oil Futures | log_return           -0.003160         0.041984           -0.075           0.940
+L9.Silver Futures | log_return                  -0.099440         0.073971           -1.344           0.179
+L9.Copper Futures | log_return                  -0.057585         0.057007           -1.010           0.312
+L9.US 10Y Treasury Yield | diff_1                0.035932         0.018462            1.946           0.052
+L9.US 3M Treasury Yield | diff_1                -0.082542         0.018348           -4.499           0.000
+L10.Gold Futures (COMEX) | log_return            0.281881         0.127458            2.212           0.027
+L10.U.S. Dollar Index | log_return               0.042473         0.200610            0.212           0.832
+L10.USD / JPY Exchange Rate | log_return         0.268283         0.114127            2.351           0.019
+L10.S&P 500 | log_return                         0.180298         0.138627            1.301           0.193
+L10.CBOE Volatility Index | diff_1               0.000583         0.000854            0.683           0.495
+L10.ICE BofA MOVE Index | diff_1                -0.000917         0.000237           -3.872           0.000
+L10.WTI Crude Oil Futures | log_return          -0.078713         0.041935           -1.877           0.061
+L10.Silver Futures | log_return                 -0.116764         0.073183           -1.596           0.111
+L10.Copper Futures | log_return                 -0.138715         0.056725           -2.445           0.014
+L10.US 10Y Treasury Yield | diff_1               0.025344         0.018379            1.379           0.168
+L10.US 3M Treasury Yield | diff_1                0.076131         0.018309            4.158           0.000
+===========================================================================================================
+
+Correlation matrix of residuals
+                                        Gold Futures (COMEX) | log_return  U.S. Dollar Index | log_return  USD / JPY Exchange Rate | log_return  S&P 500 | log_return  CBOE Volatility Index | diff_1  ICE BofA MOVE Index | diff_1  WTI Crude Oil Futures | log_return  Silver Futures | log_return  Copper Futures | log_return  US 10Y Treasury Yield | diff_1  US 3M Treasury Yield | diff_1
+Gold Futures (COMEX) | log_return                                1.000000                       -0.385439                             -0.054022              0.013935                       -0.003549                     -0.034055                            0.244813                     0.817029                     0.371424                       -0.110614                      -0.082529
+U.S. Dollar Index | log_return                                  -0.385439                        1.000000                              0.107380             -0.202439                        0.148532                      0.083886                           -0.273444                    -0.382960                    -0.296508                        0.044524                       0.054365
+USD / JPY Exchange Rate | log_return                            -0.054022                        0.107380                              1.000000              0.262900                       -0.204514                     -0.051346                            0.084436                    -0.005375                     0.083649                        0.247925                       0.114774
+S&P 500 | log_return                                             0.013935                       -0.202439                              0.262900              1.000000                       -0.838833                     -0.198580                            0.347168                     0.148421                     0.319576                        0.387047                       0.181570
+CBOE Volatility Index | diff_1                                  -0.003549                        0.148532                             -0.204514             -0.838833                        1.000000                      0.254678                           -0.297471                    -0.139069                    -0.270835                       -0.324680                      -0.153857
+ICE BofA MOVE Index | diff_1                                    -0.034055                        0.083886                             -0.051346             -0.198580                        0.254678                      1.000000                           -0.053064                    -0.070470                    -0.085402                        0.075245                      -0.118326
+WTI Crude Oil Futures | log_return                               0.244813                       -0.273444                              0.084436              0.347168                       -0.297471                     -0.053064                            1.000000                     0.306524                     0.407376                        0.269628                       0.038147
+Silver Futures | log_return                                      0.817029                       -0.382960                             -0.005375              0.148421                       -0.139069                     -0.070470                            0.306524                     1.000000                     0.463938                        0.019468                      -0.028983
+Copper Futures | log_return                                      0.371424                       -0.296508                              0.083649              0.319576                       -0.270835                     -0.085402                            0.407376                     0.463938                     1.000000                        0.242137                       0.072104
+US 10Y Treasury Yield | diff_1                                  -0.110614                        0.044524                              0.247925              0.387047                       -0.324680                      0.075245                            0.269628                     0.019468                     0.242137                        1.000000                       0.189884
+US 3M Treasury Yield | diff_1                                   -0.082529                        0.054365                              0.114774              0.181570                       -0.153857                     -0.118326                            0.038147                    -0.028983                     0.072104                        0.189884                       1.000000
+
+

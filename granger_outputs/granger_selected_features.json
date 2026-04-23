@@ -1,0 +1,21 @@
+{
+  "method": "granger_causality",
+  "target": "Gold Futures (COMEX) | log_return",
+  "max_lag": 10,
+  "alpha": 0.05,
+  "n_selected": 12,
+  "features": [
+    "U.S. Dollar Index | log_return",
+    "S&P 500 | log_return",
+    "CBOE Volatility Index | diff_1",
+    "CBOE Volatility Index | log_return",
+    "ICE BofA MOVE Index | diff_1",
+    "ICE BofA MOVE Index | log_return",
+    "WTI Crude Oil Futures | log_return",
+    "Silver Futures | log_return",
+    "US 10Y Treasury Yield | diff_1",
+    "US 10Y Treasury Yield | log_return",
+    "US 3M Treasury Yield | diff_1",
+    "US 3M Treasury Yield | log_return"
+  ]
+}
