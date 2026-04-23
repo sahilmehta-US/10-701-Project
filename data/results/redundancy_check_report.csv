@@ -1,0 +1,5 @@
+,pair_name,option_a,option_b,chosen_option,paired_alternative_reason,keep_both_in_reduced_feature_set,caution
+0,Dollar proxy pair,U.S. Dollar Index,Euro / USD Exchange Rate,U.S. Dollar Index,"Both capture closely related dollar strength information, so keeping both adds redundant FX exposure.",False,Treat as paired alternatives. Keeping both may add redundant information in the feature set.
+1,Equity index pair,S&P 500,NASDAQ Composite,S&P 500,"Both are broad U.S. equity market proxies, so keeping both may add redundant market exposure.",False,Treat as paired alternatives. Keeping both may add redundant information in the feature set.
+2,Crude oil pair,WTI Crude Oil Futures,Brent Crude Oil Futures,WTI Crude Oil Futures,"Both track crude oil conditions, and Brent also starts later and adds missingness.",False,Treat as paired alternatives. Keeping both may add redundant information in the feature set.
+3,Gold exposure pair,Gold Futures (COMEX),SPDR Gold Shares ETF,Gold Futures (COMEX),"GLD is a near-duplicate gold exposure, so keeping both is usually unnecessary.",False,Treat as paired alternatives. Keeping both may add redundant information in the feature set.

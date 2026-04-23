@@ -1,0 +1,13 @@
+{
+  "scaling_applied_in_preprocessing_handoff": false,
+  "applies_to": [
+    "gold_base_stationary.csv",
+    "gold_base_stationary_dropna.csv"
+  ],
+  "reason": [
+    "Scaling must be fit on the training split only.",
+    "Global standardization before the split would leak information from validation and test periods.",
+    "The preprocessing handoff should be cleaned and transformed, but not globally standardized."
+  ],
+  "instruction_for_downstream_use": "Fit any scaler on the training split only, then apply that fitted scaler to validation and test splits."
+}

@@ -1,0 +1,38 @@
+{
+  "target": "Gold Futures (COMEX) | log_return",
+  "pcmci_config": {
+    "max_lag": 5,
+    "pc_alpha": 0.05,
+    "mci_alpha": 0.05,
+    "fdr_method": "fdr_bh",
+    "independence_test": "ParCorr (linear)"
+  },
+  "n_exogenous_features": 3,
+  "exogenous_features": [
+    "U.S. Dollar Index | log_return",
+    "USD / JPY Exchange Rate | log_return",
+    "WTI Crude Oil Futures | log_return"
+  ],
+  "has_significant_self_links": false,
+  "all_causal_links": [
+    {
+      "feature": "U.S. Dollar Index | log_return",
+      "lag": 2,
+      "val_mci": -0.05943405815439547,
+      "pval": 0.01074944053211569
+    },
+    {
+      "feature": "USD / JPY Exchange Rate | log_return",
+      "lag": 5,
+      "val_mci": -0.05612043219533963,
+      "pval": 0.017986167208767733
+    },
+    {
+      "feature": "WTI Crude Oil Futures | log_return",
+      "lag": 2,
+      "val_mci": 0.05098817974328417,
+      "pval": 0.04244078108625227
+    }
+  ],
+  "self_links": []
+}

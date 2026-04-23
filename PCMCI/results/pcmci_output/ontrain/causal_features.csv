@@ -1,0 +1,4 @@
+feature,lag,val_mci,pval
+U.S. Dollar Index | log_return,2,-0.05943405815439547,0.01074944053211569
+USD / JPY Exchange Rate | log_return,5,-0.05612043219533963,0.017986167208767733
+WTI Crude Oil Futures | log_return,2,0.05098817974328417,0.04244078108625227

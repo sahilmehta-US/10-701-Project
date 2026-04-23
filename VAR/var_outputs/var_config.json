@@ -1,0 +1,33 @@
+{
+    "data_root": "../data/results",
+    "dataset_name": "gold_base_stationary_dropna.csv",
+    "split_file": "../results/split_definition.json",
+    "date_column": "Date",
+    "target_column": "Gold Futures (COMEX) | log_return",
+    "n_endogenous_series": 11,
+    "endogenous_columns": [
+        "Gold Futures (COMEX) | log_return",
+        "U.S. Dollar Index | log_return",
+        "USD / JPY Exchange Rate | log_return",
+        "S&P 500 | log_return",
+        "CBOE Volatility Index | diff_1",
+        "ICE BofA MOVE Index | diff_1",
+        "WTI Crude Oil Futures | log_return",
+        "Silver Futures | log_return",
+        "Copper Futures | log_return",
+        "US 10Y Treasury Yield | diff_1",
+        "US 3M Treasury Yield | diff_1"
+    ],
+    "train_rows": 3361,
+    "val_rows": 774,
+    "test_rows": 782,
+    "lag_order_selection_ic": "aic",
+    "selected_lag_order": 10,
+    "maxlags_searched": 20,
+    "trend": "c",
+    "horizons": [
+        1,
+        5
+    ],
+    "nobs_used_for_forecast": 3351
+}
