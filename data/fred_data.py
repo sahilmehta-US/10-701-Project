@@ -1,3 +1,10 @@
+"""
+Download and preprocess FRED daily series into cleaned levels and derived features.
+
+Pipeline: raw levels (step 1) → audit → selection → cleaning → derived spreads and transforms
+(steps 2–5 under pipeline_steps/) → results/ documentation and handoff aliases (steps 6–7).
+Merging with Yahoo is handled in merged_data.py.
+"""
 import json
 import os
 import shutil
@@ -159,7 +166,7 @@ FEATURE_DECISIONS = {
     "USD / EUR Exchange Rate (FRED)": {
         "keep": True,
         "role": "feature",
-        "decision_reason": "Adds a liquid FX channel from FRED without depending on yfinance yet.",
+        "decision_reason": "Liquid FX level from FRED; complements Yahoo FX in the merged panel.",
     },
     "JPY / USD Exchange Rate (FRED)": {
         "keep": True,
@@ -184,22 +191,18 @@ FEATURE_DECISIONS = {
     "WTI Spot Price (FRED)": {
         "keep": True,
         "role": "feature",
-        "decision_reason": "Useful macro commodity control directly from FRED when yfinance oil is not yet merged.",
+        "decision_reason": "Macro oil level from FRED; complements Yahoo WTI in the merged panel.",
     },
 }
 
 STEP_OUTPUT_DIR = "pipeline_steps"
 RESULTS_DIR = "results"
 
-PREDICTOR_LAGS = (1, 5, 10, 20)
-
 FINAL_HANDOFF_FILE_ALIASES = {
     "step_4_fred_cleaned_series.csv": "fred_base_daily.csv",
     "step_4_fred_cleaned_series_dropna.csv": "fred_base_daily_dropna.csv",
     "step_5_fred_derived_features.csv": "fred_derived_features.csv",
     "step_5_fred_derived_features_dropna.csv": "fred_derived_features_dropna.csv",
-    "step_6_fred_lagged_features.csv": "fred_lagged_features.csv",
-    "step_6_fred_lagged_features_dropna.csv": "fred_lagged_features_dropna.csv",
 }
 
 
@@ -572,7 +575,7 @@ def build_derived_feature_dataset(df: pd.DataFrame) -> pd.DataFrame:
         else:
             derived[f"{column} | diff_1"] = compute_first_difference(df[column])
 
-    # Diffs of spreads can be useful for forecasting and causal-discovery baselines.
+    # First differences of constructed spreads for changes in curve and policy stance.
     for spread_col in [
         "10Y-2Y Treasury Spread | level",
         "10Y-3M Treasury Spread | level",
@@ -625,33 +628,7 @@ def build_derived_feature_report(df: pd.DataFrame) -> pd.DataFrame:
     return report
 
 
-def build_lagged_feature_dataset(derived_df: pd.DataFrame, lags: tuple = PREDICTOR_LAGS) -> pd.DataFrame:
-    """Create a FRED-only lagged feature table from the derived feature panel."""
-    lagged_data = {}
-    for column in derived_df.columns:
-        for lag in lags:
-            lagged_data[f"{column} | lag_{lag}"] = derived_df[column].shift(lag)
-    return pd.DataFrame(lagged_data, index=derived_df.index)
-
-
-def build_lagged_feature_report(derived_df: pd.DataFrame, lags: tuple = PREDICTOR_LAGS) -> pd.DataFrame:
-    rows = {}
-    for column in derived_df.columns:
-        lagged_columns = [f"{column} | lag_{lag}" for lag in lags]
-        rows[column] = {
-            "lagged_columns": "; ".join(lagged_columns),
-            "lagging_reason": (
-                "Create observation-date lags for standalone FRED-only forecasting experiments. "
-                "These are useful for inspection and baseline modeling, while a later merger script can still "
-                "recompute a unified lag policy across the combined Yahoo + FRED panel."
-            ),
-        }
-    report = pd.DataFrame.from_dict(rows, orient="index")
-    report.index.name = "derived_feature"
-    return report
-
-
-def build_feature_dictionary(base_daily_df: pd.DataFrame, derived_df: pd.DataFrame, lagged_df: Optional[pd.DataFrame] = None) -> pd.DataFrame:
+def build_feature_dictionary(base_daily_df: pd.DataFrame, derived_df: pd.DataFrame) -> pd.DataFrame:
     rows = []
     rows.append({
         "output_file": "fred_base_daily.csv",
@@ -715,52 +692,6 @@ def build_feature_dictionary(base_daily_df: pd.DataFrame, derived_df: pd.DataFra
             "feature_role": "derived feature",
         })
 
-    if lagged_df is not None:
-        rows.append({
-            "output_file": "fred_lagged_features.csv",
-            "column_name": "Date",
-            "source_series_id": "",
-            "source_series": "Date",
-            "human_readable_meaning": "Observation date for the lagged daily FRED feature panel.",
-            "transform_used": "None",
-            "units_or_interpretation": "Calendar date in YYYY-MM-DD format.",
-            "feature_role": "date",
-        })
-
-        for column in lagged_df.columns:
-            parts = column.split(" | ")
-            if len(parts) == 3 and parts[2].startswith("lag_"):
-                base_name = parts[0]
-                base_transform = parts[1]
-                lag_name = parts[2]
-                lag_days = int(lag_name.split("_")[1])
-            else:
-                base_name = column
-                base_transform = "derived value"
-                lag_days = None
-
-            source_series_id = NAME_TO_SERIES_ID.get(base_name, "")
-            if base_transform == "level":
-                base_transform_label = "Level"
-            elif base_transform == "diff_1":
-                base_transform_label = "First difference"
-            elif base_transform == "log_return":
-                base_transform_label = "Daily log return"
-            else:
-                base_transform_label = base_transform
-
-            lag_phrase = f"{lag_days}-day lag" if lag_days is not None else "Lagged value"
-            rows.append({
-                "output_file": "fred_lagged_features.csv",
-                "column_name": column,
-                "source_series_id": source_series_id,
-                "source_series": base_name,
-                "human_readable_meaning": f"{lag_phrase} of the {base_transform_label.lower()} for {base_name}.",
-                "transform_used": f"{base_transform_label}; then lagged by {lag_days} trading day(s)" if lag_days is not None else base_transform_label,
-                "units_or_interpretation": "Lagged version of the corresponding derived FRED feature.",
-                "feature_role": "lagged predictor",
-            })
-
     return pd.DataFrame(rows)
 
 
@@ -772,13 +703,11 @@ def build_no_scaling_policy() -> dict:
             "fred_base_daily_dropna.csv",
             "fred_derived_features.csv",
             "fred_derived_features_dropna.csv",
-            "fred_lagged_features.csv",
-            "fred_lagged_features_dropna.csv",
         ],
         "reason": [
             "Scaling must be fit on the training split only after the time-series split is chosen.",
             "Global scaling before splitting would leak future information into earlier periods.",
-            "This script is intended only to download, audit, clean, derive, and optionally lag features from FRED data.",
+            "This script is intended only to download, audit, clean, and derive features from FRED data.",
         ],
     }
 
@@ -788,6 +717,7 @@ def build_no_scaling_policy() -> dict:
 # -----------------------------
 
 def main() -> None:
+    """Run the full FRED pipeline: steps 1–5 in pipeline_steps/, then results/ docs and aliases (6–7)."""
     start_date = "2006-01-01"
     end_date = "2024-12-31"
 
@@ -820,19 +750,12 @@ def main() -> None:
     save_data(derived_df, step_file("step_5_fred_derived_features.csv"))
     save_data(derived_df.dropna(how="any"), step_file("step_5_fred_derived_features_dropna.csv"))
 
-    # Step 6. Optional standalone lagged FRED-only predictor panel.
-    lagged_feature_report = build_lagged_feature_report(derived_df, lags=PREDICTOR_LAGS)
-    save_data(lagged_feature_report, step_file("step_6_fred_lagged_feature_report.csv"))
-    lagged_df = build_lagged_feature_dataset(derived_df, lags=PREDICTOR_LAGS)
-    save_data(lagged_df, step_file("step_6_fred_lagged_features.csv"))
-    save_data(lagged_df.dropna(how="any"), step_file("step_6_fred_lagged_features_dropna.csv"))
-
-    # Step 7. Informational files for downstream use.
-    feature_dictionary = build_feature_dictionary(cleaned_df, derived_df, lagged_df=lagged_df)
+    # Step 6. Informational files (results/ only: feature_dictionary.csv, no_scaling_policy.json).
+    feature_dictionary = build_feature_dictionary(cleaned_df, derived_df)
     feature_dictionary.to_csv(result_file("feature_dictionary.csv"), index=False)
     save_json(build_no_scaling_policy(), result_file("no_scaling_policy.json"))
 
-    # Step 8. Clean alias copies for downstream usage.
+    # Step 7. Copy step_4–5 pipeline CSVs into results/ as fred_base_daily*.csv and fred_derived_features*.csv.
     export_final_handoff_aliases()
 
 
