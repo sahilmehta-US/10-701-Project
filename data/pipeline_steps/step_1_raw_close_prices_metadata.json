@@ -1,0 +1,26 @@
+{
+  "start_date": "2006-01-01",
+  "end_date": "2025-01-01",
+  "interval": "1d",
+  "tickers": [
+    "GC=F",
+    "DX-Y.NYB",
+    "EURUSD=X",
+    "JPY=X",
+    "^GSPC",
+    "^IXIC",
+    "^VIX",
+    "^MOVE",
+    "CL=F",
+    "BZ=F",
+    "SI=F",
+    "HG=F",
+    "GLD",
+    "^TNX",
+    "^IRX",
+    "^TYX"
+  ],
+  "auto_adjust": true,
+  "end_is_exclusive": true,
+  "notes": "Raw close-only file is saved exactly as downloaded before cleaning, stationary transforms, or any later handoff steps in this script."
+}

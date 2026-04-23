@@ -9,7 +9,7 @@ from dataclasses import dataclass
 # Configuration
 DATA_ROOT = "../data/results"
 DATASET_NAME = "gold_base_stationary_dropna.csv"
-SPLIT_FILE = "../results/split_definition.json"
+SPLIT_FILE = "split_definition.json"
 TARGET_COL = "Gold Futures (COMEX) | log_return"
 MAXLAGS = None
 IC = "aic"

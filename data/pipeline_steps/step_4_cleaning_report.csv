@@ -1,0 +1,12 @@
+series,fill_method,short_gaps_filled,remaining_unfilled_gaps,cleaning_reason
+Gold Futures (COMEX),forward_fill_only_up_to_2_rows,176,1,Apply only short forward fill for 1-2 day holiday-like gaps. Leave leading or longer gaps missing to avoid leaking future information into the past.
+U.S. Dollar Index,forward_fill_only_up_to_2_rows,173,1,Apply only short forward fill for 1-2 day holiday-like gaps. Leave leading or longer gaps missing to avoid leaking future information into the past.
+USD / JPY Exchange Rate,forward_fill_only_up_to_2_rows,11,2,Apply only short forward fill for 1-2 day holiday-like gaps. Leave leading or longer gaps missing to avoid leaking future information into the past.
+S&P 500,forward_fill_only_up_to_2_rows,173,1,Apply only short forward fill for 1-2 day holiday-like gaps. Leave leading or longer gaps missing to avoid leaking future information into the past.
+CBOE Volatility Index,forward_fill_only_up_to_2_rows,173,1,Apply only short forward fill for 1-2 day holiday-like gaps. Leave leading or longer gaps missing to avoid leaking future information into the past.
+ICE BofA MOVE Index,forward_fill_only_up_to_2_rows,245,3,"Allow only short forward fill for 1-2 day gaps. Longer MOVE gaps require manual review because they may not be simple calendar closures, so they are left missing."
+WTI Crude Oil Futures,forward_fill_only_up_to_2_rows,174,1,Apply only short forward fill for 1-2 day holiday-like gaps. Leave leading or longer gaps missing to avoid leaking future information into the past.
+Silver Futures,forward_fill_only_up_to_2_rows,175,1,Apply only short forward fill for 1-2 day holiday-like gaps. Leave leading or longer gaps missing to avoid leaking future information into the past.
+Copper Futures,forward_fill_only_up_to_2_rows,172,1,Apply only short forward fill for 1-2 day holiday-like gaps. Leave leading or longer gaps missing to avoid leaking future information into the past.
+US 10Y Treasury Yield,forward_fill_only_up_to_2_rows,176,1,Apply only short forward fill for 1-2 day holiday-like gaps. Leave leading or longer gaps missing to avoid leaking future information into the past.
+US 3M Treasury Yield,forward_fill_only_up_to_2_rows,176,1,Apply only short forward fill for 1-2 day holiday-like gaps. Leave leading or longer gaps missing to avoid leaking future information into the past.

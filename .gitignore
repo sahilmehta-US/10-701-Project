@@ -39,7 +39,7 @@ wandb/
 mlruns/
 
 # Generated data under data/ (* matches fred_, yfinance_, or empty prefix)
-data/*pipeline_steps/
+# data/*pipeline_steps/
 # data/*results/
 
 # PCMCI/results: ignore all

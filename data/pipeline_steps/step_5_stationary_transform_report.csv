@@ -1,0 +1,12 @@
+series,stationary_columns,transform_reason
+Gold Futures (COMEX),Gold Futures (COMEX) | log_return,Treat as a price-like series and use log returns to create a more stationary base feature.
+U.S. Dollar Index,U.S. Dollar Index | log_return,Treat as a price-like series and use log returns to create a more stationary base feature.
+USD / JPY Exchange Rate,USD / JPY Exchange Rate | log_return,Treat as a price-like series and use log returns to create a more stationary base feature.
+S&P 500,S&P 500 | log_return,Treat as a price-like series and use log returns to create a more stationary base feature.
+CBOE Volatility Index,CBOE Volatility Index | diff_1; CBOE Volatility Index | log_return,Emit both first difference and log return for this volatility or yield-like series; use whichever column you need for modeling or merge downstream.
+ICE BofA MOVE Index,ICE BofA MOVE Index | diff_1; ICE BofA MOVE Index | log_return,Emit both first difference and log return for this volatility or yield-like series; use whichever column you need for modeling or merge downstream.
+WTI Crude Oil Futures,WTI Crude Oil Futures | log_return,Treat as a price-like series and use log returns to create a more stationary base feature.
+Silver Futures,Silver Futures | log_return,Treat as a price-like series and use log returns to create a more stationary base feature.
+Copper Futures,Copper Futures | log_return,Treat as a price-like series and use log returns to create a more stationary base feature.
+US 10Y Treasury Yield,US 10Y Treasury Yield | diff_1; US 10Y Treasury Yield | log_return,Emit both first difference and log return for this volatility or yield-like series; use whichever column you need for modeling or merge downstream.
+US 3M Treasury Yield,US 3M Treasury Yield | diff_1; US 3M Treasury Yield | log_return,Emit both first difference and log return for this volatility or yield-like series; use whichever column you need for modeling or merge downstream.

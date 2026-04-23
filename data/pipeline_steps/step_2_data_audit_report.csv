@@ -1,0 +1,17 @@
+series,first_valid_date,last_valid_date,missing_values,max_consecutive_missing_gap,missing_gap_assessment,audit_note
+Brent Crude Oil Futures,2007-07-30,2024-12-31,624,410,Something more serious,Long leading gap before the series begins (410 rows). Also has an internal gap of 12 rows (2009-04-15 to 2009-04-30).
+WTI Crude Oil Futures,2006-01-03,2024-12-31,178,2,Holiday-like only,Missing values are limited to short 1-2 day market-calendar gaps.
+U.S. Dollar Index,2006-01-03,2024-12-31,175,2,Holiday-like only,Missing values are limited to short 1-2 day market-calendar gaps.
+Euro / USD Exchange Rate,2006-01-02,2024-12-31,27,11,Something more serious,"Contains multi-day historical gaps beyond holiday-like closures: 5 rows (2008-08-01 to 2008-08-07), 11 rows (2008-08-11 to 2008-08-25)."
+Gold Futures (COMEX),2006-01-03,2024-12-31,179,2,Holiday-like only,Missing values are limited to short 1-2 day market-calendar gaps.
+SPDR Gold Shares ETF,2006-01-03,2024-12-31,176,2,Holiday-like only,Missing values are limited to short 1-2 day market-calendar gaps.
+Copper Futures,2006-01-03,2024-12-31,176,2,Holiday-like only,Missing values are limited to short 1-2 day market-calendar gaps.
+USD / JPY Exchange Rate,2006-01-02,2024-12-31,27,11,Something more serious,"Contains multi-day historical gaps beyond holiday-like closures: 5 rows (2008-08-01 to 2008-08-07), 11 rows (2008-08-11 to 2008-08-25)."
+Silver Futures,2006-01-03,2024-12-31,178,2,Holiday-like only,Missing values are limited to short 1-2 day market-calendar gaps.
+S&P 500,2006-01-03,2024-12-31,176,2,Holiday-like only,Missing values are limited to short 1-2 day market-calendar gaps.
+US 3M Treasury Yield,2006-01-03,2024-12-31,179,2,Holiday-like only,Missing values are limited to short 1-2 day market-calendar gaps.
+NASDAQ Composite,2006-01-03,2024-12-31,176,2,Holiday-like only,Missing values are limited to short 1-2 day market-calendar gaps.
+ICE BofA MOVE Index,2006-01-03,2024-12-31,263,5,Something more serious,More missing values than the typical series (263 vs median 177) and a longest gap of 5 rows (2013-03-18 to 2013-03-22).
+US 10Y Treasury Yield,2006-01-03,2024-12-31,179,2,Holiday-like only,Missing values are limited to short 1-2 day market-calendar gaps.
+US 30Y Treasury Yield,2006-01-03,2024-12-31,179,2,Holiday-like only,Missing values are limited to short 1-2 day market-calendar gaps.
+CBOE Volatility Index,2006-01-03,2024-12-31,176,2,Holiday-like only,Missing values are limited to short 1-2 day market-calendar gaps.
